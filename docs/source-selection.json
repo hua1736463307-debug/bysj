@@ -1,0 +1,1249 @@
+{
+  "source_repo": "https://github.com/hua1736463307-debug/-xtythpt",
+  "source_branch": "main",
+  "source_commit": "aa331df0657ad4ffcf3c105f9ba52b7e159deb2a",
+  "selection": "Dataset import, annotation, split/export, YOLO/YOLOE training, model management, inference and auth. Backend transitive legacy dependencies retained until modular refactor.",
+  "included": {
+    "LICENSE": {
+      "reason": "license_or_frontend_build",
+      "source_sha256": "6f1e622c82a380075843bb084a7ec3b1f1d12a4a02526d75e78b0924a860aa75",
+      "selected_sha256": "6f1e622c82a380075843bb084a7ec3b1f1d12a4a02526d75e78b0924a860aa75"
+    },
+    "backend/admin_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "0de4032f06cde8b5e984a018a6650bb5448220339bfa194026dbe52ea3e41def",
+      "selected_sha256": "0de4032f06cde8b5e984a018a6650bb5448220339bfa194026dbe52ea3e41def"
+    },
+    "backend/alarm_flow.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d66571387e8ec7af79d18b5339d7043855b0fdba1eda5b2d7d4e2507b7abf5bf",
+      "selected_sha256": "3996b15cffec39785d53a8c8eb92b63701bfc690bc3fdac0e96670efbd9f0b2e"
+    },
+    "backend/alarm_push.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "4f1c2d38c4c9566d14eaa1b3a35ad7c934cbdac6c674d43a88998559e05c3bd9",
+      "selected_sha256": "2fd54568276768c37ff98e3d088d7e473c7160bd63e72b02a44be9647165bafb"
+    },
+    "backend/algorithm_catalog.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8792981e89a104ef9303760db12656f9ac5059912367125253bb5d9c071cc3ae",
+      "selected_sha256": "8792981e89a104ef9303760db12656f9ac5059912367125253bb5d9c071cc3ae"
+    },
+    "backend/annotation_class_aliases.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "88f0d045ffa160e46ad24f6ae9fcdfc7dda885556ec94f63e530c0169540c1c8",
+      "selected_sha256": "88f0d045ffa160e46ad24f6ae9fcdfc7dda885556ec94f63e530c0169540c1c8"
+    },
+    "backend/annotation_draft_batches.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "fb084a7500ea3236fda7ee1730b8d7e6177097e336e2d8c8fdf99e68fe0ded34",
+      "selected_sha256": "4a48851f37f92e9a714efe3afb0df7ee19788139db9c5e0a5432b82db1405f69"
+    },
+    "backend/annotation_drafts.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "18226b499728832c2a4da7b7009968f3f7768ad4901ca257c3a45aebc17333e4",
+      "selected_sha256": "18226b499728832c2a4da7b7009968f3f7768ad4901ca257c3a45aebc17333e4"
+    },
+    "backend/annotation_export.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "379b2d4c4f2b1a14e9fd3ef0ab08150ee766c6ccc53c38fa5078ac350bc98488",
+      "selected_sha256": "379b2d4c4f2b1a14e9fd3ef0ab08150ee766c6ccc53c38fa5078ac350bc98488"
+    },
+    "backend/annotation_session_classes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "4bacb1b3e1826d8d1811e9dcbc1549fe420bd2004c51428457921535b2496219",
+      "selected_sha256": "4bacb1b3e1826d8d1811e9dcbc1549fe420bd2004c51428457921535b2496219"
+    },
+    "backend/auth_audit.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "faece21923de8e88bbf0809b916263e80f8411132179876a689799a31a995c7d",
+      "selected_sha256": "faece21923de8e88bbf0809b916263e80f8411132179876a689799a31a995c7d"
+    },
+    "backend/auth_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "37d546ec48b06ffddc365300a33beb90320f4362a1aacfc2374d6b80628725d6",
+      "selected_sha256": "37d546ec48b06ffddc365300a33beb90320f4362a1aacfc2374d6b80628725d6"
+    },
+    "backend/auth_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c896630a37ab3ab16fabca3bf9db835cc1d137683c885a16c1c3900425621c5f",
+      "selected_sha256": "c896630a37ab3ab16fabca3bf9db835cc1d137683c885a16c1c3900425621c5f"
+    },
+    "backend/behavior/__init__.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "69c73970552ad3353ab868f9274c82a2b2e0973fe6d20278bbd600fff96cdece",
+      "selected_sha256": "69c73970552ad3353ab868f9274c82a2b2e0973fe6d20278bbd600fff96cdece"
+    },
+    "backend/behavior/action_classifier.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "2deaaf94e9e7aea998d8c94d4b2facdc1fe9b52d4835d0ca69c0020255f126ce",
+      "selected_sha256": "2deaaf94e9e7aea998d8c94d4b2facdc1fe9b52d4835d0ca69c0020255f126ce"
+    },
+    "backend/behavior/analyzer.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d18580b7dcf2f18b138f75e15a22e29bf84cf7ed1c6e74bad22dd95c381edb56",
+      "selected_sha256": "d18580b7dcf2f18b138f75e15a22e29bf84cf7ed1c6e74bad22dd95c381edb56"
+    },
+    "backend/behavior/batch_jobs.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "9af37ae9e4380da242b796864211338f243604f2f29ab90bdd11292c9cd3dcee",
+      "selected_sha256": "9af37ae9e4380da242b796864211338f243604f2f29ab90bdd11292c9cd3dcee"
+    },
+    "backend/behavior/clip_extractor.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d05939acd3c55b87817a1d709f43687319af7785d7b1af951e8afeb460aaa0b1",
+      "selected_sha256": "d05939acd3c55b87817a1d709f43687319af7785d7b1af951e8afeb460aaa0b1"
+    },
+    "backend/behavior/event_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "0b91a5058ab75a4540692e6762dc4937c57772bc0a422299eb3f11076aebc19d",
+      "selected_sha256": "0b91a5058ab75a4540692e6762dc4937c57772bc0a422299eb3f11076aebc19d"
+    },
+    "backend/behavior/event_store.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "5d4a167b69e3e7bed098d35916be9045c677cf1b04b504de7e2ef1b67803ee17",
+      "selected_sha256": "5d4a167b69e3e7bed098d35916be9045c677cf1b04b504de7e2ef1b67803ee17"
+    },
+    "backend/behavior/evidence.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b2e04b71b07b2991b912417c86a06f30a925ec8085f3b03575049b336aa59486",
+      "selected_sha256": "b2e04b71b07b2991b912417c86a06f30a925ec8085f3b03575049b336aa59486"
+    },
+    "backend/behavior/fall_posture.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "314d028877a718eb03b9d05d19d23286f8a53f25c73dfa86bfd231f24e7eaacf",
+      "selected_sha256": "314d028877a718eb03b9d05d19d23286f8a53f25c73dfa86bfd231f24e7eaacf"
+    },
+    "backend/behavior/feedback_mapping.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "72abe307305c059e56e5b586661899047981f847b4b1e010f844d812e5d0ceac",
+      "selected_sha256": "72abe307305c059e56e5b586661899047981f847b4b1e010f844d812e5d0ceac"
+    },
+    "backend/behavior/object_tracker.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "13debd2d9cf6f651ead43243579af4a1a7786dd988c4a64be98891b3d88a8f7b",
+      "selected_sha256": "13debd2d9cf6f651ead43243579af4a1a7786dd988c4a64be98891b3d88a8f7b"
+    },
+    "backend/behavior/pose_clip_extractor.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "dc2d0bddbdd39d27776c7104f6239d0c61c899f63057f398b8fccc2cef104669",
+      "selected_sha256": "dc2d0bddbdd39d27776c7104f6239d0c61c899f63057f398b8fccc2cef104669"
+    },
+    "backend/behavior/pose_feature_encoder.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "6d79b3edaad907b6f417d20559749d7ce45e623a8f2c4aafd136b12dae4981a8",
+      "selected_sha256": "6d79b3edaad907b6f417d20559749d7ce45e623a8f2c4aafd136b12dae4981a8"
+    },
+    "backend/behavior/pose_image_extractor.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "3d2b341c671b829de23f8e983c50d3ac755de4d502fa3b04bcfc1067bfe6f1e8",
+      "selected_sha256": "3d2b341c671b829de23f8e983c50d3ac755de4d502fa3b04bcfc1067bfe6f1e8"
+    },
+    "backend/behavior/realtime_engine.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "7d2f6c3b2c80d86c4f8755f1ba0ce5808faf9668c04d30ea7100b06106f13ccb",
+      "selected_sha256": "7d2f6c3b2c80d86c4f8755f1ba0ce5808faf9668c04d30ea7100b06106f13ccb"
+    },
+    "backend/behavior/realtime_queue.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "70b867d54f574452ff2841387d4d3058e29e99045be6bd3ec5c8ccde700e7ecd",
+      "selected_sha256": "70b867d54f574452ff2841387d4d3058e29e99045be6bd3ec5c8ccde700e7ecd"
+    },
+    "backend/behavior/rules.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "f9c5e2d42aa03eb56027f47dbbc8263bcf8f5a16263e1c581d648917755cdfe3",
+      "selected_sha256": "f9c5e2d42aa03eb56027f47dbbc8263bcf8f5a16263e1c581d648917755cdfe3"
+    },
+    "backend/behavior/runtime.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "20015ae0bb5e49caac1c2ae45937cc5ca77525a6128f3005f7cae7c0d38ce952",
+      "selected_sha256": "20015ae0bb5e49caac1c2ae45937cc5ca77525a6128f3005f7cae7c0d38ce952"
+    },
+    "backend/behavior/sample_manager.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8b87a01319e0294ce945160efe5bc0b4a3ef847d17dee51b1f51e633269daf2e",
+      "selected_sha256": "8b87a01319e0294ce945160efe5bc0b4a3ef847d17dee51b1f51e633269daf2e"
+    },
+    "backend/behavior/temporal_fusion.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "1683db804febd0cde58dbbc61453c58f31dc4a6b44a9f8e518ff7cd626a28274",
+      "selected_sha256": "1683db804febd0cde58dbbc61453c58f31dc4a6b44a9f8e518ff7cd626a28274"
+    },
+    "backend/behavior/temporal_runtime.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "03e749f329ac28e48e2ad55737e3ab9013f6a1c60551f66ab27119c1238ed344",
+      "selected_sha256": "03e749f329ac28e48e2ad55737e3ab9013f6a1c60551f66ab27119c1238ed344"
+    },
+    "backend/behavior/verifier_runtime.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "7e754109a93e76a1be6125ba1e0de3e1de32037e8556b461fb9c6f12a409cef1",
+      "selected_sha256": "7e754109a93e76a1be6125ba1e0de3e1de32037e8556b461fb9c6f12a409cef1"
+    },
+    "backend/behavior/video_output.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "2cb00f02ed2bfd4acdcc4120c78f618ccb77156a3de7d18bde9a7b70b0d896e7",
+      "selected_sha256": "2cb00f02ed2bfd4acdcc4120c78f618ccb77156a3de7d18bde9a7b70b0d896e7"
+    },
+    "backend/behavior_worker_health.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "2da222441b810471229c62048e7761392050867d892f2fe5b39afdddca9bb499",
+      "selected_sha256": "2da222441b810471229c62048e7761392050867d892f2fe5b39afdddca9bb499"
+    },
+    "backend/continuous_monitoring.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "552e7ed0cde1ea863a2941a5ed6425252ea95de3817bb8ab3a4e4140179e2fe4",
+      "selected_sha256": "552e7ed0cde1ea863a2941a5ed6425252ea95de3817bb8ab3a4e4140179e2fe4"
+    },
+    "backend/continuous_monitoring_grid.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "68c34ce6afe27bdd41d2cddd7c7f014b47b22a3eea361d5f7ef947288210668c",
+      "selected_sha256": "68c34ce6afe27bdd41d2cddd7c7f014b47b22a3eea361d5f7ef947288210668c"
+    },
+    "backend/credential_crypto.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "382108720333bd4b34bf548206c5445cacd762751af6fbef410a957bc7b07ec8",
+      "selected_sha256": "382108720333bd4b34bf548206c5445cacd762751af6fbef410a957bc7b07ec8"
+    },
+    "backend/database.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b3d525af8cf31e0bc5de3be5492eb01e1028fc0fcbe4494e2cb4a79e98483435",
+      "selected_sha256": "9b48163ab5047f48ea1534fa656e31a46e3946309435c8c956edb55392851720"
+    },
+    "backend/dataset_access.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d5b20a9fb4103996c331836830f594a67a0722db982368b6c769789b9271dbfa",
+      "selected_sha256": "d5b20a9fb4103996c331836830f594a67a0722db982368b6c769789b9271dbfa"
+    },
+    "backend/dataset_config_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "a1bd54761bdd3d73722d206a2b4cda14e85546d7e95ba04ec5137fc57c8f5bbf",
+      "selected_sha256": "a1bd54761bdd3d73722d206a2b4cda14e85546d7e95ba04ec5137fc57c8f5bbf"
+    },
+    "backend/dataset_deletion.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "11b2ccc22c30367460c6ca7a1ccb5c289b505a6dda7c9c031066d423885af37a",
+      "selected_sha256": "11b2ccc22c30367460c6ca7a1ccb5c289b505a6dda7c9c031066d423885af37a"
+    },
+    "backend/dataset_merge.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b0e56553917ab75163bc1e325bad720ad7f4a9a8656d295bea808c18560a481e",
+      "selected_sha256": "b0e56553917ab75163bc1e325bad720ad7f4a9a8656d295bea808c18560a481e"
+    },
+    "backend/dataset_versioning.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "3551fbe8579180cd2c723379d6eb52ee809ac4bab93e449e6cec917c692c8f4d",
+      "selected_sha256": "3551fbe8579180cd2c723379d6eb52ee809ac4bab93e449e6cec917c692c8f4d"
+    },
+    "backend/face_capture/__init__.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "53881de5394ace82cfe08f44695ffd28500401ca6c5f547bdd28fac9ef77bfa0",
+      "selected_sha256": "53881de5394ace82cfe08f44695ffd28500401ca6c5f547bdd28fac9ef77bfa0"
+    },
+    "backend/face_capture/alarm_gate.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b138c067d019aa0c9829027de1c1fa72e91dfd2ff34cc0233d629b451fbb5e6f",
+      "selected_sha256": "b138c067d019aa0c9829027de1c1fa72e91dfd2ff34cc0233d629b451fbb5e6f"
+    },
+    "backend/face_capture/assets/LICENSE": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "c83b8120c50ccbd4c4f96edf53141bdd566ebb8f8e9227e415326aa1b1aba958",
+      "selected_sha256": "c83b8120c50ccbd4c4f96edf53141bdd566ebb8f8e9227e415326aa1b1aba958"
+    },
+    "backend/face_capture/assets/head_pose_6drepnet360.json": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "c34833a1875228191ac732342a8e0af8cf1d3075a2e1ddf4b70fa4619903a9f6",
+      "selected_sha256": "3b263a8242426135e70e2d55c6e5a08ab9d695cd350a72e47684eed6c7eca7cc"
+    },
+    "backend/face_capture/camera.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "958ab336d3eb4bb52c570793209582a39a397813bf0a8b8abc4b1c0fed89e8bc",
+      "selected_sha256": "52a3156cac52bdc2829a5d49c4e821826b3bc0f7a796d60e36f3c24255bc4455"
+    },
+    "backend/face_capture/detector.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "064374ad72a86d73a8dc1260568d1fc6d089bafdef502c2116df0a3a9c1ce328",
+      "selected_sha256": "064374ad72a86d73a8dc1260568d1fc6d089bafdef502c2116df0a3a9c1ce328"
+    },
+    "backend/face_capture/manual_test.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b5bebfa30e6a0a4ce68b60870463913f3079bb463b3c6da39ba0f40ada263d15",
+      "selected_sha256": "b5bebfa30e6a0a4ce68b60870463913f3079bb463b3c6da39ba0f40ada263d15"
+    },
+    "backend/face_capture/models.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "e0962c32f6f379875698bf339121d84338f4ed413e6710c8a4e92a1acc32469c",
+      "selected_sha256": "e0962c32f6f379875698bf339121d84338f4ed413e6710c8a4e92a1acc32469c"
+    },
+    "backend/face_capture/pose.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8a4bf51562b73da1c61c50a20db18346705eb76704ca8ef759412be7b344e774",
+      "selected_sha256": "8a4bf51562b73da1c61c50a20db18346705eb76704ca8ef759412be7b344e774"
+    },
+    "backend/face_capture/push.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "0c78fedb9371b73a09b88aa2d5cb8038904ce3765d21a1789fc963610bc0bef6",
+      "selected_sha256": "0c78fedb9371b73a09b88aa2d5cb8038904ce3765d21a1789fc963610bc0bef6"
+    },
+    "backend/face_capture/receiver.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "794bd9a6bf2778c87a823c71b9e0834e2f167fdc2c8f5a3aa7bd1452a6575b91",
+      "selected_sha256": "794bd9a6bf2778c87a823c71b9e0834e2f167fdc2c8f5a3aa7bd1452a6575b91"
+    },
+    "backend/face_capture/routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "9515675998c24b26042a3ba03257ceffbcf26bb504ab76d9788b8a05620c14a4",
+      "selected_sha256": "9515675998c24b26042a3ba03257ceffbcf26bb504ab76d9788b8a05620c14a4"
+    },
+    "backend/face_capture/sampling.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "578134f92312b2212e584bcddc4175e084c7f608e67218c94897aaa1c17ff5b0",
+      "selected_sha256": "578134f92312b2212e584bcddc4175e084c7f608e67218c94897aaa1c17ff5b0"
+    },
+    "backend/face_capture/service.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "6fadbca338c048b56c9d5a30b97fe120929500eb78094068d6cd1e895df8d8bb",
+      "selected_sha256": "6fadbca338c048b56c9d5a30b97fe120929500eb78094068d6cd1e895df8d8bb"
+    },
+    "backend/face_capture/signals.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d257c79d3adc462b9110bf7dc17b74905b28564af4e50b7a1fafccabc1ca260f",
+      "selected_sha256": "d257c79d3adc462b9110bf7dc17b74905b28564af4e50b7a1fafccabc1ca260f"
+    },
+    "backend/face_capture/streams.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8b6405427bd9eb1a60972609c47a61723c07ab61b3de47647f2971e71aaf3eab",
+      "selected_sha256": "33cd556e66696935864404ce08414b1e81b952444f99536fc27946bca64e3775"
+    },
+    "backend/face_capture/structure.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "fe480867623aa88bf8e2bfe7e22a5a006c10b24c8f469d13a61c6afa3f4a9370",
+      "selected_sha256": "fe480867623aa88bf8e2bfe7e22a5a006c10b24c8f469d13a61c6afa3f4a9370"
+    },
+    "backend/face_capture/worker.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c24e4bfff6722e5dc3fa91989c489d22ea33669714ee240f4cf2970341aac1c0",
+      "selected_sha256": "c24e4bfff6722e5dc3fa91989c489d22ea33669714ee240f4cf2970341aac1c0"
+    },
+    "backend/gpu_probe_service.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c8b9f74756a6aa525d3b69e441832ec911bcbfd7ee7984b6d6a7dd582eba01b5",
+      "selected_sha256": "c8b9f74756a6aa525d3b69e441832ec911bcbfd7ee7984b6d6a7dd582eba01b5"
+    },
+    "backend/gpu_runtime.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "50371e360eb3ae026852fc79f5f50d46aef9ac4d567de42db9f3085ab6aefb9b",
+      "selected_sha256": "50371e360eb3ae026852fc79f5f50d46aef9ac4d567de42db9f3085ab6aefb9b"
+    },
+    "backend/grid_batch_inference.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "dba723dc2e5b7a3331718efeeae5eaf0c6c41205fbbb1468734e919a68200a22",
+      "selected_sha256": "dba723dc2e5b7a3331718efeeae5eaf0c6c41205fbbb1468734e919a68200a22"
+    },
+    "backend/http_access.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "799d9afd9832885a8cf5370645827a3f9522e272d1c6d6ac258a4b6b08152248",
+      "selected_sha256": "799d9afd9832885a8cf5370645827a3f9522e272d1c6d6ac258a4b6b08152248"
+    },
+    "backend/image_augmentation.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "a73979259446a3587e5654779565f81862fb6ca27606bfe7f46dc15767e9b985",
+      "selected_sha256": "a73979259446a3587e5654779565f81862fb6ca27606bfe7f46dc15767e9b985"
+    },
+    "backend/image_size_processing.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "235b35550c644a3784425376126e8e4ac783ff3ca44477b50cb579dd76a495b0",
+      "selected_sha256": "0463c4613f20e1df54f648d1a831d13017b7ba9583487ff6ac95186fb942091e"
+    },
+    "backend/inference_service/__init__.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "5ef4ca8938e91fd658ec834e01aa90afa275d9a69f1333e1605edc16b2cd0e84",
+      "selected_sha256": "5ef4ca8938e91fd658ec834e01aa90afa275d9a69f1333e1605edc16b2cd0e84"
+    },
+    "backend/inference_service/catalog.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "aaff2d01d4acde261cba4631f1ef0e2c27703aecf21a99472ea104bacba74e36",
+      "selected_sha256": "aaff2d01d4acde261cba4631f1ef0e2c27703aecf21a99472ea104bacba74e36"
+    },
+    "backend/inference_service/client.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "9f7cbe27d4a84a05549a79a2a4657bb8c36bf83871b9cf1ab58e6bf58186c83e",
+      "selected_sha256": "9f7cbe27d4a84a05549a79a2a4657bb8c36bf83871b9cf1ab58e6bf58186c83e"
+    },
+    "backend/inference_service/router.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "74a5b91103b4859946b3eda7ae7ae39e9b4b59445f1aeb003129fc6e8cb17cad",
+      "selected_sha256": "74a5b91103b4859946b3eda7ae7ae39e9b4b59445f1aeb003129fc6e8cb17cad"
+    },
+    "backend/job_store.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c4973209c3cbd99d64638d70904dc1e66f0d1d9e80c125b3d7c4c343097504cf",
+      "selected_sha256": "c4973209c3cbd99d64638d70904dc1e66f0d1d9e80c125b3d7c4c343097504cf"
+    },
+    "backend/log_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "26a9392dbfe327411227db7d21eaedec1ce0888817d78f0fff5aa2335fcca8bf",
+      "selected_sha256": "26a9392dbfe327411227db7d21eaedec1ce0888817d78f0fff5aa2335fcca8bf"
+    },
+    "backend/menu_structure_migration.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d4279eb3df7d112d421a4b9f137c8ddf6460ecc0b834d3867fd68f2c78df9a7a",
+      "selected_sha256": "d4279eb3df7d112d421a4b9f137c8ddf6460ecc0b834d3867fd68f2c78df9a7a"
+    },
+    "backend/model_capabilities.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d623a69836e794fa9bbdf28f5aa9efcc0bfefca443dda6b6a37663b737cd4c9e",
+      "selected_sha256": "d623a69836e794fa9bbdf28f5aa9efcc0bfefca443dda6b6a37663b737cd4c9e"
+    },
+    "backend/model_export.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "45f05d3f1f2da417a65bc73fa2f6b45b237028e851687f9d08422b578389ef64",
+      "selected_sha256": "45f05d3f1f2da417a65bc73fa2f6b45b237028e851687f9d08422b578389ef64"
+    },
+    "backend/model_lifecycle.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "200f41354b3f33b42e3bd7a75758fd517bcf7be0949e03ceb28de9ed39f88fc4",
+      "selected_sha256": "200f41354b3f33b42e3bd7a75758fd517bcf7be0949e03ceb28de9ed39f88fc4"
+    },
+    "backend/model_registry.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "aedf08438e2dddb8a2eca4bf0f8f19f1dc8408911f2e5fe1fbac26a9996f57bd",
+      "selected_sha256": "aedf08438e2dddb8a2eca4bf0f8f19f1dc8408911f2e5fe1fbac26a9996f57bd"
+    },
+    "backend/model_tasks.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "147144c24765693fb6eeecef3d1f994a1f51dd90ec8857529b50c3fcc3730f78",
+      "selected_sha256": "147144c24765693fb6eeecef3d1f994a1f51dd90ec8857529b50c3fcc3730f78"
+    },
+    "backend/model_usage.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "4be0c8ad47f21068907151ae88daef3ba3e5abe8618080276e95168dae7aff52",
+      "selected_sha256": "4be0c8ad47f21068907151ae88daef3ba3e5abe8618080276e95168dae7aff52"
+    },
+    "backend/monitoring_gpu_admission.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "36952c6d7f6d028c2e30a53e4e0e7f8bbe5696e826290c194ef335786fbbe00c",
+      "selected_sha256": "36952c6d7f6d028c2e30a53e4e0e7f8bbe5696e826290c194ef335786fbbe00c"
+    },
+    "backend/monitoring_inference.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "922663a108f004f66cd56fc7b5b0e956b87e76b0fdd1209f3ee94cbff97d3319",
+      "selected_sha256": "922663a108f004f66cd56fc7b5b0e956b87e76b0fdd1209f3ee94cbff97d3319"
+    },
+    "backend/monitoring_live_frames.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "3c04fd26eb6dbff22ca6d9267618acc9507bf5e76d5836bc1e3560151683d715",
+      "selected_sha256": "3c04fd26eb6dbff22ca6d9267618acc9507bf5e76d5836bc1e3560151683d715"
+    },
+    "backend/monitoring_menu_migration.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "bc12f68fbc221cd1041ce78d891f9bfdc366a1a9a250d60ef2d2f5c0738280dd",
+      "selected_sha256": "bc12f68fbc221cd1041ce78d891f9bfdc366a1a9a250d60ef2d2f5c0738280dd"
+    },
+    "backend/monitoring_policy.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "f38196de2102710a8c3ca60437ff92f2b95749d0761be3419edb9845c0c695a9",
+      "selected_sha256": "f38196de2102710a8c3ca60437ff92f2b95749d0761be3419edb9845c0c695a9"
+    },
+    "backend/monitoring_webrtc.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b80e01666a3d03cb05bcf3af37095694894f4b6c0182775a798fe8b39433c5d8",
+      "selected_sha256": "b80e01666a3d03cb05bcf3af37095694894f4b6c0182775a798fe8b39433c5d8"
+    },
+    "backend/monitoring_workspace.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "43795ebd07cfcdecfce33246e234d40097b954ea3d0393e7d2705eb960ee1330",
+      "selected_sha256": "43795ebd07cfcdecfce33246e234d40097b954ea3d0393e7d2705eb960ee1330"
+    },
+    "backend/password_crypto.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "86d8705bf0dfe15ec3eee7df1e72b537e16611aa934fd9cf3d11ca80576e8d77",
+      "selected_sha256": "86d8705bf0dfe15ec3eee7df1e72b537e16611aa934fd9cf3d11ca80576e8d77"
+    },
+    "backend/phone_badge_geometry.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "2fa4e1bdd4b7208e190fceaae38fb026a339f79af75ddee259ccf9a587f63aca",
+      "selected_sha256": "2fa4e1bdd4b7208e190fceaae38fb026a339f79af75ddee259ccf9a587f63aca"
+    },
+    "backend/phone_badge_slicing.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "303cad2767ad6862054e0d5b80b6d077ccde14d7779d8f548ab5fabbe436dbc3",
+      "selected_sha256": "303cad2767ad6862054e0d5b80b6d077ccde14d7779d8f548ab5fabbe436dbc3"
+    },
+    "backend/pose_training/__init__.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "cff788ea3cb25188853cf09fb7bf72efeb9a1551361b35d7d1b7ca7035ece4f9",
+      "selected_sha256": "cff788ea3cb25188853cf09fb7bf72efeb9a1551361b35d7d1b7ca7035ece4f9"
+    },
+    "backend/pose_training/data.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "058ce30d3c0b306a91b3db90febca1b609cf70ecffcd5d99d6b246b9fe4a2e34",
+      "selected_sha256": "058ce30d3c0b306a91b3db90febca1b609cf70ecffcd5d99d6b246b9fe4a2e34"
+    },
+    "backend/pose_training/features.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8b41560237b52bb198f8ed710b039519a3143fc3f79914457956f3d0996a144e",
+      "selected_sha256": "8b41560237b52bb198f8ed710b039519a3143fc3f79914457956f3d0996a144e"
+    },
+    "backend/pose_training/gpu.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "772ac6ee6dc25b2d017fa738025f916d12892c1cd356fb3761096d66b483d0ff",
+      "selected_sha256": "772ac6ee6dc25b2d017fa738025f916d12892c1cd356fb3761096d66b483d0ff"
+    },
+    "backend/pose_training/image_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "ebf5450eb56386ce1862cf293df89dec1e645b8339866b1806f2e80bf5a32b39",
+      "selected_sha256": "ebf5450eb56386ce1862cf293df89dec1e645b8339866b1806f2e80bf5a32b39"
+    },
+    "backend/pose_training/inference.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "53d7204076110ae9745286400708bd9f59200c04797830a843a3bfe63e4fb959",
+      "selected_sha256": "53d7204076110ae9745286400708bd9f59200c04797830a843a3bfe63e4fb959"
+    },
+    "backend/pose_training/jobs.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d8640d66a0290aa7b7c7c9c8fa09514c6126db213c81af25fe7aea66faf8ed82",
+      "selected_sha256": "d8640d66a0290aa7b7c7c9c8fa09514c6126db213c81af25fe7aea66faf8ed82"
+    },
+    "backend/pose_training/network.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b827445a488527d4768b4d3819170d27a04b81492d7dc0d20a5245f1d99f9488",
+      "selected_sha256": "b827445a488527d4768b4d3819170d27a04b81492d7dc0d20a5245f1d99f9488"
+    },
+    "backend/pose_training/routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d7f3733bedd293fcaae381c685680d3ba1d40ba2003e30b0f45b013250bc18fc",
+      "selected_sha256": "d7f3733bedd293fcaae381c685680d3ba1d40ba2003e30b0f45b013250bc18fc"
+    },
+    "backend/pose_training/trainer.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "34482c15c44bd8e7850b0696a4403e74746db6a26a5a3f5bce36b498407891c9",
+      "selected_sha256": "34482c15c44bd8e7850b0696a4403e74746db6a26a5a3f5bce36b498407891c9"
+    },
+    "backend/pose_training/worker.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8e0b40c1f16619cac76b863c1e940b6a9c931452f87c4b7dce494a0ec9beb2cb",
+      "selected_sha256": "8e0b40c1f16619cac76b863c1e940b6a9c931452f87c4b7dce494a0ec9beb2cb"
+    },
+    "backend/recorder_config.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "e9559e2076a1648e3d52bfa717e1663cb9ec8262c2c358917ee5cd726e184db5",
+      "selected_sha256": "e9559e2076a1648e3d52bfa717e1663cb9ec8262c2c358917ee5cd726e184db5"
+    },
+    "backend/recorder_connection.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "2de62fba68001b43dd89042f85aca70f84849c16efcfeb9dc19ec8d49c758776",
+      "selected_sha256": "597a4b2bae08f8742b144dcc8242f91d6ecda6055aa36b2f32a16bc418c753ab"
+    },
+    "backend/recorder_playback.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "84fc3399523859522531e249feddd88a3b5437f9c0c10f7b19d077a62884ef4e",
+      "selected_sha256": "84fc3399523859522531e249feddd88a3b5437f9c0c10f7b19d077a62884ef4e"
+    },
+    "backend/requirements.txt": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "d70797a53f64144cab8d16934bbb958d5539b70ec184c9b67c616028b06177be",
+      "selected_sha256": "d70797a53f64144cab8d16934bbb958d5539b70ec184c9b67c616028b06177be"
+    },
+    "backend/sql/20260714_dataset_versions.sql": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "80a0e2ea68058fb8b03e904ed2291220c962c9d12e2160a332c4f34da4237928",
+      "selected_sha256": "80a0e2ea68058fb8b03e904ed2291220c962c9d12e2160a332c4f34da4237928"
+    },
+    "backend/sql/20260714_job_tasks.sql": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "6d3dc5757b8677717a8f76441cd3725d2b2d9c202f6b6baff1582f618744bdf9",
+      "selected_sha256": "6d3dc5757b8677717a8f76441cd3725d2b2d9c202f6b6baff1582f618744bdf9"
+    },
+    "backend/sql/20260714_model_registry.sql": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "24192a062d72b4ccd00338eeb6f55be4ee15a9b1347f5c6f05bdd2a86fd0f6d4",
+      "selected_sha256": "24192a062d72b4ccd00338eeb6f55be4ee15a9b1347f5c6f05bdd2a86fd0f6d4"
+    },
+    "backend/sql/postgresql_system_management.sql": {
+      "reason": "backend_file_loaded_support",
+      "source_sha256": "289fdce25094b4fc3a95f56a47c7f18f8b7c77c283ab82d810c8bfc3cd4172a8",
+      "selected_sha256": "289fdce25094b4fc3a95f56a47c7f18f8b7c77c283ab82d810c8bfc3cd4172a8"
+    },
+    "backend/start_api.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "196f97cd7a7e1c12062bc0682a57b8617997f311c3fd8ba129fe2105826fcf9c",
+      "selected_sha256": "196f97cd7a7e1c12062bc0682a57b8617997f311c3fd8ba129fe2105826fcf9c"
+    },
+    "backend/start_training_worker.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "1f5e23613256a0413c607acc6ee50033581ed907b3e72fadbb5a191414f8424e",
+      "selected_sha256": "1f5e23613256a0413c607acc6ee50033581ed907b3e72fadbb5a191414f8424e"
+    },
+    "backend/system_admin_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8daf3991aa672cc0f12918dec8267823bb83bc11f991d441ab6f526da23885b2",
+      "selected_sha256": "8daf3991aa672cc0f12918dec8267823bb83bc11f991d441ab6f526da23885b2"
+    },
+    "backend/system_fault_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "341bb6db045ec195a34776b06acaca8eb7f65cf81debbcdaabcd08484520659b",
+      "selected_sha256": "341bb6db045ec195a34776b06acaca8eb7f65cf81debbcdaabcd08484520659b"
+    },
+    "backend/system_faults.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "f200a56c426cc05f419f488bf9ee1db603f699b47643d1145ee4ad8e6f9d7bbc",
+      "selected_sha256": "f200a56c426cc05f419f488bf9ee1db603f699b47643d1145ee4ad8e6f9d7bbc"
+    },
+    "backend/system_log_routes.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "b2d798e878c05720a4787ac8e0f1f6e8c281e11df21532028be1df7f3089b060",
+      "selected_sha256": "b2d798e878c05720a4787ac8e0f1f6e8c281e11df21532028be1df7f3089b060"
+    },
+    "backend/tests/test_admin_authorization.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "f9648a7ccfacb2785585d50169fd2f2e9d58ef7294bd5efe09655f9c002877ef",
+      "selected_sha256": "f9648a7ccfacb2785585d50169fd2f2e9d58ef7294bd5efe09655f9c002877ef"
+    },
+    "backend/tests/test_annotation_draft_completeness.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "957ec0f1cd22d943826f1a5a55eca3c8e0ac9cd8be0cd05eb478a1c9961e8c57",
+      "selected_sha256": "957ec0f1cd22d943826f1a5a55eca3c8e0ac9cd8be0cd05eb478a1c9961e8c57"
+    },
+    "backend/tests/test_annotation_geometry_filter.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "5841970a1360a04fd59f2ca2eae4001492bbdddb375c2eadee8715b979844a45",
+      "selected_sha256": "5841970a1360a04fd59f2ca2eae4001492bbdddb375c2eadee8715b979844a45"
+    },
+    "backend/tests/test_annotation_prompt_classes.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "35c71a13d4cbf24cc8bd58716d4a4b3d4150db4e8305adc801972657062cdb08",
+      "selected_sha256": "35c71a13d4cbf24cc8bd58716d4a4b3d4150db4e8305adc801972657062cdb08"
+    },
+    "backend/tests/test_annotation_session_isolation.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "d1f3719060576c34c2a0683cb8fe828ed57ffc79ebc4630fe91396c2321d26bc",
+      "selected_sha256": "d1f3719060576c34c2a0683cb8fe828ed57ffc79ebc4630fe91396c2321d26bc"
+    },
+    "backend/tests/test_auth_audit.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "39f9bd87ed799317500381ee15de79630a897bd97cf356f46926f101b98f2ba3",
+      "selected_sha256": "08be8f78af6ac80465b943bf594b135b9676ce3d5ead7ec054b61e07e9323c41"
+    },
+    "backend/tests/test_dataset_delete_quarantine.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "6a80818601b46f29c74bf6b5ecf789e35f509831081be639ab745bdc8b80b744",
+      "selected_sha256": "6a80818601b46f29c74bf6b5ecf789e35f509831081be639ab745bdc8b80b744"
+    },
+    "backend/tests/test_dataset_record_deletion.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "10f7a3c3443d77cdcf24708f4bd106a49d06a49dce23e3c20d47e4ee338ebbfd",
+      "selected_sha256": "10f7a3c3443d77cdcf24708f4bd106a49d06a49dce23e3c20d47e4ee338ebbfd"
+    },
+    "backend/tests/test_image_size_processing.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "3207db0612f92401364652aaa82629553628ec9dd34b5a9aea86fd91d97939fa",
+      "selected_sha256": "48c6ae7d498976fe807a02f4380cdc14d4977fce343686a5ff297d628ad58a2d"
+    },
+    "backend/tests/test_model_delete_rollback.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "c7bff60bd95865bbbdb403476d12422ec474f1a955af70b13d24a383869954c1",
+      "selected_sha256": "c7bff60bd95865bbbdb403476d12422ec474f1a955af70b13d24a383869954c1"
+    },
+    "backend/tests/test_role_consistency.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "bd717f36505d30ed3f618613f0b126c45c4b3d45225121b8bdf36a35cc0bcb3a",
+      "selected_sha256": "bd717f36505d30ed3f618613f0b126c45c4b3d45225121b8bdf36a35cc0bcb3a"
+    },
+    "backend/tests/test_yoloe_trainer_profile.py": {
+      "reason": "core_regression_test",
+      "source_sha256": "e2bdeda4ed3998e512377f4f51ee4f7ddb67d878a22a6c06a473aa5ea7f38f9d",
+      "selected_sha256": "e2bdeda4ed3998e512377f4f51ee4f7ddb67d878a22a6c06a473aa5ea7f38f9d"
+    },
+    "backend/training_acceptance.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c01fb07e048474e23000d885b04abe7faf0fa4894463254d6f7372c682b0fab1",
+      "selected_sha256": "c01fb07e048474e23000d885b04abe7faf0fa4894463254d6f7372c682b0fab1"
+    },
+    "backend/training_model_test.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "e8ae4c9af1cdac30242603fdbed81fcb35bd87061a6701fb6ce29e3a7a275c1a",
+      "selected_sha256": "e8ae4c9af1cdac30242603fdbed81fcb35bd87061a6701fb6ce29e3a7a275c1a"
+    },
+    "backend/training_optimization.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "8cef6f16ffc1a3a2804957b3600a8f1bc637d903a5688ea72bbc8fe5d60b88c2",
+      "selected_sha256": "8cef6f16ffc1a3a2804957b3600a8f1bc637d903a5688ea72bbc8fe5d60b88c2"
+    },
+    "backend/training_validation.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "cd46af92ac6105bdf67cc9fb32fa3fcc73cefd809a76ce674c8429b61a56c533",
+      "selected_sha256": "cd46af92ac6105bdf67cc9fb32fa3fcc73cefd809a76ce674c8429b61a56c533"
+    },
+    "backend/training_worker.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c5feaeeca054b174a93a3bb6f3611321a0beaa2dcdd8e4eac9eb6b84c46f55bc",
+      "selected_sha256": "c5feaeeca054b174a93a3bb6f3611321a0beaa2dcdd8e4eac9eb6b84c46f55bc"
+    },
+    "backend/training_worker_health.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "f08a597a648318ecf6c225fea7d2307b1686456f0a312ba3c1770a52f03a33d4",
+      "selected_sha256": "f08a597a648318ecf6c225fea7d2307b1686456f0a312ba3c1770a52f03a33d4"
+    },
+    "backend/training_worker_service.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "489a9af7efc281db09232743ce2fa54ac1acb340fdd6703ca3648fdb1765e973",
+      "selected_sha256": "489a9af7efc281db09232743ce2fa54ac1acb340fdd6703ca3648fdb1765e973"
+    },
+    "backend/training_workspace.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "cd3f671997d5bcfcead255692ebdcbb78faefb48c4ce686b1d7e3238348b81da",
+      "selected_sha256": "cd3f671997d5bcfcead255692ebdcbb78faefb48c4ce686b1d7e3238348b81da"
+    },
+    "backend/utils/__init__.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "5ffe902d8297dda4fa69069b4e14eba7239fc44312b68ca0ef8c02b305d63c32",
+      "selected_sha256": "5ffe902d8297dda4fa69069b4e14eba7239fc44312b68ca0ef8c02b305d63c32"
+    },
+    "backend/utils/archive_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "340f1e561121795e765c8c7ccca0cf7eed61e122ab96d4f26482ca97bd0fb875",
+      "selected_sha256": "340f1e561121795e765c8c7ccca0cf7eed61e122ab96d4f26482ca97bd0fb875"
+    },
+    "backend/utils/constants.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "ea745ae93d1ef83842fcd6e8c790eb39bbcae110440022c527b5bb1a8d3b296c",
+      "selected_sha256": "ea745ae93d1ef83842fcd6e8c790eb39bbcae110440022c527b5bb1a8d3b296c"
+    },
+    "backend/utils/dataset_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "3424cc6a0a319d31a03af91ed085217ed46fbe5f2ef1ea52785d3acfd555c934",
+      "selected_sha256": "3424cc6a0a319d31a03af91ed085217ed46fbe5f2ef1ea52785d3acfd555c934"
+    },
+    "backend/utils/file_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "290da60889111d2f1ac1fbf99913052ae230ae2ab387fce9b92ef4d9937e8dd2",
+      "selected_sha256": "290da60889111d2f1ac1fbf99913052ae230ae2ab387fce9b92ef4d9937e8dd2"
+    },
+    "backend/utils/image_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "d6612cc7c7679994e3790d47ff594376c6318668d1b7195335125f86458c9660",
+      "selected_sha256": "d6612cc7c7679994e3790d47ff594376c6318668d1b7195335125f86458c9660"
+    },
+    "backend/utils/inference_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "4d0a76da8358cd3c0795acd75d3f74e0424e00cf676dcf05b2aef436a4fc63ae",
+      "selected_sha256": "4d0a76da8358cd3c0795acd75d3f74e0424e00cf676dcf05b2aef436a4fc63ae"
+    },
+    "backend/utils/result_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "cd6ab1e75c25f7e046e8d9e3d8c5fd5451bcae890f3fc42434993a3f50139409",
+      "selected_sha256": "cd6ab1e75c25f7e046e8d9e3d8c5fd5451bcae890f3fc42434993a3f50139409"
+    },
+    "backend/utils/task_manager.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "ee6991ee1a923098dc0b79e2ef7191ddf4db88ada6baa828e3894f5e02e7fb34",
+      "selected_sha256": "ee6991ee1a923098dc0b79e2ef7191ddf4db88ada6baa828e3894f5e02e7fb34"
+    },
+    "backend/utils/video_utils.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "fe32a975db871f162efa2a8223051f166cf7d3de8259e09ae192819a3e26f1c5",
+      "selected_sha256": "fe32a975db871f162efa2a8223051f166cf7d3de8259e09ae192819a3e26f1c5"
+    },
+    "backend/yolo_api.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "c5bd4cabf1448fd82a360679007bf406acef81e766f890bfaae6b414600ca3f3",
+      "selected_sha256": "bb7655fecc5179271df157b71f9983eb3056646187efe1591cda28ea9f541616"
+    },
+    "backend/yolo_trainer.py": {
+      "reason": "backend_entry_or_import_dependency",
+      "source_sha256": "065a23b166a54c96e94a94df7f15a68f2b00f5c7045376f73750314ae7912271",
+      "selected_sha256": "065a23b166a54c96e94a94df7f15a68f2b00f5c7045376f73750314ae7912271"
+    },
+    "frontend/index.html": {
+      "reason": "license_or_frontend_build",
+      "source_sha256": "7c3720c6bf4ff9de10d3cc030f62197d675a4c80eb9670958ec6351b2143cb7e",
+      "selected_sha256": "c11d09905982cb1e32b15668df3f5adeef3d43b775be1f249250cee8f192de1a"
+    },
+    "frontend/package-lock.json": {
+      "reason": "license_or_frontend_build",
+      "source_sha256": "5fb1bcdc2b3ed76d2dc0e62b330bead66cbfc72382741f5391cd90e343c5c698",
+      "selected_sha256": "701ff8851e5fa64eecfb63065a9e6e251608b8085e0a641be1bb9d6b5f7eb653"
+    },
+    "frontend/package.json": {
+      "reason": "license_or_frontend_build",
+      "source_sha256": "b51fd4044250dd87bb86a922d44c14f48bdecee2d800dfe4e14616395c8a22bb",
+      "selected_sha256": "562e0ad0893de4e19a8d33aac3c825f6236e5a39f5f74c13d16f7a0870c70596"
+    },
+    "frontend/public/third-party-licenses/mediamtx.txt": {
+      "reason": "third_party_license",
+      "source_sha256": "8c78c14130d83c494924b3ed53bc54f81955ddfd90969ce5c615d70f32c96f94",
+      "selected_sha256": "8c78c14130d83c494924b3ed53bc54f81955ddfd90969ce5c615d70f32c96f94"
+    },
+    "frontend/src/App.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "1bb22a47e0144f19b7a90fac660aaa23a3d9b02153548030a8021c882268df20",
+      "selected_sha256": "41eff95017e17a54ead744056339794d176b81bd83ac5e3407ca4f988da77e6d"
+    },
+    "frontend/src/api/api.js": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "20412d2c1fb325348eb335a64bf8b11ac06d2378cf1b21786fe74fed58369656",
+      "selected_sha256": "20412d2c1fb325348eb335a64bf8b11ac06d2378cf1b21786fe74fed58369656"
+    },
+    "frontend/src/assets/login-bg.png": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "e416071d0af910f1dfc1e2d0aae20d1f2a5587c9c622d70ce0e9e148a132f305",
+      "selected_sha256": "e416071d0af910f1dfc1e2d0aae20d1f2a5587c9c622d70ce0e9e148a132f305"
+    },
+    "frontend/src/assets/logo.svg": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "40f4bfc56622f881d07a3cf2e2529a8c6ee0a293a17bdc92ad3a7b8f9baf7300",
+      "selected_sha256": "40f4bfc56622f881d07a3cf2e2529a8c6ee0a293a17bdc92ad3a7b8f9baf7300"
+    },
+    "frontend/src/components/BatchInferencePanel.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "150cdf9fea647b9e2c5005a275a9c9d8f394a4f32ce459a5505d44fdb2228f28",
+      "selected_sha256": "150cdf9fea647b9e2c5005a275a9c9d8f394a4f32ce459a5505d44fdb2228f28"
+    },
+    "frontend/src/components/PoseImageTestPanel.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "4bb87e6feab70271072cb3ba71eede187a93fb18a71c17585e54e1871fe921c0",
+      "selected_sha256": "4bb87e6feab70271072cb3ba71eede187a93fb18a71c17585e54e1871fe921c0"
+    },
+    "frontend/src/components/PoseTrainingPanel.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "96221ec9e42dfd3bb30b21a94355e50c1a9c778bd3249c05a1c9608935bbe882",
+      "selected_sha256": "96221ec9e42dfd3bb30b21a94355e50c1a9c778bd3249c05a1c9608935bbe882"
+    },
+    "frontend/src/main.js": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "c6d244d1b82ac714a9dd830688bf199c60b23b00968e3a3ebe2ef2c6a17e3a4a",
+      "selected_sha256": "ed80cfe1ebb7aaf2d7b0ef114c20c557f44de9c1a0ebb5e624868e0f5e7c863c"
+    },
+    "frontend/src/styles/ruoyi-theme.css": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "83954db0f94ad11b559298b0ba755a85c2b55eae304d77c6d3d2d5ce34a7748d",
+      "selected_sha256": "83954db0f94ad11b559298b0ba755a85c2b55eae304d77c6d3d2d5ce34a7748d"
+    },
+    "frontend/src/utils/annotationLabeling.mjs": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "73643267c8e10a43b88b2227f640e45e93bc2a46586aa3ef99519121f986f592",
+      "selected_sha256": "73643267c8e10a43b88b2227f640e45e93bc2a46586aa3ef99519121f986f592"
+    },
+    "frontend/src/utils/api.js": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "2e9188b40495e1a7a60d4d8827682a129f3c4002615b46386f91f7b49d3fa13a",
+      "selected_sha256": "2e9188b40495e1a7a60d4d8827682a129f3c4002615b46386f91f7b49d3fa13a"
+    },
+    "frontend/src/utils/imageAugmentation.mjs": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "11fd29f27f67a9731b7a8fe997f7a834a059754616dc149c88f4b0ac35f47eee",
+      "selected_sha256": "11fd29f27f67a9731b7a8fe997f7a834a059754616dc149c88f4b0ac35f47eee"
+    },
+    "frontend/src/utils/modelCapabilities.mjs": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "e754314c953b863c9a4eeae6920ef90b6530baaf26963e2892939df14b60d57e",
+      "selected_sha256": "e754314c953b863c9a4eeae6920ef90b6530baaf26963e2892939df14b60d57e"
+    },
+    "frontend/src/utils/poseSubmission.test.mjs": {
+      "reason": "frontend_core_regression",
+      "source_sha256": "97bd13c58d1ac54d591bf669dd13fbedac89ddd0e574165a3ef2607dcb760977",
+      "selected_sha256": "97bd13c58d1ac54d591bf669dd13fbedac89ddd0e574165a3ef2607dcb760977"
+    },
+    "frontend/src/utils/poseTraining.mjs": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "e3fc5c3845c410797d70a1719af5eb55e2d719accfa05212debe64e3bb95adff",
+      "selected_sha256": "e3fc5c3845c410797d70a1719af5eb55e2d719accfa05212debe64e3bb95adff"
+    },
+    "frontend/src/utils/poseTraining.test.mjs": {
+      "reason": "frontend_core_regression",
+      "source_sha256": "c1ff434ec366ab64bcebcfd03a3f1f7bc695979e598687a41a85f3dc37d11a6b",
+      "selected_sha256": "c1ff434ec366ab64bcebcfd03a3f1f7bc695979e598687a41a85f3dc37d11a6b"
+    },
+    "frontend/src/views/Annotation.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "88fec6bf4bb401412ff9d1e69ae99acae2b3148f0c8475febb608adf3f683885",
+      "selected_sha256": "c3b05c0341f92e47c04fadf2a0f4b8a3aedd35740a07b5a1cc4e9cfb6c2e6c61"
+    },
+    "frontend/src/views/Dataset.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "1ef6c29077f3c36a7b2bd23fe2bd2a1290742584ab199996e75d4d771c35702a",
+      "selected_sha256": "133d3e96eebfc23044119b495b63dab67f96b16211497919aa4fd39df75a75a4"
+    },
+    "frontend/src/views/DatasetManager.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "4859c5c7fa0626095f24c7dc4be6f170d35aa828a8ad0e6517e665b33811b31c",
+      "selected_sha256": "4859c5c7fa0626095f24c7dc4be6f170d35aa828a8ad0e6517e665b33811b31c"
+    },
+    "frontend/src/views/Inference.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "ae5490d58f94e5347bf0cd03c95e07f5740bd0212fb9b5987f3223c4d51b14a4",
+      "selected_sha256": "6df1b9d732e23507df977c885d7c8b45c4ed40c99b1dc3387a9c4da4d04521e4"
+    },
+    "frontend/src/views/Login.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "2293c44de5fabbbe77678496569fc2e0722211118fe5efe9e738650fe8ea373b",
+      "selected_sha256": "c27ea9f342412f8dc10510048838ad1920335fcb0992310073107769de1b52bc"
+    },
+    "frontend/src/views/ModelHub.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "34ae10c790ff7287e5da0572db4c616c19ff8c6081b08889774bf381f182115a",
+      "selected_sha256": "34ae10c790ff7287e5da0572db4c616c19ff8c6081b08889774bf381f182115a"
+    },
+    "frontend/src/views/Training.vue": {
+      "reason": "frontend_core_entry_or_dependency",
+      "source_sha256": "1b8369d47312133b8c8a54f20b84374547924869e390c1a7156084933e85b188",
+      "selected_sha256": "056e76138e1e656046a8855ce3a2f81b8cec1882620e66b5e05d6c06facdeb4d"
+    },
+    "frontend/tests/annotation-draft-completeness.test.mjs": {
+      "reason": "frontend_core_regression",
+      "source_sha256": "353f963147888f3a7da9e92f908c2555751fc171c5892caecfc9b41ba5551c2b",
+      "selected_sha256": "651e80f7bdbf3378fee5ae8ecee53d668273ebbf91b95f2f3ed918acad850200"
+    },
+    "frontend/tests/annotation-session-isolation.test.mjs": {
+      "reason": "frontend_core_regression",
+      "source_sha256": "376602a14b5f3d928d3ae6cde5507d2ae45fc44e3885ced24edc485a727240b2",
+      "selected_sha256": "d6a724f7986c4241e242da4e8aaac5cbb372ebb876d36e60ef67c27735159889"
+    },
+    "frontend/vite.config.js": {
+      "reason": "license_or_frontend_build",
+      "source_sha256": "5fb13a0762b91866cc6a14f06bcd117b0622550940912a106c78fe06d2ba2d7a",
+      "selected_sha256": "5fb13a0762b91866cc6a14f06bcd117b0622550940912a106c78fe06d2ba2d7a"
+    },
+    "backend/start_dataset_augmentation_worker.py": {
+      "reason": "core_augmentation_or_regression_import_dependency",
+      "source_sha256": "815f7df0d2d985853a34f264c44b4fd302eae8e6758e1ec9ecbb6262c3d7cf89",
+      "selected_sha256": "815f7df0d2d985853a34f264c44b4fd302eae8e6758e1ec9ecbb6262c3d7cf89"
+    },
+    "backend/dataset_augmentation_worker_service.py": {
+      "reason": "core_augmentation_or_regression_import_dependency",
+      "source_sha256": "8579c892ff98d8d1012ff55be0c80204c9bcb56e737cdbd4ab83bb29c0710899",
+      "selected_sha256": "8579c892ff98d8d1012ff55be0c80204c9bcb56e737cdbd4ab83bb29c0710899"
+    },
+    "backend/dataset_augmentation_jobs.py": {
+      "reason": "core_augmentation_or_regression_import_dependency",
+      "source_sha256": "e6507f10fef633ea76c449620e1ffc245df35e022f4e56f7a6f6a5ea7cfd59c7",
+      "selected_sha256": "e6507f10fef633ea76c449620e1ffc245df35e022f4e56f7a6f6a5ea7cfd59c7"
+    }
+  },
+  "modified_paths": [
+    "backend/alarm_flow.py",
+    "backend/alarm_push.py",
+    "backend/annotation_draft_batches.py",
+    "backend/database.py",
+    "backend/face_capture/assets/head_pose_6drepnet360.json",
+    "backend/face_capture/camera.py",
+    "backend/face_capture/streams.py",
+    "backend/image_size_processing.py",
+    "backend/recorder_connection.py",
+    "backend/tests/test_auth_audit.py",
+    "backend/tests/test_image_size_processing.py",
+    "backend/yolo_api.py",
+    "frontend/index.html",
+    "frontend/package-lock.json",
+    "frontend/package.json",
+    "frontend/src/App.vue",
+    "frontend/src/main.js",
+    "frontend/src/views/Annotation.vue",
+    "frontend/src/views/Dataset.vue",
+    "frontend/src/views/Inference.vue",
+    "frontend/src/views/Login.vue",
+    "frontend/src/views/Training.vue",
+    "frontend/tests/annotation-draft-completeness.test.mjs",
+    "frontend/tests/annotation-session-isolation.test.mjs"
+  ],
+  "excluded_paths": [
+    ".dockerignore",
+    ".env.example",
+    ".gitattributes",
+    ".github/workflows/security-hardening.yml",
+    ".gitignore",
+    "ALARM_PUSH_API.md",
+    "CONTINUOUS_MONITORING.md",
+    "DEPLOYMENT.md",
+    "DOCKER.md",
+    "README.md",
+    "README_new.md",
+    "REALTIME_STREAM_RUNBOOK.md",
+    "SOURCE_SYNC_20260909.md",
+    "TRAINING_LOGS.md",
+    "backend/.dockerignore",
+    "backend/Dockerfile",
+    "backend/README.md",
+    "backend/action_event_realtime_runtime.py",
+    "backend/alarm_push_worker_health.py",
+    "backend/alarm_push_worker_service.py",
+    "backend/behavior/README_一阶段行为动作检测后端覆盖说明.md",
+    "backend/behavior/README_第二阶段覆盖说明.txt",
+    "backend/behavior/README_绗簩闃舵瑕嗙洊璇存槑.txt",
+    "backend/behavior/action_classifier_patch.py",
+    "backend/behavior/feature_extractor.py",
+    "backend/behavior/image_dataset_importer.py",
+    "backend/behavior/image_pose_extractor.py",
+    "backend/behavior/sample_manager_patch.py",
+    "backend/behavior/schemas.py",
+    "backend/behavior/visualizer.py",
+    "backend/behavior_worker_service.py",
+    "backend/debug_load.py",
+    "backend/face_capture/README.md",
+    "backend/face_capture/test_receiver.py",
+    "backend/inference_service/app.py",
+    "backend/media_access.py",
+    "backend/mobilephone_ab_evaluation.py",
+    "backend/monitoring_gpu_profile.json",
+    "backend/monitoring_live_preview.py",
+    "backend/monitoring_overlay_tracking.py",
+    "backend/monitoring_preview.py",
+    "backend/offline_assets/fonts/Arial.ttf",
+    "backend/pose_training/task.py",
+    "backend/pytest.ini",
+    "backend/requirements-dev.txt",
+    "backend/scripts/cleanup_user_password_ciphertext.py",
+    "backend/scripts/index_dataset_versions.py",
+    "backend/scripts/job_health_audit.py",
+    "backend/scripts/migrate_device_credentials.py",
+    "backend/scripts/reconcile_models.py",
+    "backend/scripts/recover_model_deletions.py",
+    "backend/scripts/report_role_consistency.py",
+    "backend/start_alarm_push_worker.py",
+    "backend/start_behavior_worker.py",
+    "backend/test_training.py",
+    "backend/tests/alarm_flow_fixture.json",
+    "backend/tests/check_app_import.py",
+    "backend/tests/check_m3_app.py",
+    "backend/tests/check_m4_app.py",
+    "backend/tests/pose-image-flow.json",
+    "backend/tests/run_dataset_versioning_checks.py",
+    "backend/tests/run_job_store_checks.py",
+    "backend/tests/run_m2_workflow_checks.py",
+    "backend/tests/run_m4_checks.py",
+    "backend/tests/run_m5_acceptance_checks.py",
+    "backend/tests/run_m5_full_chain_checks.py",
+    "backend/tests/run_security_checks.py",
+    "backend/tests/test_alarm_flow.py",
+    "backend/tests/test_alarm_flow_catalog.py",
+    "backend/tests/test_alarm_flow_fall.py",
+    "backend/tests/test_alarm_flow_pose.py",
+    "backend/tests/test_alarm_push.py",
+    "backend/tests/test_alarm_push_worker_health.py",
+    "backend/tests/test_alarm_push_worker_postgres.py",
+    "backend/tests/test_algorithm_configuration.py",
+    "backend/tests/test_auth_context_reuse.py",
+    "backend/tests/test_badge_class_capability.py",
+    "backend/tests/test_continuous_monitoring.py",
+    "backend/tests/test_device_credential_crypto.py",
+    "backend/tests/test_face_capture_module.py",
+    "backend/tests/test_face_capture_policies.py",
+    "backend/tests/test_gpu_api_isolation.py",
+    "backend/tests/test_gpu_job_waiting.py",
+    "backend/tests/test_gpu_probe_service.py",
+    "backend/tests/test_gpu_runtime.py",
+    "backend/tests/test_grid_batch_inference.py",
+    "backend/tests/test_grid_true_fps.py",
+    "backend/tests/test_isolated_inference_service.py",
+    "backend/tests/test_job_record_deletion.py",
+    "backend/tests/test_media_access.py",
+    "backend/tests/test_mobilephone_ab_evaluation.py",
+    "backend/tests/test_mobilephone_export_api_contract.py",
+    "backend/tests/test_model_registry_availability.py",
+    "backend/tests/test_monitoring_live_frames.py",
+    "backend/tests/test_pose_crop_config.py",
+    "backend/tests/test_pose_image_alarm.py",
+    "backend/tests/test_pose_test_history.py",
+    "backend/tests/test_pose_threshold.py",
+    "backend/tests/test_pose_training.py",
+    "backend/tests/test_pose_training_gpu.py",
+    "backend/tests/test_pose_training_postgres.py",
+    "backend/tests/test_realtime_behavior_rules.py",
+    "backend/tests/test_realtime_inference_memory_path.py",
+    "backend/tests/test_realtime_session_cleanup.py",
+    "backend/tests/test_realtime_stream_resilience.py",
+    "backend/tests/test_realtime_transport_backpressure.py",
+    "backend/tests/test_result_manager_paths.py",
+    "backend/tests/test_security_guards.py",
+    "backend/tests/test_snapshot_evidence.py",
+    "backend/tests/test_system_faults.py",
+    "backend/tests/test_training_gpu_admission.py",
+    "backend/tests/test_training_optimization.py",
+    "backend/tests/test_training_validation.py",
+    "backend/tests/test_training_worker_isolation.py",
+    "backend/yoloe_ab_evaluation.py",
+    "deploy-yoloe-training-optimization.sh",
+    "deploy/deepvision-gpu-watchdog.service",
+    "deploy/deepvision-gpu-watchdog.sh",
+    "deploy/deepvision-gpu-watchdog.timer",
+    "deploy/deploy-grid-backpressure.sh",
+    "deploy/deploy-grid-stream-monitor.sh",
+    "deploy/verify-original-dataset.sh",
+    "docker-compose.yml",
+    "frontend/.dockerignore",
+    "frontend/Dockerfile",
+    "frontend/README.md",
+    "frontend/auto-imports.d.ts",
+    "frontend/nginx.conf",
+    "frontend/public/alarm-flow-template/app-e5dbb16bb895.js",
+    "frontend/public/alarm-flow-template/canvas-31c289782fed.js",
+    "frontend/public/alarm-flow-template/canvas-9814b65658d7.css",
+    "frontend/public/alarm-flow-template/classifier-module-5fd0a6203add.js",
+    "frontend/public/alarm-flow-template/classifier-module-a74cafd60de7.css",
+    "frontend/public/alarm-flow-template/editor-state-11be01e62874.js",
+    "frontend/public/alarm-flow-template/editor-state-bd7665e6ccea.js",
+    "frontend/public/alarm-flow-template/face-capture-module-3e6dbc7ef379.css",
+    "frontend/public/alarm-flow-template/face-policy-cbfd8d770eea.js",
+    "frontend/public/alarm-flow-template/face-policy-fbfc472c4fa3.css",
+    "frontend/public/alarm-flow-template/flow-model-b2fcdc1a6540.js",
+    "frontend/public/alarm-flow-template/flow-model-cd6f0c5b0674.js",
+    "frontend/public/alarm-flow-template/index.html",
+    "frontend/public/alarm-flow-template/legacy-v2-23a4329582b2.js",
+    "frontend/public/alarm-flow-template/styles-69e88b6b9c8d.css",
+    "frontend/public/alarm-flow-template/v1/index.html",
+    "frontend/public/alarm-flow-template/v2/index.html",
+    "frontend/public/logo.svg",
+    "frontend/src/components/AlgorithmFlowEditor.vue",
+    "frontend/src/components/BatchBehaviorInference.vue",
+    "frontend/src/components/ContinuousMonitoring.vue",
+    "frontend/src/components/FaceCapturePanel.vue",
+    "frontend/src/components/GridInference.vue",
+    "frontend/src/components/MonitoringFrame.vue",
+    "frontend/src/components/MonitoringVideo.vue",
+    "frontend/src/components/PoseAlarmClassifierPanel.vue",
+    "frontend/src/components/RealtimeInference.vue",
+    "frontend/src/components/SidebarMenuNode.vue",
+    "frontend/src/components/algorithmFlow/canvas-31c289782fed.js",
+    "frontend/src/components/algorithmFlow/classifier-module-5fd0a6203add.js",
+    "frontend/src/components/algorithmFlow/editor-base.css",
+    "frontend/src/components/algorithmFlow/editor-state-11be01e62874.js",
+    "frontend/src/components/algorithmFlow/editor.html",
+    "frontend/src/components/algorithmFlow/editor.js",
+    "frontend/src/components/algorithmFlow/face-policy.js",
+    "frontend/src/components/algorithmFlow/flow-model-cd6f0c5b0674.js",
+    "frontend/src/components/algorithmFlow/layout.css",
+    "frontend/src/components/algorithmFlow/legacy-v2-23a4329582b2.js",
+    "frontend/src/components/algorithmFlow/save-state.js",
+    "frontend/src/utils/alarmCategories.js",
+    "frontend/src/utils/alarmTypes.js",
+    "frontend/src/utils/behaviorModelOptions.mjs",
+    "frontend/src/utils/mediamtx-reader.js",
+    "frontend/src/utils/menuAccess.js",
+    "frontend/src/utils/monitoringTime.mjs",
+    "frontend/src/utils/monitoringView.mjs",
+    "frontend/src/utils/systemHealth.js",
+    "frontend/src/views/ActionTraining.vue",
+    "frontend/src/views/AdminUsers.vue",
+    "frontend/src/views/AlarmCenter.vue",
+    "frontend/src/views/AlgorithmTraining.vue",
+    "frontend/src/views/BehaviorAnalysis.vue",
+    "frontend/src/views/BehaviorReview.vue",
+    "frontend/src/views/FaceReceiver.vue",
+    "frontend/src/views/Home.vue",
+    "frontend/src/views/ImageUpload.vue",
+    "frontend/src/views/LoginLog.vue",
+    "frontend/src/views/OnlineUsers.vue",
+    "frontend/src/views/PlatformAlgorithms.vue",
+    "frontend/src/views/SystemFaults.vue",
+    "frontend/src/views/SystemPlaceholder.vue",
+    "frontend/src/views/monitoring/AlgorithmConfig.vue",
+    "frontend/src/views/monitoring/LiveMonitoring.vue",
+    "frontend/src/views/monitoring/MonitoringConfig.vue",
+    "material-recognition-service/.dockerignore",
+    "material-recognition-service/Dockerfile",
+    "material-recognition-service/README.md",
+    "material-recognition-service/app/__init__.py",
+    "material-recognition-service/app/main.py",
+    "material-recognition-service/app/model_runtime.py",
+    "material-recognition-service/debug/index.html",
+    "material-recognition-service/docker-compose.yml",
+    "ops/GITHUB_SOURCE_SYNC_20261015.json",
+    "ops/LIVE_RELEASE.md",
+    "ops/LIVE_SOURCE_SNAPSHOT.md",
+    "ops/REPOSITORY_REVIEW.md",
+    "ops/live-release.sh",
+    "ops/live-source-snapshot.json",
+    "ops/mediamtx.yml",
+    "package.json",
+    "postflight-yoloe-training-optimization.sh",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/alarm_push.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/algorithm_catalog.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/annotation_export.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/behavior/analyzer.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/behavior/event_routes.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/behavior/evidence.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/behavior/realtime_engine.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/behavior/runtime.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/continuous_monitoring.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/continuous_monitoring_grid.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/database.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/dataset_augmentation_jobs.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/dataset_versioning.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/face_capture/camera.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/face_capture/detector.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/face_capture/models.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/face_capture/routes.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/face_capture/worker.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/inference_service/app.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/inference_service/catalog.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/inference_service/client.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/inference_service/router.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/job_store.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/model_registry.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/monitoring_live_frames.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/monitoring_policy.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/monitoring_workspace.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/recorder_config.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/training_optimization.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/training_validation.py",
+    "runtime-sources/deep-vision-master-inference-service-1/backend/yolo_api.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/alarm_flow.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/alarm_push.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/algorithm_catalog.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/behavior/event_routes.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/face_capture/alarm_gate.py",
+    "runtime-sources/deep-vision-master-pose-training-worker-1/backend/pose_training/routes.py",
+    "runtime-sources/deepvision-alarm-push-worker/backend/alarm_flow.py",
+    "runtime-sources/deepvision-alarm-push-worker/backend/alarm_push.py",
+    "runtime-sources/deepvision-alarm-push-worker/backend/alarm_push_worker_service.py",
+    "runtime-sources/deepvision-training-worker/backend/alarm_push.py",
+    "runtime-sources/deepvision-training-worker/backend/algorithm_catalog.py",
+    "runtime-sources/deepvision-training-worker/backend/annotation_export.py",
+    "runtime-sources/deepvision-training-worker/backend/behavior/analyzer.py",
+    "runtime-sources/deepvision-training-worker/backend/behavior/event_routes.py",
+    "runtime-sources/deepvision-training-worker/backend/behavior/evidence.py",
+    "runtime-sources/deepvision-training-worker/backend/behavior/realtime_engine.py",
+    "runtime-sources/deepvision-training-worker/backend/behavior/runtime.py",
+    "runtime-sources/deepvision-training-worker/backend/continuous_monitoring.py",
+    "runtime-sources/deepvision-training-worker/backend/continuous_monitoring_grid.py",
+    "runtime-sources/deepvision-training-worker/backend/database.py",
+    "runtime-sources/deepvision-training-worker/backend/dataset_augmentation_jobs.py",
+    "runtime-sources/deepvision-training-worker/backend/dataset_versioning.py",
+    "runtime-sources/deepvision-training-worker/backend/face_capture/camera.py",
+    "runtime-sources/deepvision-training-worker/backend/face_capture/detector.py",
+    "runtime-sources/deepvision-training-worker/backend/face_capture/models.py",
+    "runtime-sources/deepvision-training-worker/backend/face_capture/routes.py",
+    "runtime-sources/deepvision-training-worker/backend/face_capture/worker.py",
+    "runtime-sources/deepvision-training-worker/backend/grid_batch_inference.py",
+    "runtime-sources/deepvision-training-worker/backend/http_access.py",
+    "runtime-sources/deepvision-training-worker/backend/job_store.py",
+    "runtime-sources/deepvision-training-worker/backend/model_registry.py",
+    "runtime-sources/deepvision-training-worker/backend/monitoring_inference.py",
+    "runtime-sources/deepvision-training-worker/backend/monitoring_policy.py",
+    "runtime-sources/deepvision-training-worker/backend/monitoring_workspace.py",
+    "runtime-sources/deepvision-training-worker/backend/recorder_config.py",
+    "runtime-sources/deepvision-training-worker/backend/tests/test_realtime_behavior_rules.py",
+    "runtime-sources/deepvision-training-worker/backend/tests/test_training_resilience.py",
+    "runtime-sources/deepvision-training-worker/backend/tests/training_resilience_probe.py",
+    "runtime-sources/deepvision-training-worker/backend/tests/training_yoloe_resume_smoke.py",
+    "runtime-sources/deepvision-training-worker/backend/training_optimization.py",
+    "runtime-sources/deepvision-training-worker/backend/training_resilience.py",
+    "runtime-sources/deepvision-training-worker/backend/training_validation.py",
+    "runtime-sources/deepvision-training-worker/backend/training_worker.py",
+    "runtime-sources/deepvision-training-worker/backend/training_worker_service.py",
+    "runtime-sources/deepvision-training-worker/backend/yolo_api.py",
+    "runtime-sources/deepvision-training-worker/backend/yolo_trainer.py",
+    "runtime-sources/deepvision-training-worker/backend/yoloe_resume_trainer.py",
+    "scripts/check_docker.sh",
+    "scripts/docker_minimal.sh",
+    "scripts/docker_start.sh",
+    "scripts/docker_stop.sh",
+    "scripts/start_all.sh",
+    "scripts/start_backend.sh",
+    "scripts/start_frontend.sh",
+    "scripts/verify-system-management.sh",
+    "start_api.py",
+    "train_config.json",
+    "训推一体化平台告警推送接口文档.md"
+  ]
+}

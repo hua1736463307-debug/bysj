@@ -1,0 +1,18 @@
+{
+  "files": 192,
+  "retained_source_files": 183,
+  "excluded_source_files": 298,
+  "python_syntax_files": 145,
+  "forbidden_and_secret_scan": [],
+  "backend_tests": "97 passed",
+  "frontend_tests": "24 passed",
+  "frontend_build": "passed",
+  "runtime_data_and_weights": "excluded",
+  "backend_source_fully_overlaid": true,
+  "production_changes": false,
+  "limitations": [
+    "Original backend monolith still registers optional coupled modules.",
+    "Real training/GPU/PostgreSQL worker/new environment installation and medical dataset evaluation not run.",
+    "Fixed /app output directory assumptions remain; isolated tests used empty temporary mounts."
+  ]
+}

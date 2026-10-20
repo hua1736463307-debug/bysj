@@ -1,0 +1,38 @@
+{
+  "//": "项目依赖和脚本配置文件",
+  "name": "bysj",
+  "version": "1.0.0",
+  "description": "Image annotation, model training and inference thesis foundation",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --port 3000"
+  },
+  "dependencies": {
+    "vue": "^3.3.0",
+    "vue-router": "^4.2.0",
+    "axios": "^1.5.0",
+    "element-plus": "^2.4.0",
+    "@element-plus/icons-vue": "^2.1.0",
+    "fabric": "^5.3.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.4.0",
+    "vite": "^4.5.0",
+    "unplugin-vue-components": "^0.25.0",
+    "unplugin-auto-import": "^0.16.0"
+  },
+  "keywords": [
+    "vue",
+    "yolo",
+    "annotation",
+    "dataset",
+    "computer-vision"
+  ],
+  "author": "YOLO API Team",
+  "license": "MIT"
+}

@@ -1,0 +1,11 @@
+{
+  "model": "6DRepNet360 Full Rotation",
+  "source": "https://github.com/thohemp/6DRepNet360",
+  "weights_url": "https://cloud.ovgu.de/s/TewGC9TDLGgKkmS/download/6DRepNet360_Full-Rotation_300W_LP%2BPanoptic.pth",
+  "source_weights_sha256": "3ee08f1e04b8d452a6c4a40926a6f38051894ae6d0aaa6d191fe6d8bc6e4f9c6",
+  "runtime_sha256": "68b8ba2adef2ca08ed4eeb41067120f457660b84b3f33ed1ca55b88e5257047d",
+  "export": "ResNet50 official SixDRepNet360 architecture, strict state_dict load, raw 6D output, fixed 1x3x224x224, ONNX opset11",
+  "preprocess": "PIL RGB bilinear Resize short edge256, CenterCrop224, ImageNet normalization",
+  "inference": "OpenCV CPU; no production dependency changes",
+  "policy": "head_forward_normal_v1; max turn95 degrees, max tilt35 degrees, original-or-mirror support; not an identity or sharpness score"
+}

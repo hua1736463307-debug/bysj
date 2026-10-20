@@ -1,0 +1,33 @@
+<svg width="240" height="160" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glowGradient">
+      <stop offset="0%" stop-color="#FF8C00" />
+      <stop offset="100%" stop-color="#FF4500" />
+    </radialGradient>
+  </defs>
+
+  <!-- Main angular eye structure -->
+  <path d="M 10,40 L 30,15 L 90,15 L 110,40 L 90,65 L 30,65 Z" fill="transparent"/>
+
+  <!-- Mechanical iris/aperture blades -->
+  <g transform="translate(60, 40)">
+    <path d="M 0,-18 L -8, -8 L 8, -8 Z" fill="#4A4A4A"/>
+    <path d="M 0,18 L -8, 8 L 8, 8 Z" fill="#4A4A4A"/>
+    <path d="M -22,0 L -10,-6 L -10,6 Z" fill="#4A4A4A"/>
+    <path d="M 22,0 L 10,-6 L 10,6 Z" fill="#4A4A4A"/>
+  </g>
+  
+  <!-- Glowing Core -->
+  <circle cx="60" cy="40" r="10" fill="url(#glowGradient)" />
+  <circle cx="60" cy="40" r="4" fill="#FFFFFF" />
+
+  <!-- Text -->
+  <text x="60" y="78" 
+        font-family="'Microsoft YaHei', Arial, sans-serif" 
+        font-size="7" 
+        fill="#1A1A1A" 
+        text-anchor="middle" 
+        letter-spacing="0.5">
+    训推一体化平台
+  </text>
+</svg>
