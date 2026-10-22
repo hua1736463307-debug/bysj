@@ -33,6 +33,21 @@ curl --fail http://127.0.0.1:8000/api/v1/health/ready
 
 离线安装要先用 generate_lock.py --wheelhouse <wheelhouse> --offline 生成经过全部 wheel 实物校验的离线锁，再使用 --no-index --find-links --require-hashes。在线 Torch URL 锁即使传 --no-index 仍可能访问直链，不能把这当成离线验收。
 
+已验证的分阶段构建路径如下（在干净源码提交上执行；实际 report/wheels 放在忽略目录）：
+
+```sh
+python scripts/generate_lock.py --report .runtime/ml-report.json --wheelhouse .runtime/wheels --offline --output .runtime/wheels/ml-offline.lock.txt
+docker build --network none --build-context wheelhouse=.runtime/wheels -f deploy/locked-dependencies.Dockerfile -t bysj-core-deps:20261022 .
+docker build --build-context wheelhouse=.runtime/wheels -f deploy/locked-ml-dependencies.Dockerfile -t bysj-ml-deps:20261022 .
+docker build --network none --build-arg DEPENDENCY_IMAGE=bysj-core-deps:20261022 --build-arg BYSJ_CODE_SHA=<exact-commit> -f deploy/runtime.Dockerfile -t bysj-api:<release> .
+docker build --network none --build-arg DEPENDENCY_IMAGE=bysj-ml-deps:20261022 --build-arg BYSJ_CODE_SHA=<exact-commit> -f deploy/runtime.Dockerfile -t bysj-worker:<release> .
+docker build -f deploy/frontend.Dockerfile -t bysj-frontend:<release> .
+```
+
+ML 依赖阶段需要系统 libGL/GLib；系统包下载阶段需要网络，wheel 安装本身使用已校验的本地内容。前端存在已按 package-lock integrity 校验的 npm 缓存时，可使用 frontend.offline.Dockerfile 与命名上下文 npmcache，禁网执行 npm ci/test/build。官方 Python/Node/Nginx 基础摘要已固定，来源证据见 deploy/base-images.json。
+
+在 deploy/.env 设置 BYSJ_API_IMAGE/BYSJ_WORKER_IMAGE/BYSJ_FRONTEND_IMAGE 为实际构建标签（交付时同时记录 image ID），添加 `-f deploy/compose.formal.yml`，使用 `up -d --no-build` 启动。正式 override 不能与 compose.candidate.yml 混用。代码提交与镜像声明必须一致，不得用未提交挂载源码冒充精确提交。
+
 ## 作业取消和故障恢复
 
 取消由 API 请求、worker 确认；训练子进程停止并回收后才释放 GPU。排队 waiting_gpu 可取消。不要手工将数据库任务改成 completed，也不要仅因 GPU 租约超时便清空 holder。
@@ -46,6 +61,13 @@ curl --fail http://127.0.0.1:8000/api/v1/health/ready
 一致性备份必须暂停新提交、等待在途任务结束并停止 API/worker 写入，同时备份 PostgreSQL、data、models、artifacts 和文件 SHA256 清单。只备份 data 不足以恢复模型和血缘。备份含用户和认证数据，禁止提交 Git。
 
 恢复必须在另一套新卷/数据库进行，核对表计数、版本/模型/资产 hash、登录和已完成记录，再提交一次新推理；恢复前持有的 running/cancelling 作业必须转为可解释状态，不能幽灵运行。实际备份脚本与演练结果以 U08 为准，尚未验收时不声称可恢复。
+
+```sh
+python scripts/backup_project.py --project <owned-bysj-project> --helper-image <verified-api-image> --output artifacts/backups/<unique-name>
+python scripts/restore_project.py --project <new-bysj-project> --backup artifacts/backups/<unique-name> --output .runtime/<new-name> --source-env deploy/.env --api-image <verified-api-image> --worker-image <verified-worker-image> --frontend-image <verified-frontend-image> --db-port <unused-port> --api-port <unused-port> --frontend-port <unused-port>
+```
+
+恢复工具只启动新 PostgreSQL 和恢复数据，禁止覆盖现有项目/卷/输出目录。业务启动前确认原 GPU 作业结束并停下原 trainer/inference worker：不同数据库的租约不能协调一张物理 GPU。恢复目录 .env 会生成独立 DB/JWT 密钥；它及全部 dump/归档不得提交。
 
 旧库迁移工具 scripts/migrate_legacy_snapshot.py 目前为经测试的离线拷贝函数：只读 REPEATABLE READ 源、严格识别旧 schema、已 Alembic 初始化且空的目标库。源文件不改写。合成演练通过，真实旧库尚未提供授权副本，不能直接用于未知生产库。
 

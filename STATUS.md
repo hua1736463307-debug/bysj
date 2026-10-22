@@ -1,5 +1,7 @@
 # 项目现状（一页版）
 
+> **当前状态入口**：[续作实施状态](docs/refactor/execution/unblock/STATUS.md)。2026-10-22 后续已完成干净容器/GPU、PG 并发、六页面迁移、旧入口清退和隔离备份恢复；E1/E2 协议已冻结，正式实验执行中。下文是原 DS 交接历史，不代表当前阻塞。
+
 > 更新时间：2026-10-22 01:35（America/Los_Angeles）
 > 分支：`graduation/pr-00-baseline`　基线：`c47950b`
 > 详细证据与逐阶段记录：[docs/refactor/execution/STATUS.md](docs/refactor/execution/STATUS.md)
