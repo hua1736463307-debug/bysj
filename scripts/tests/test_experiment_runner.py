@@ -18,11 +18,12 @@ def config():
 
 
 def test_seed_zero_and_all_parameters_survive():
-    value = config(); runner.validate_config(value)
+    value = {**config(), "optimizer":"SGD", "lr0":.002, "weight_decay":.0001}; runner.validate_config(value)
     params = runner.training_body(value, 0)["params"]
     assert params["seed"] == 0
     assert params["augmentation"] == value["augmentation"]
     assert params["early_stopping"] == value["early_stopping"]
+    assert params['optimizer']=='SGD' and params['lr0']==.002 and params['weight_decay']==.0001
 
 
 @pytest.mark.parametrize("change", [{"seeds": []}, {"seeds": [1, 1]}, {"approved_model_id": None}, {"base_weight_sha256": "bad"}])

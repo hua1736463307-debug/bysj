@@ -12,12 +12,15 @@ def test_explicit_zero_seed_and_augmentation_reach_actual_arguments():
     assert args["device"] == "0"
     assert args["amp"] is False
     assert args["workers"] == 0
+    assert args["optimizer"] == "AdamW" and args["lr0"] == .001
+    assert args["weight_decay"] == .0005 and args["warmup_epochs"] == 3
     assert "augmentation" not in args and "early_stopping" not in args
 
 
 @pytest.mark.parametrize("payload", [
     {"unknown":1}, {"augmentation":{"typo":1}}, {"augmentation":{"mosaic":2}},
     {"early_stopping":{"monitor":"train/loss"}}, {"imgsz":65}, {"device":"0,1"},
+    {"optimizer":"auto"}, {"lr0":0}, {"momentum":1},
 ])
 def test_unsupported_or_invalid_experiment_parameter_rejected(payload):
     with pytest.raises(ValidationError):

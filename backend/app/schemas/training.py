@@ -33,6 +33,14 @@ class TrainingParams(BaseModel):
     seed: int = Field(default=42, ge=0)
     deterministic: bool = True
     device: str = "0"
+    # `auto` changes optimizer according to iteration count; tiled datasets must
+    # not silently select a different optimizer in a controlled comparison.
+    optimizer: Literal["AdamW", "SGD"] = "AdamW"
+    lr0: float = Field(default=.001, gt=0, le=1)
+    lrf: float = Field(default=.01, gt=0, le=1)
+    momentum: float = Field(default=.937, ge=0, lt=1)
+    weight_decay: float = Field(default=.0005, ge=0, le=1)
+    warmup_epochs: float = Field(default=3, ge=0, le=100)
     augmentation: Augmentation = Field(default_factory=Augmentation)
     early_stopping: EarlyStopping = Field(default_factory=EarlyStopping)
 

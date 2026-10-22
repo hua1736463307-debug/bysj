@@ -99,7 +99,8 @@ def wait_job(client, api, token, job_id, timeout):
 
 
 def training_body(config, seed):
-    params = {key: config[key] for key in ("epochs", "batch", "imgsz", "augmentation", "early_stopping") if key in config}
+    params = {key: config[key] for key in ("epochs", "batch", "imgsz", "augmentation", "early_stopping",
+        "optimizer", "lr0", "lrf", "momentum", "weight_decay", "warmup_epochs") if key in config}
     params.update(seed=seed, deterministic=config.get("deterministic", True), device=config.get("device", "0"))
     return {"dataset_version_id": config["dataset_version_id"], "model_id": config["approved_model_id"], "task": "detect", "params": params}
 
