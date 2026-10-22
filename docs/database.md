@@ -77,3 +77,7 @@
 ## 6. GPU 租约
 
 `resource_leases` 记录 `resource/holder/generation/job_id/expires_at`。训练、评估、推理在同一数据库内竞争 `gpu:0`。过期持有者进入隔离，不能仅凭到期时间被新 worker 抢占；旧 holder/generation 必须在确认对应进程停止后精确恢复。作业 attempt、租约 generation 与心跳分别限制旧执行者回写。另一套数据库无法参与此互斥，恢复演练启动 GPU worker 前必须停止原项目的 GPU worker。
+
+## 7. 引用检查边界
+
+当前模型未声明 SQL ForeignKey；跨表引用主要由域服务检查，不能把本文件的关系描述误认为数据库强制外键。`scripts/audit_database_links.py` 在只读一致性快照中对 48 项明确的非空标量引用执行反连接检查。2026-10-22 对本轮恢复库实测均为 0 悬空引用；该结果只说明受检关系，不涵盖 JSON、多态 resource_id、授权及全部业务语义。后续若引入物理 FK，应先审计数据并设计增量迁移，不在正式训练中改变 schema。

@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import time
 from backup_project import docker, inspect, row_counts, sha, sql
+from audit_database_links import audit_container
 
 RESTORE_VOLUME = r'''
 import hashlib,json,pathlib,tarfile,sys
@@ -98,6 +99,9 @@ def restore(args):
             raise ValueError('restore has active jobs; explicit recovery required before service startup')
         if int(sql(db,"SELECT count(*) FROM pg_constraint WHERE contype='f' AND NOT convalidated")):
             raise ValueError('restored foreign key constraint not validated')
+        report['reference_audit']=audit_container(db,project)
+        if report['reference_audit']['status']!='passed':
+            raise ValueError('restored logical references contain orphans')
         report['status']='data_verified_runtime_acceptance_pending'
     except Exception as exc:
         report.update(status='failed',error=type(exc).__name__+': '+str(exc));raise

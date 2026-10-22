@@ -69,6 +69,8 @@ python scripts/restore_project.py --project <new-bysj-project> --backup artifact
 
 恢复工具只启动新 PostgreSQL 和恢复数据，禁止覆盖现有项目/卷/输出目录。业务启动前确认原 GPU 作业结束并停下原 trainer/inference worker：不同数据库的租约不能协调一张物理 GPU。恢复目录 .env 会生成独立 DB/JWT 密钥；它及全部 dump/归档不得提交。
 
+v1 大部分表关系由业务代码维护，当前 SQL 外键数为 0；不能把“没有未验证的 FK”当作引用完整。恢复工具额外执行 48 项标量引用检查，也可单独只读运行：`python scripts/audit_database_links.py --project <owned-bysj-project> --db-container <owned-db-container> --output artifacts/<unique-audit>.json`。检查非空外部 ID 对应行存在，包含软删除父行；不替代 JSON/多态引用、文件 hash、权限与业务血缘验收。
+
 旧库迁移工具 scripts/migrate_legacy_snapshot.py 目前为经测试的离线拷贝函数：只读 REPEATABLE READ 源、严格识别旧 schema、已 Alembic 初始化且空的目标库。源文件不改写。合成演练通过，真实旧库尚未提供授权副本，不能直接用于未知生产库。
 
 ## 常见问题
