@@ -65,7 +65,35 @@ envelope 解包、AbortController。`main.js` 的全局 axios/fetch 兜底保留
 
 只有 `--profile workers` 才启动 worker。GPU override 单独文件，缺 GPU 的机器不得传入。
 
-## 5. 已知限制（截至 PR-08）
+## 5. 与既有代码的关系（重要）
+
+当前仓库同时存在两套运行路径，必须区分“新入口”和“整个仓库”：
+
+| 层面 | 事实 |
+|---|---|
+| 代码导入 | `backend/app` **不导入** `yolo_api` / `database` / `dataset_versioning` / `annotation_drafts` / `job_store` / `model_registry` |
+| 旧文件 | 上述旧模块相对基线 `c47950b` **零改动**，旧入口 `start_api.py` 仍可启动旧应用 |
+| 数据契约 | 新模型沿用 9 张既有表名：`users`、`dataset_resources`、`dataset_versions`、`dataset_assets`、`annotation_drafts`、`annotation_draft_assets`、`job_tasks`、`job_events`、`model_registry` |
+| 新增表 | 12 张：`auth_sessions`、`dataset_imports`、`evaluation_runs`、`inference_runs/items/predictions`、`review_records/items`、`feedback_exports`、`experiment_runs`、`artifact_records`、`resource_leases` |
+| 规模 | 新 `app/` 6,845 行；旧 `yolo_api.py` 16,292 行、`dataset_versioning.py` 1,887 行 |
+| 前端 | 7 个页面中只有 `Login.vue` 走新 `api/client.js`；Dataset/Annotation/Training/Inference/ModelHub/DatasetManager 仍调用旧端点 |
+| 测试 | 新 68 个后端测试只覆盖新实现；旧 `backend/tests/*` 仍针对旧实现，未做交叉回归 |
+
+**结论**：v1 后端是**平行重写**（re-architecture），不是“基本无关联”，也**不是**在旧代码上做增量改造。
+它与旧代码共享数据库 schema 和部分算法语义（组级三集划分、revision CAS、安全解压），
+但实现是独立的；仓库整体和当前前端运行路径仍以旧代码为主。
+
+这与 `START_HERE.md` 中“优先复用已经核验的源码符号，不从头开放式重写”存在偏差，代价是：
+
+1. 版本划分、草稿冲突、解压安全、鉴权各存在两套实现，行为可能漂移；
+2. 旧测试覆盖旧实现、新测试覆盖新实现，缺少跨实现一致性回归；
+3. 表名相同但**未用旧数据库副本做迁移演练**，直接指向旧库的行为尚未验证；
+4. PR-09 要求的“旧入口退出最终运行图”尚未完成。
+
+可接受的前提是完成：前端页面全量迁移 → 删除旧入口/行业模块 → 旧库副本迁移演练 →
+对同一份数据跑一遍新旧行为对比。在上述完成前，不能声称“重构已完成”或“已替换旧系统”。
+
+## 6. 已知限制（截至 PR-08）
 
 - 训练/推理子进程管理在 worker 内实现（`train_cli` 子进程 + 取消终止），
   但本轮未在真实 GPU 上验证 OOM/进程被 kill 的恢复路径。
