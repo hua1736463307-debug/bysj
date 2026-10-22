@@ -9,6 +9,9 @@ import logging
 import os
 import socket
 import time
+import json
+import zipfile
+from pathlib import Path, PurePosixPath
 
 from sqlalchemy.orm import Session
 
@@ -70,20 +73,46 @@ def handle_annotation_export(ctx: JobContext) -> dict:
         .order_by(DatasetAsset.relative_path.asc())
         .all()
     )
-    lines = []
+    snapshot = []
     for index, asset in enumerate(assets, start=1):
-        for ann in asset.annotations_json or []:
-            lines.append(
-                f"{asset.relative_path} {ann['class_id']} {ann['cx']:.6f} {ann['cy']:.6f} {ann['w']:.6f} {ann['h']:.6f}"
-            )
+        snapshot.append({"asset_id": asset.id, "relative_path": asset.relative_path,
+                         "sha256": asset.content_hash, "annotations": asset.annotations_json or []})
         ctx.progress(index / max(1, len(assets)), "exporting", f"导出 {index}/{len(assets)}")
-    body = "\n".join(lines) + ("\n" if lines else "")
+    from app.core.storage import atomic_write_bytes, ensure_dir, normalize_relative
+    from app.domains.inference.service import record_artifact
+    directory = ensure_dir(ctx.settings.artifact_root / "annotations" / ctx.job.id / str(ctx.attempt))
+    export = {"schema_version": 1, "dataset_id": version.dataset_id, "version_id": version.id,
+              "class_map": version.class_map_json, "assets": snapshot}
+    fmt = payload.get("format", "yolo-txt")
+    if fmt == "json":
+        path = directory / "annotations.json"
+        atomic_write_bytes(path, json.dumps(export, ensure_ascii=False, indent=2).encode("utf-8"))
+        mime = "application/json"
+    else:
+        path = directory / "labels.zip"
+        names = set()
+        with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("manifest.json", json.dumps(export, ensure_ascii=False, indent=2))
+            for item in snapshot:
+                ctx.check_cancelled()
+                name = "labels/" + normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
+                if name in names:
+                    raise ApiError(409, "label_name_collision", "不同图像导出为同名标签，请使用 JSON 导出")
+                names.add(name)
+                body = "".join(f"{a['class_id']} {a['cx']:.6f} {a['cy']:.6f} {a['w']:.6f} {a['h']:.6f}\n" for a in item["annotations"])
+                archive.writestr(name, body)
+        mime = "application/zip"
+    ctx.lock_for_write()
+    record = record_artifact(ctx.db, ctx.settings, owner_id=ctx.job.owner_user_id,
+        resource_type="annotation_export", resource_id=ctx.job.id, path=path, mime=mime)
     return {
         "version_id": version.id,
         "asset_count": len(assets),
-        "annotation_count": len(lines),
-        "format": "yolo-txt",
-        "content_preview_sha256": __import__("hashlib").sha256(body.encode()).hexdigest(),
+        "annotation_count": sum(len(item["annotations"]) for item in snapshot),
+        "format": fmt,
+        "artifact_id": record.id,
+        "sha256": record.sha256,
+        "download_url": f"/api/v1/artifacts/{record.id}",
     }
 
 
@@ -94,28 +123,9 @@ def handle_feedback_export(ctx: JobContext) -> dict:
     return export_service.export_feedback_version(ctx.db, ctx.settings, payload, ctx.progress)
 
 
-def run_forever() -> None:  # pragma: no cover - 进程入口
-    settings = get_settings()
-    logging.basicConfig(level="INFO")
-    worker_id = f"dataset-{socket.gethostname()}-{os.getpid()}"
-    from app.db.session import get_session_factory
-
-    factory = get_session_factory()
-    lease = f"worker:dataset:{worker_id}"
-    logger.info("dataset_worker_start id=%s types=%s", worker_id, WORKER_TYPES)
-    while True:
-        with factory() as db:
-            lease_service.acquire_lease(db, lease, holder=worker_id, ttl_seconds=30)
-            job_service.mark_stale_interrupted(db, older_than_seconds=max(120, settings.job_lease_seconds))
-            job = job_service.claim_job(
-                db, job_types=WORKER_TYPES, worker_id=worker_id, lease_seconds=settings.job_lease_seconds
-            )
-            if job:
-                logger.info("claimed job_id=%s type=%s", job.id, job.type)
-                run_claimed_job(db, job, worker_id=worker_id, settings=settings)
-            else:
-                db.commit()
-        time.sleep(settings.worker_poll_seconds)
+def run_forever() -> None:  # pragma: no cover
+    from app.workers.runtime import run_worker
+    run_worker("dataset", WORKER_TYPES)
 
 
 if __name__ == "__main__":  # pragma: no cover

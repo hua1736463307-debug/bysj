@@ -215,7 +215,7 @@ def build_dataset_yaml(db: Session, version: DatasetVersion, workdir: Path) -> P
     return dataset_yaml
 
 
-def _run_dummy(request: dict, workdir: Path, progress) -> dict:
+def _run_dummy(request: dict, workdir: Path, progress, should_stop=None) -> dict:
     target = workdir / "dummy-best.pt"
     payload = {
         "backend": "dummy",
@@ -225,6 +225,8 @@ def _run_dummy(request: dict, workdir: Path, progress) -> dict:
     }
     target.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
     for step in range(1, 6):
+        if should_stop and should_stop():
+            raise JobStopped("训练收到取消请求")
         if progress:
             progress(step / 5, "training", f"dummy 训练 {step}/5")
         time.sleep(0.01)
@@ -256,28 +258,31 @@ def _run_ultralytics(request: dict, workdir: Path, should_stop, progress) -> dic
     # 必须重定向到文件：PIPE 缓冲区写满会让训练子进程阻塞。
     with log_path.open("w", encoding="utf-8", errors="replace") as log_handle:
         process = subprocess.Popen(
-            [sys.executable, "-m", "app.ml.train_cli", "--request", str(request_file), "--output", str(output_file)],
+            [sys.executable, "-m", "app.ml.train_cli", "--request", str(request_file), "--output", str(output_file), "--parent-pid", str(os.getpid())],
             stdout=log_handle,
             stderr=subprocess.STDOUT,
             text=True,
             cwd=str(workdir),
             env=child_env,
+            start_new_session=os.name == "posix",
         )
         try:
             while process.poll() is None:
                 if should_stop and should_stop():
-                    process.terminate()
+                    _signal_training(process, hard=False)
                     try:
                         process.wait(timeout=30)
                     except subprocess.TimeoutExpired:
-                        process.kill()
+                        _signal_training(process, hard=True)
+                        process.wait(timeout=10)
                     raise JobStopped("训练收到取消请求")
                 if progress:
                     progress(None, "training", "训练进行中")
                 time.sleep(2)
         finally:
             if process.poll() is None:
-                process.kill()
+                _signal_training(process, hard=True)
+            process.wait(timeout=10)
     if process.returncode != 0:
         stderr = log_path.read_text(encoding="utf-8", errors="replace")[-2000:]
         raise RuntimeError(f"训练子进程退出码 {process.returncode}: {stderr}")
@@ -286,7 +291,25 @@ def _run_ultralytics(request: dict, workdir: Path, should_stop, progress) -> dic
     return json.loads(output_file.read_text(encoding="utf-8"))
 
 
-class JobStopped(Exception):
+def _signal_training(process, *, hard: bool) -> None:
+    """Signal only the session created for this exact training child."""
+    if os.name == "posix":
+        import signal
+        try:
+            if os.getpgid(process.pid) == process.pid:
+                os.killpg(process.pid, signal.SIGKILL if hard else signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+    elif hard:
+        process.kill()
+    else:
+        process.terminate()
+
+
+from app.workers.dispatcher import JobCancelled
+
+
+class JobStopped(JobCancelled):
     """训练被取消。"""
 
 
@@ -315,7 +338,7 @@ def train(
         "env": environment_snapshot(),
     }
     if adapter.backend == "dummy":
-        result = _run_dummy(request, workdir, progress)
+        result = _run_dummy(request, workdir, progress, should_stop)
     else:
         result = _run_ultralytics(request, workdir, should_stop, progress)
     result["dataset_manifest_sha256"] = version.manifest_sha256

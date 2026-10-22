@@ -23,18 +23,9 @@ logger = logging.getLogger("bysj.worker.inference")
 WORKER_TYPES = ("inference",)
 
 
-def _acquire_gpu(ctx: JobContext, *, timeout_seconds: int = 120) -> str:
-    holder = f"inference:{os.getpid()}:{ctx.job.id[:8]}"
-    deadline = time.time() + timeout_seconds
-    while time.time() < deadline:
-        ctx.check_cancelled()
-        if lease_service.acquire_lease(
-            ctx.db, lease_service.GPU_RESOURCE, holder=holder, job_id=ctx.job.id, ttl_seconds=ctx.settings.gpu_lease_seconds
-        ):
-            return holder
-        ctx.progress(None, "waiting_gpu", "等待 GPU 租约")
-        time.sleep(2)
-    raise ApiError(503, "gpu_busy", "等待 GPU 租约超时")
+def _acquire_gpu(ctx: JobContext):
+    from app.workers.gpu import acquire
+    return acquire(ctx)
 
 
 def handle_inference(ctx: JobContext) -> dict:
@@ -50,6 +41,7 @@ def handle_inference(ctx: JobContext) -> dict:
     class_map = model.class_map_json or {}
     adapter = get_adapter(ctx.settings)
     holder = _acquire_gpu(ctx)
+    handle = None
     try:
         load_start = time.perf_counter()
         handle = adapter.load(model_path, class_map)
@@ -66,13 +58,14 @@ def handle_inference(ctx: JobContext) -> dict:
                 ctx.check_cancelled()
             except JobCancelled:
                 raise
-            source = inference_service.resolve_item_path(ctx.db, ctx.settings, item)
-            if not source.exists():
-                raise FileNotFoundError("源图像不存在")
             process_start = time.perf_counter()
             try:
+                source = inference_service.resolve_item_path(ctx.db, ctx.settings, item)
+                if not source.exists():
+                    raise FileNotFoundError("源图像不存在")
                 predictions = adapter.predict_image(handle, source, run.params_json or {})
             except Exception as exc:
+                ctx.lock_for_write()
                 item.status = "failed"
                 item.error = f"{type(exc).__name__}: {exc}"[:1000]
                 item.finished_at = utcnow()
@@ -88,6 +81,8 @@ def handle_inference(ctx: JobContext) -> dict:
             except Exception:
                 target = None  # 结果图失败不影响预测落库
 
+            ctx.lock_for_write()
+            ctx.db.query(InferencePrediction).filter(InferencePrediction.item_id == item.id).delete()
             for prediction in predictions:
                 ctx.db.add(
                     InferencePrediction(
@@ -131,8 +126,10 @@ def handle_inference(ctx: JobContext) -> dict:
             run.completed_count = int(run.completed_count or 0) + 1
             ctx.db.commit()
             ctx.progress(index / max(1, len(items)), "inferring", f"推理 {index}/{len(items)}")
-        adapter.release(handle)
 
+        ctx.lock_for_write()
+        run.completed_count = ctx.db.query(InferenceItem).filter(InferenceItem.run_id == run.id, InferenceItem.status == "completed").count()
+        run.failed_count = ctx.db.query(InferenceItem).filter(InferenceItem.run_id == run.id, InferenceItem.status == "failed").count()
         run.status = "partial" if int(run.failed_count or 0) else "completed"
         run.finished_at = utcnow()
         ctx.db.commit()
@@ -144,29 +141,15 @@ def handle_inference(ctx: JobContext) -> dict:
             "status": run.status,
         }
     finally:
-        lease_service.release_lease(ctx.db, lease_service.GPU_RESOURCE, holder=holder)
+        if handle is not None:
+            adapter.release(handle)
+        from app.workers.gpu import release
+        release(ctx, holder)
 
 
 def run_forever() -> None:  # pragma: no cover
-    from app.core.config import get_settings
-
-    settings = get_settings()
-    logging.basicConfig(level="INFO")
-    worker_id = f"inference-{socket.gethostname()}-{os.getpid()}"
-    factory = get_session_factory()
-    lease = f"worker:inference:{worker_id}"
-    while True:
-        with factory() as db:
-            lease_service.acquire_lease(db, lease, holder=worker_id, ttl_seconds=30)
-            job_service.mark_stale_interrupted(db, older_than_seconds=max(120, settings.job_lease_seconds))
-            job = job_service.claim_job(
-                db, job_types=WORKER_TYPES, worker_id=worker_id, lease_seconds=settings.job_lease_seconds
-            )
-            if job:
-                run_claimed_job(db, job, worker_id=worker_id, settings=settings)
-            else:
-                db.commit()
-        time.sleep(settings.worker_poll_seconds)
+    from app.workers.runtime import run_worker
+    run_worker("inference", WORKER_TYPES)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -63,6 +63,8 @@ class Settings(BaseSettings):
     worker_poll_seconds: float = 2.0
     job_lease_seconds: int = 120
     gpu_lease_seconds: int = 600
+    gpu_wait_seconds: int = Field(default=0, ge=0, description="0=queue indefinitely; cancellation remains available")
+    required_worker_roles: list[str] = []
     max_pending_training_per_user: int = 5
     training_epoch_seconds: int = 0
 

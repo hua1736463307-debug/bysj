@@ -80,7 +80,7 @@ def get_annotation_state(db: Session, asset_id: int, user: CurrentUser) -> dict:
         geometry="rect",
     )
     draft_asset = None
-    if draft is not None:
+    if draft is not None and version.state != "frozen":
         draft_asset = (
             db.query(AnnotationDraftAsset)
             .filter(
@@ -123,7 +123,8 @@ def save_annotations(
 ) -> dict:
     asset = dataset_service.get_asset(db, asset_id, user)
     version = dataset_service.get_version(db, asset.dataset_version_id, user)
-    if version.state == "frozen":
+    version = db.query(DatasetVersion).filter(DatasetVersion.id == version.id).populate_existing().with_for_update().one()
+    if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_frozen", "冻结版本内容只读；请创建子版本后再修改标注")
     class_map = version.class_map_json or {}
     validated = [_validate_box(box, class_map) for box in boxes]
@@ -157,7 +158,7 @@ def save_annotations(
             )
             db.add(draft)
             try:
-                db.commit()
+                db.flush()
             except IntegrityError:
                 db.rollback()
                 if attempt == 1:
@@ -202,6 +203,9 @@ def save_annotations(
         draft.last_page = max(1, int(page))
         draft.last_image_path = asset.relative_path
         draft.updated_at = utcnow()
+        # The version is locked until commit. Freeze/export/training must see
+        # the saved labels, not the original import labels hidden by a draft.
+        asset.annotations_json = validated
         try:
             db.commit()
         except IntegrityError:

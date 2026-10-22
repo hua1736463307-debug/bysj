@@ -1,0 +1,23 @@
+# Local integration only. Never publish the inherited candidate image.
+services:
+  migrate:
+    image: bysj-unblock-candidate:20261022
+    command: ["python", "-m", "alembic", "-c", "/opt/bysj/backend/alembic.ini", "upgrade", "head"]
+    volumes:
+      - ../backend:/opt/bysj/backend:ro
+  api:
+    image: bysj-unblock-candidate:20261022
+    volumes:
+      - ../backend:/opt/bysj/backend:ro
+  worker:
+    image: bysj-unblock-candidate:20261022
+    volumes:
+      - ../backend:/opt/bysj/backend:ro
+  dataset-worker:
+    image: bysj-unblock-candidate:20261022
+    volumes:
+      - ../backend:/opt/bysj/backend:ro
+  inference-worker:
+    image: bysj-unblock-candidate:20261022
+    volumes:
+      - ../backend:/opt/bysj/backend:ro

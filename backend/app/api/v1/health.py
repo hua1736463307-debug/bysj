@@ -29,14 +29,17 @@ def ready(db: Session = Depends(get_db)):
         components["database"] = {"status": "error", "detail": type(exc).__name__}
 
     try:
-        from app.domains.lease_service import active_worker_leases
+        from app.domains.lease_service import worker_roles
+        from app.core.config import get_settings
 
-        leases = active_worker_leases(db)
-        components["workers"] = {"status": "ok", "active_leases": leases}
+        roles = worker_roles(db)
+        missing = [role for role in get_settings().required_worker_roles if not roles.get(role)]
+        components["workers"] = {"status": "missing" if missing else "ok", "roles": roles,
+                                  "active_leases": sum(roles.values()), "missing": missing}
     except Exception as exc:  # pragma: no cover
         components["workers"] = {"status": "unknown", "detail": type(exc).__name__}
 
-    healthy = components.get("database", {}).get("status") == "ok"
+    healthy = all(components.get(key, {}).get("status") == "ok" for key in ("database", "workers"))
     payload = {"status": "ready" if healthy else "degraded", "components": components}
     return JSONResponse(
         status_code=200 if healthy else 503,

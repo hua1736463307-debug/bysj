@@ -145,8 +145,8 @@ def get_asset(db: Session, asset_id: int, user: CurrentUser) -> DatasetAsset:
 
 
 def delete_asset(db: Session, asset: DatasetAsset) -> None:
-    version = db.get(DatasetVersion, asset.dataset_version_id)
-    if version and version.state == "frozen":
+    version = db.query(DatasetVersion).filter(DatasetVersion.id == asset.dataset_version_id).populate_existing().with_for_update().one()
+    if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_frozen", "冻结版本内容只读；请创建子版本后删除")
     if version and version.parent_version_id:
         pass
@@ -155,5 +155,8 @@ def delete_asset(db: Session, asset: DatasetAsset) -> None:
 
 
 def restore_asset(db: Session, asset: DatasetAsset) -> None:
+    version = db.query(DatasetVersion).filter(DatasetVersion.id == asset.dataset_version_id).populate_existing().with_for_update().one()
+    if version.state not in {"draft", "failed"}:
+        raise ApiError(409, "version_frozen", "冻结或冻结中的版本只读")
     asset.deleted_at = None
     db.commit()

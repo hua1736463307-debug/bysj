@@ -100,13 +100,17 @@ def list_runs(
 @router.get("/runs/{run_id}", response_model=None)
 def get_run(
     run_id: str,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
     user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     run = inference_service.get_run(db, run_id, user)
-    items = db.query(InferenceItem).filter(InferenceItem.run_id == run.id).order_by(InferenceItem.created_at).all()
+    items = db.query(InferenceItem).filter(InferenceItem.run_id == run.id).order_by(InferenceItem.created_at, InferenceItem.id).offset((page - 1) * page_size).limit(page_size).all()
     data = inference_service.serialize_run(run)
     data["items"] = [inference_service.serialize_item(db, item) for item in items]
+    data["page"] = page
+    data["page_size"] = page_size
     return ok(data)
 
 

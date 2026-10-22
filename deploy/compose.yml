@@ -18,6 +18,20 @@ services:
     ports:
       - "127.0.0.1:${DB_PORT:-5433}:5432"
 
+  migrate:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: api
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bysj}:${DB_PASSWORD}@db:5432/${POSTGRES_DB:-bysj}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    command: ["python", "-m", "alembic", "-c", "/app/backend/alembic.ini", "upgrade", "head"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
   api:
     build:
       context: ..
@@ -35,17 +49,18 @@ services:
       MODEL_ROOT: /models
       ARTIFACT_ROOT: /artifacts
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8080}
+      REQUIRED_WORKER_ROLES: '["dataset", "trainer", "inference"]'
+      INLINE_JOBS: "false"
+      BYSJ_CODE_SHA: ${BYSJ_CODE_SHA:?set source commit SHA}
       ML_BACKEND: ${ML_BACKEND:-ultralytics}
-    command: >
-      sh -c "python -m alembic -c /app/backend/alembic.ini upgrade head &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
     volumes:
       - data:/data
       - models:/models
       - artifacts:/artifacts
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/live', timeout=5)\""]
       interval: 10s
@@ -83,16 +98,24 @@ services:
       DATA_ROOT: /data
       MODEL_ROOT: /models
       ARTIFACT_ROOT: /artifacts
+      INLINE_JOBS: "false"
+      BYSJ_CODE_SHA: ${BYSJ_CODE_SHA:?set source commit SHA}
       ML_BACKEND: ${ML_BACKEND:-ultralytics}
       WORKER_TYPE: trainer
     command: ["python", "-m", "app.workers.trainer_worker"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.workers.health", "trainer"]
+      interval: 10s
+      timeout: 5s
+      retries: 4
+      start_period: 30s
     volumes:
       - data:/data
       - models:/models
       - artifacts:/artifacts
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   dataset-worker:
     profiles: ["workers"]
@@ -108,15 +131,23 @@ services:
       DATA_ROOT: /data
       MODEL_ROOT: /models
       ARTIFACT_ROOT: /artifacts
+      INLINE_JOBS: "false"
+      BYSJ_CODE_SHA: ${BYSJ_CODE_SHA:?set source commit SHA}
       ML_BACKEND: dummy
     command: ["python", "-m", "app.workers.dataset_worker"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.workers.health", "dataset"]
+      interval: 10s
+      timeout: 5s
+      retries: 4
+      start_period: 30s
     volumes:
       - data:/data
       - models:/models
       - artifacts:/artifacts
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   inference-worker:
     profiles: ["workers"]
@@ -132,22 +163,30 @@ services:
       DATA_ROOT: /data
       MODEL_ROOT: /models
       ARTIFACT_ROOT: /artifacts
+      INLINE_JOBS: "false"
+      BYSJ_CODE_SHA: ${BYSJ_CODE_SHA:?set source commit SHA}
       ML_BACKEND: ${ML_BACKEND:-ultralytics}
     command: ["python", "-m", "app.workers.inference_worker"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.workers.health", "inference"]
+      interval: 10s
+      timeout: 5s
+      retries: 4
+      start_period: 30s
     volumes:
       - data:/data
       - models:/models
       - artifacts:/artifacts
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   db-data:
-    name: bysj-db-data
+    name: ${BYSJ_VOLUME_PREFIX:-bysj}-db-data
   data:
-    name: bysj-data
+    name: ${BYSJ_VOLUME_PREFIX:-bysj}-data
   models:
-    name: bysj-models
+    name: ${BYSJ_VOLUME_PREFIX:-bysj}-models
   artifacts:
-    name: bysj-artifacts
+    name: ${BYSJ_VOLUME_PREFIX:-bysj}-artifacts

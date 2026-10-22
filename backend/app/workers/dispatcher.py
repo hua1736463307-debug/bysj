@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import Callable
 
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from app.core.config import Settings, get_settings
 from app.core.errors import ApiError
@@ -13,6 +15,7 @@ from app.db.base import utcnow
 from app.db.models import JobTask
 from app.db.session import get_session_factory
 from app.domains import job_service
+from app.workers.liveness import JobHeartbeat
 
 logger = logging.getLogger("bysj.worker")
 
@@ -34,13 +37,20 @@ class JobContext:
     settings: Settings
     worker_id: str
 
+    def __post_init__(self):
+        self.attempt = self.job.attempt
+        self.guard = JobHeartbeat(self.job.id, self.attempt, self.worker_id, self.settings)
+
     def progress(self, value: float, stage: str | None = None, message: str | None = None) -> None:
+        self.check_cancelled()
         job_service.update_progress(
-            self.db, self.job, worker_id=self.worker_id, progress=value, stage=stage, message=message
+            self.db, self.job, worker_id=self.worker_id, progress=value, stage=stage, message=message,
+            expected_attempt=self.attempt,
         )
         # 长训练期间必须续租，否则其它 worker 的心跳清扫会误判为 interrupted。
         job_service.heartbeat(
-            self.db, self.job, worker_id=self.worker_id, lease_seconds=self.settings.job_lease_seconds
+            self.db, self.job, worker_id=self.worker_id, lease_seconds=self.settings.job_lease_seconds,
+            expected_attempt=self.attempt,
         )
 
     def event(self, event_type: str, message: str, payload: dict | None = None) -> None:
@@ -48,11 +58,31 @@ class JobContext:
 
     def check_cancelled(self) -> None:
         self.db.refresh(self.job)
+        if (self.guard.lost.is_set() or self.job.lease_owner != self.worker_id
+                or self.job.attempt != self.attempt or self.job.status not in {"running", "cancelling"}
+                or self.job.lease_expires_at is None or self.job.lease_expires_at <= utcnow()):
+            raise ApiError(409, "lease_lost", "任务租约失效，停止当前执行")
         if self.job.cancel_requested or self.job.status == "cancelling":
             raise JobCancelled()
 
+    def should_stop(self) -> bool:
+        self.check_cancelled()
+        return False
+
+    def lock_for_write(self) -> None:
+        self.check_cancelled()
+        row = self.db.execute(select(JobTask.id).where(
+            JobTask.id == self.job.id, JobTask.lease_owner == self.worker_id,
+            JobTask.attempt == self.attempt, JobTask.status == "running",
+            JobTask.cancel_requested.is_(False), JobTask.lease_expires_at > utcnow(),
+        ).with_for_update()).scalar_one_or_none()
+        if row is None:
+            raise ApiError(409, "lease_lost", "拒绝陈旧执行写入产物")
+
     def heartbeat(self) -> None:
-        job_service.heartbeat(self.db, self.job, worker_id=self.worker_id, lease_seconds=self.settings.job_lease_seconds)
+        if not job_service.heartbeat(self.db, self.job, worker_id=self.worker_id,
+                expected_attempt=self.attempt, lease_seconds=self.settings.job_lease_seconds):
+            self.guard.lost.set()
 
 
 class JobCancelled(Exception):
@@ -74,12 +104,17 @@ def run_claimed_job(db: Session, job: JobTask, *, worker_id: str, settings: Sett
     settings = settings or get_settings()
     context = JobContext(db=db, job=job, settings=settings, worker_id=worker_id)
     handler = resolve_handler(job.type)
+    context.guard.start()
     try:
         result = handler(context)
+        context.check_cancelled()
     except JobCancelled:
-        job_service.finish_job(db, job, worker_id=worker_id, result=None, message="任务已取消")
+        job_service.finish_job(db, job, worker_id=worker_id, result=None, message="任务已取消", expected_attempt=context.attempt)
         return "cancelled"
     except ApiError as exc:
+        db.rollback()
+        if exc.code == "lease_lost":
+            return "interrupted"
         job_service.fail_job(
             db,
             job,
@@ -87,15 +122,19 @@ def run_claimed_job(db: Session, job: JobTask, *, worker_id: str, settings: Sett
             code=exc.code,
             detail=exc.message,
             result={"error": exc.data} if exc.data else None,
+            expected_attempt=context.attempt,
         )
         return "failed"
     except Exception as exc:  # 记录类型，不吞 traceback 到响应
         logger.exception("job_failed job_id=%s type=%s", job.id, job.type)
+        db.rollback()
         job_service.fail_job(
-            db, job, worker_id=worker_id, code="internal_error", detail=f"{type(exc).__name__}: {exc}"
+            db, job, worker_id=worker_id, code="internal_error", detail=f"{type(exc).__name__}: {exc}", expected_attempt=context.attempt,
         )
         return "failed"
-    job_service.finish_job(db, job, worker_id=worker_id, result=result or {}, message="任务完成")
+    finally:
+        context.guard.close()
+    job_service.finish_job(db, job, worker_id=worker_id, result=result or {}, message="任务完成", expected_attempt=context.attempt)
     return "completed"
 
 
@@ -113,6 +152,6 @@ def execute_job_inline(job_id: str) -> str:
             job.started_at = now
             job.heartbeat_at = now
             job.lease_owner = "inline"
-            job.lease_expires_at = now
+            job.lease_expires_at = now + timedelta(seconds=get_settings().job_lease_seconds)
             db.commit()
         return run_claimed_job(db, job, worker_id="inline")

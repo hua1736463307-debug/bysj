@@ -42,18 +42,9 @@ def _cancel_checker(job_id: str):
     return _check
 
 
-def _acquire_gpu(ctx: JobContext, *, timeout_seconds: int = 120) -> str:
-    holder = f"trainer:{os.getpid()}:{ctx.job.id[:8]}"
-    deadline = time.time() + timeout_seconds
-    while time.time() < deadline:
-        ctx.check_cancelled()
-        if lease_service.acquire_lease(
-            ctx.db, lease_service.GPU_RESOURCE, holder=holder, job_id=ctx.job.id, ttl_seconds=ctx.settings.gpu_lease_seconds
-        ):
-            return holder
-        ctx.progress(None, "waiting_gpu", "等待 GPU 租约")
-        time.sleep(2)
-    raise ApiError(503, "gpu_busy", "等待 GPU 租约超时")
+def _acquire_gpu(ctx: JobContext):
+    from app.workers.gpu import acquire
+    return acquire(ctx)
 
 
 def handle_training(ctx: JobContext) -> dict:
@@ -76,12 +67,13 @@ def handle_training(ctx: JobContext) -> dict:
             class_map=version.class_map_json or {},
             params=payload.get("params") or {},
             workdir=workspace,
-            should_stop=_cancel_checker(ctx.job.id),
+            should_stop=ctx.should_stop,
             progress=ctx.progress,
         )
         ctx.check_cancelled()
         best_path = Path(result["best_path"])
         metrics = result.get("metrics") or {}
+        ctx.lock_for_write()
         registered = model_service.register_trained_model(
             ctx.db,
             ctx.settings,
@@ -114,6 +106,7 @@ def handle_training(ctx: JobContext) -> dict:
                 "best_path": str(best_path),
             },
         )
+        ctx.lock_for_write()
         ctx.db.add(experiment)
         ctx.db.commit()
         return {
@@ -126,7 +119,8 @@ def handle_training(ctx: JobContext) -> dict:
             "dataset_manifest_sha256": version.manifest_sha256,
         }
     finally:
-        lease_service.release_lease(ctx.db, lease_service.GPU_RESOURCE, holder=holder)
+        from app.workers.gpu import release
+        release(ctx, holder)
 
 
 def handle_evaluation(ctx: JobContext) -> dict:
@@ -150,6 +144,7 @@ def handle_evaluation(ctx: JobContext) -> dict:
             output = adapter.evaluate(handle, dataset_yaml, run.split, run.params_json or {})
         finally:
             adapter.release(handle)
+        ctx.lock_for_write()
         run.status = "completed"
         run.metrics_json = output.get("metrics") or {}
         run.artifacts_json = {"backend": output.get("backend"), "reason": output.get("reason"), "dataset_yaml": str(dataset_yaml)}
@@ -163,28 +158,13 @@ def handle_evaluation(ctx: JobContext) -> dict:
             "reason": output.get("reason"),
         }
     finally:
-        lease_service.release_lease(ctx.db, lease_service.GPU_RESOURCE, holder=holder)
+        from app.workers.gpu import release
+        release(ctx, holder)
 
 
 def run_forever() -> None:  # pragma: no cover
-    settings = __import__("app.core.config", fromlist=["get_settings"]).get_settings()
-    logging.basicConfig(level="INFO")
-    worker_id = f"trainer-{socket.gethostname()}-{os.getpid()}"
-    factory = get_session_factory()
-    lease = f"worker:trainer:{worker_id}"
-    logger.info("trainer_worker_start id=%s", worker_id)
-    while True:
-        with factory() as db:
-            lease_service.acquire_lease(db, lease, holder=worker_id, ttl_seconds=30)
-            job_service.mark_stale_interrupted(db, older_than_seconds=max(120, settings.job_lease_seconds))
-            job = job_service.claim_job(
-                db, job_types=WORKER_TYPES, worker_id=worker_id, lease_seconds=settings.job_lease_seconds
-            )
-            if job:
-                run_claimed_job(db, job, worker_id=worker_id, settings=settings)
-            else:
-                db.commit()
-        time.sleep(settings.worker_poll_seconds)
+    from app.workers.runtime import run_worker
+    run_worker("trainer", WORKER_TYPES)
 
 
 if __name__ == "__main__":  # pragma: no cover

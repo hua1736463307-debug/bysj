@@ -85,6 +85,8 @@ def export_annotations(
     )
     if version is None:
         raise ApiError(404, "not_found", "数据集还没有版本")
+    if version.dataset_id != resource.id:
+        raise ApiError(404, "not_found", "该版本不属于此数据集")
     if payload.format not in {"yolo-txt", "json"}:
         raise ApiError(422, "invalid_format", "导出格式只支持 yolo-txt 或 json")
 

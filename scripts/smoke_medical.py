@@ -22,7 +22,7 @@ from pathlib import Path
 
 import httpx
 
-TERMINAL = {"completed", "failed", "cancelled"}
+TERMINAL = {"completed", "failed", "cancelled", "interrupted"}
 
 
 def now() -> str:
@@ -40,6 +40,7 @@ class Smoke:
     def record(self, step: str, status: str, **extra) -> None:
         item = {"step": step, "status": status, "at": now(), **extra}
         self.steps.append(item)
+        (self.evidence / "steps.json").write_text(json.dumps(self.steps, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(item, ensure_ascii=False))
 
     def login(self, username: str, password: str) -> str:
@@ -69,6 +70,15 @@ class Smoke:
 
         admin_token = self.login(admin_user, admin_password)
         self.record("login_admin", "ok")
+        base_model_id = config.get("approved_model_id")
+        if config.get("base_relative_path"):
+            registered = self.client.post(f"{self.api}/models/register",
+                headers={"Authorization": f"Bearer {admin_token}"}, json={
+                    "name": "gpu-smoke-base", "relative_path": config["base_relative_path"],
+                    "sha256": config["base_weight_sha256"], "class_map": config["class_map"]})
+            registered.raise_for_status()
+            base_model_id = registered.json()["data"]["model_id"]
+            self.record("register_base", "ok", model_id=base_model_id, sha256=config["base_weight_sha256"])
         create = self.client.post(
             f"{self.api}/auth/users",
             headers={"Authorization": f"Bearer {admin_token}"},
@@ -140,6 +150,7 @@ class Smoke:
 
         train_body = {
             "dataset_version_id": version_id,
+            "model_id": base_model_id,
             "params": {
                 "epochs": int(config.get("epochs", 1)),
                 "batch": int(config.get("batch", 4)),
@@ -164,7 +175,13 @@ class Smoke:
             self.record("train", "failed", error=train.get("error"))
             return 1
         model_id = train["result"]["model_id"]
-        self.record("train", "ok", model_id=model_id, metrics=train["result"].get("metrics"))
+        backend = train["result"].get("backend")
+        expected = config.get("expected_backend")
+        if expected and backend != expected:
+            self.record("train", "failed", reason="unexpected backend", backend=backend)
+            return 1
+        self.record("train", "ok", job_id=train["job_id"], model_id=model_id,
+            backend=backend, metrics=train["result"].get("metrics"))
 
         response = self.client.post(
             f"{self.api}/evaluations",

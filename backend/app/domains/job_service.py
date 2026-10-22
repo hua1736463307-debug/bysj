@@ -211,11 +211,13 @@ def claim_job(
             return candidate
 
 
-def heartbeat(db: Session, job: JobTask, *, worker_id: str, lease_seconds: int = 120) -> bool:
+def heartbeat(db: Session, job: JobTask, *, worker_id: str, lease_seconds: int = 120, expected_attempt: int | None = None) -> bool:
     now = utcnow()
     updated = (
         db.query(JobTask)
-        .filter(JobTask.id == job.id, JobTask.lease_owner == worker_id, JobTask.status.in_(["running", "cancelling"]))
+        .filter(JobTask.id == job.id, JobTask.lease_owner == worker_id,
+                JobTask.attempt == (expected_attempt if expected_attempt is not None else job.attempt),
+                JobTask.lease_expires_at > now, JobTask.status.in_(["running", "cancelling"]))
         .update(
             {"heartbeat_at": now, "lease_expires_at": now + timedelta(seconds=lease_seconds)},
             synchronize_session=False,
@@ -233,6 +235,7 @@ def update_progress(
     progress: float | None = None,
     stage: str | None = None,
     message: str | None = None,
+    expected_attempt: int | None = None,
 ) -> None:
     values: dict[str, Any] = {}
     if progress is not None:
@@ -243,12 +246,16 @@ def update_progress(
         values["message"] = message
     if not values:
         return
-    db.query(JobTask).filter(
+    changed = db.query(JobTask).filter(
         JobTask.id == job.id,
         JobTask.lease_owner == worker_id,
+        JobTask.attempt == (expected_attempt if expected_attempt is not None else job.attempt),
+        JobTask.lease_expires_at > utcnow(),
         JobTask.status.in_(["running", "cancelling"]),
     ).update(values, synchronize_session=False)
     db.commit()
+    if not changed:
+        raise ApiError(409, "lease_lost", "任务租约已失效，拒绝写入进度")
 
 
 def finish_job(
@@ -258,12 +265,14 @@ def finish_job(
     worker_id: str,
     result: dict | None = None,
     message: str = "任务完成",
+    expected_attempt: int | None = None,
 ) -> JobTask:
+    attempt = expected_attempt if expected_attempt is not None else job.attempt
     db.refresh(job)
-    if job.lease_owner != worker_id:
+    if job.lease_owner != worker_id or job.attempt != attempt:
         raise ApiError(409, "lease_lost", "任务租约已失效，拒绝写入终态")
     target = "cancelled" if job.cancel_requested or job.status == "cancelling" else "completed"
-    _apply_terminal(db, job, target, message=message, result=result)
+    _apply_terminal(db, job, target, message=message, result=result, worker_id=worker_id, expected_attempt=attempt)
     return job
 
 
@@ -275,28 +284,38 @@ def fail_job(
     code: str,
     detail: str,
     result: dict | None = None,
+    expected_attempt: int | None = None,
 ) -> JobTask:
+    attempt = expected_attempt if expected_attempt is not None else job.attempt
     db.refresh(job)
-    if job.lease_owner != worker_id:
+    if job.lease_owner != worker_id or job.attempt != attempt:
         raise ApiError(409, "lease_lost", "任务租约已失效，拒绝写入终态")
-    job.error_code = code
-    job.error_detail = detail[:4000]
-    _apply_terminal(db, job, "failed", message=detail[:500], result=result)
+    _apply_terminal(db, job, "failed", message=detail[:500], result=result, worker_id=worker_id,
+                    expected_attempt=attempt, errors={"error_code": code, "error_detail": detail[:4000]})
     return job
 
 
-def _apply_terminal(db: Session, job: JobTask, target: str, *, message: str, result: dict | None) -> None:
+def _apply_terminal(db: Session, job: JobTask, target: str, *, message: str, result: dict | None,
+                    worker_id: str | None = None, expected_attempt: int | None = None, errors: dict | None = None) -> None:
     if not _transition_allowed(job.status, target):
         raise ApiError(409, "invalid_transition", f"非法状态转换 {job.status} -> {target}")
-    job.status = target
-    job.stage = target
-    job.message = message
-    job.finished_at = utcnow()
+    now = utcnow()
+    query = db.query(JobTask).filter(JobTask.id == job.id, JobTask.status == job.status,
+        JobTask.attempt == (expected_attempt if expected_attempt is not None else job.attempt),
+        JobTask.cancel_requested == job.cancel_requested)
+    if worker_id is not None:
+        query = query.filter(JobTask.lease_owner == worker_id, JobTask.lease_expires_at > now)
+    values = dict(status=target, stage=target, message=message, finished_at=now)
+    values.update(errors or {})
     if result is not None:
-        job.result_json = result
+        values["result_json"] = result
     if target in {"completed", "failed", "cancelled"}:
-        job.progress = 1.0 if target == "completed" else job.progress
+        values["progress"] = 1.0 if target == "completed" else job.progress
+    changed = query.update(values, synchronize_session=False)
     db.commit()
+    if not changed:
+        raise ApiError(409, "lease_lost", "任务状态或租约已变化，拒绝写入终态")
+    db.refresh(job)
     append_event(db, job, target, message, result or {})
 
 
@@ -304,17 +323,22 @@ def cancel_job(db: Session, job: JobTask) -> JobTask:
     db.refresh(job)
     if job.status in TERMINAL_STATES:
         return job
-    if job.status == "pending":
+    if job.status in {"pending", "interrupted"}:
         _apply_terminal(db, job, "cancelled", message="任务已取消", result=None)
         return job
     if job.status in {"running", "cancelling", "interrupted"}:
         if job.status != "cancelling":
             if not _transition_allowed(job.status, "cancelling"):
                 raise ApiError(409, "invalid_transition", f"当前状态不可取消: {job.status}")
-            job.status = "cancelling"
-        job.cancel_requested = True
-        job.message = "已请求取消，等待执行进程退出"
+        changed = db.query(JobTask).filter(JobTask.id == job.id, JobTask.status == job.status,
+            JobTask.attempt == job.attempt).update(dict(status="cancelling", cancel_requested=True,
+            message="已请求取消，等待执行进程退出"), synchronize_session=False)
         db.commit()
+        db.refresh(job)
+        if not changed:
+            if job.status in TERMINAL_STATES:
+                return job
+            raise ApiError(409, "state_changed", "任务状态已变化，请刷新")
         append_event(db, job, "cancel_requested", "已请求取消")
         return job
     raise ApiError(409, "invalid_transition", f"当前状态不可取消: {job.status}")
@@ -326,18 +350,23 @@ def mark_stale_interrupted(db: Session, *, older_than_seconds: int = 300) -> int
     cutoff = now - timedelta(seconds=older_than_seconds)
     stale = (
         db.query(JobTask)
-        .filter(JobTask.status == "running")
+        .filter(JobTask.status.in_(["running", "cancelling"]))
         .filter((JobTask.lease_expires_at.is_(None)) | (JobTask.lease_expires_at < now))
         .filter((JobTask.heartbeat_at.is_(None)) | (JobTask.heartbeat_at < cutoff))
         .all()
     )
+    count = 0
     for job in stale:
-        job.status = "interrupted"
-        job.stage = "interrupted"
-        job.message = "worker 心跳超时，任务中断"
+        changed = db.query(JobTask).filter(JobTask.id == job.id,
+            JobTask.attempt == job.attempt, JobTask.status.in_(["running", "cancelling"]),
+            (JobTask.lease_expires_at.is_(None)) | (JobTask.lease_expires_at < now),
+            (JobTask.heartbeat_at.is_(None)) | (JobTask.heartbeat_at < cutoff),
+        ).update(dict(status="interrupted", stage="interrupted", message="worker 心跳超时，任务中断"), synchronize_session=False)
         db.commit()
-        append_event(db, job, "interrupted", "worker 心跳超时，任务中断", level="error")
-    return len(stale)
+        if changed:
+            count += 1
+            append_event(db, job, "interrupted", "worker 心跳超时，任务中断", level="error")
+    return count
 
 
 def pause_for_resume(db: Session, job: JobTask) -> JobTask:

@@ -33,6 +33,7 @@ def run(request: dict) -> dict:
         name="train",
         exist_ok=True,
         pretrained=True,
+        amp=False,  # Avoid Ultralytics' implicit download/load of another model for AMP checks.
         verbose=True,
     )
     trainer = getattr(model, "trainer", None)
@@ -70,7 +71,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Ultralytics 训练子进程入口")
     parser.add_argument("--request", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--parent-pid", type=int)
     args = parser.parse_args()
+
+    if args.parent_pid and sys.platform == "linux":
+        # Install before importing torch. If the worker is killed, the training
+        # process also dies; the DB GPU lease remains quarantined until recovery.
+        import ctypes
+        import os
+        import signal
+        libc = ctypes.CDLL(None, use_errno=True)
+        if libc.prctl(1, signal.SIGKILL, 0, 0, 0) != 0:
+            raise RuntimeError("cannot install training parent-death signal")
+        if os.getppid() != args.parent_pid:
+            return 1
 
     request_path = Path(args.request)
     output_path = Path(args.output)

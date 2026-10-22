@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import ApiError
-from app.core.storage import atomic_write_bytes
+from app.core.storage import atomic_write_bytes, resolve_under, normalize_relative
 from app.db.base import utcnow
 from app.db.models import DatasetAsset, DatasetVersion
 from app.domains.datasets.split_service import SplitError, build_manifest
@@ -26,11 +26,14 @@ def freeze_version(
     fixed_splits: dict[str, str] | None = None,
     progress=None,
 ) -> dict:
+    version = db.query(DatasetVersion).filter(DatasetVersion.id == version.id).populate_existing().with_for_update().one()
     if version.state == "frozen":
         raise ApiError(409, "version_frozen", "版本已冻结，内容不可修改")
     if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_invalid_state", f"当前版本状态不可冻结: {version.state}")
 
+    version.state = "validating"
+    db.commit()
     assets = (
         db.query(DatasetAsset)
         .filter(DatasetAsset.dataset_version_id == version.id, DatasetAsset.deleted_at.is_(None))
@@ -51,8 +54,6 @@ def freeze_version(
         for asset in assets
     ]
 
-    version.state = "validating"
-    db.commit()
     try:
         manifest, stats = build_manifest(
             entries,
@@ -71,6 +72,19 @@ def freeze_version(
         raise ApiError(422, "split_invalid", str(exc), exc.details) from exc
 
     version_dir = Path(version.root_path)
+    # YOLO reads sidecar files, not database JSON. Materialize the exact frozen
+    # labels, including empty files for deleted boxes, before publishing frozen.
+    label_names = set()
+    for item in manifest["assets"]:
+        relative = normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
+        if relative in label_names:
+            version.state = "failed"
+            db.commit()
+            raise ApiError(409, "label_name_collision", "不同图像对应相同 YOLO 标签路径")
+        label_names.add(relative)
+        label = resolve_under(version_dir / "labels", relative)
+        body = "".join(f"{a['class_id']} {a['cx']:.6f} {a['cy']:.6f} {a['w']:.6f} {a['h']:.6f}\n" for a in item["annotations"])
+        atomic_write_bytes(label, body.encode("utf-8"))
     manifest_path = version_dir / "manifest.json"
     payload = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
     atomic_write_bytes(manifest_path, payload)
@@ -80,6 +94,7 @@ def freeze_version(
         asset = by_path.get(item["relative_path"])
         if asset is not None:
             asset.split = item["split"]
+            asset.label_path = "labels/" + normalize_relative(asset.relative_path).with_suffix(".txt").as_posix()
             if not asset.root_asset_id:
                 asset.root_asset_id = asset.id
 
@@ -113,7 +128,7 @@ def freeze_version(
 
 
 def assert_editable(version: DatasetVersion) -> None:
-    if version.state == "frozen":
+    if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_frozen", "冻结版本只读；修改标注请创建子版本")
     if version.deleted_at is not None:
         raise ApiError(404, "not_found", "版本不存在")

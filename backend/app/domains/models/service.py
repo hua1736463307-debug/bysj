@@ -104,6 +104,14 @@ def register_trained_model(
     metrics: dict,
     backend: str,
 ) -> ModelRegistry:
+    # The dispatcher holds the current job row lock before this call. A retry
+    # after registration but before terminal status must reuse that registration.
+    existing = db.query(ModelRegistry).filter(ModelRegistry.training_job_id == job_id).one_or_none()
+    if existing is not None:
+        if existing.dataset_version_id != version_id or existing.owner_id != owner_id:
+            raise ApiError(409, "model_lineage_conflict", "该任务已登记不同血缘的模型")
+        verify_model_file(existing, settings)
+        return existing
     digest = sha256_file(best_path)
     target_dir = ensure_dir(settings.model_root / "training" / job_id)
     target = target_dir / "best.pt"

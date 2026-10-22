@@ -3,15 +3,17 @@ from __future__ import annotations
 
 import json
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_user, settings_dep
 from app.core.config import Settings
 from app.core.errors import ApiError, accepted, ok
-from app.core.storage import remove_tree
+from app.core.storage import remove_tree, resolve_under
 from app.db.models import DatasetAsset, DatasetResource, DatasetVersion
 from app.db.session import get_db
 from app.domains import job_service
@@ -188,6 +190,8 @@ def list_assets(
     version = service.get_version(db, version_id, user) if version_id else service.latest_version(db, resource.id)
     if version is None:
         raise ApiError(404, "not_found", "数据集还没有版本")
+    if version.dataset_id != resource.id:
+        raise ApiError(404, "not_found", "该版本不属于此数据集")
     items, total = service.list_assets(db, version.id, page=page, page_size=page_size)
     return ok(
         {
@@ -224,6 +228,8 @@ def create_version(
         raise ApiError(404, "not_found", "数据集还没有版本")
     if len(payload.ratios) != 3 or any(value <= 0 for value in payload.ratios):
         raise ApiError(422, "invalid_ratios", "三集比例必须是三个正数")
+    if version.dataset_id != resource.id:
+        raise ApiError(404, "not_found", "该版本不属于此数据集")
 
     job, created = job_service.create_job(
         db,
@@ -233,6 +239,7 @@ def create_version(
         payload={
             "dataset_id": resource.id,
             "version_id": version.id,
+            "dataset_version_id": version.id,
             "split_seed": payload.split_seed,
             "ratios": payload.ratios,
         },
@@ -288,6 +295,20 @@ def delete_asset(
     asset = service.get_asset(db, asset_id, user)
     service.delete_asset(db, asset)
     return ok({"asset_id": asset_id, "deleted": True}, message="图像资产已删除")
+
+
+@router.get("/assets/{asset_id}/image", response_model=None)
+def asset_image(asset_id: int, user: CurrentUser = Depends(get_current_user),
+                db: Session = Depends(get_db), settings: Settings = Depends(settings_dep)):
+    asset = service.get_asset(db, asset_id, user)
+    version = service.get_version(db, asset.dataset_version_id, user)
+    root = Path(version.root_path).resolve()
+    try:
+        root.relative_to(settings.data_root.resolve())
+    except ValueError as exc:
+        raise ApiError(409, "invalid_path", "图像路径超出数据目录") from exc
+    path = resolve_under(root / "images", asset.relative_path, must_exist=True)
+    return FileResponse(path, headers={"Cache-Control": "private, no-store"})
 
 
 @router.post("/assets/{asset_id}/restore", response_model=None)

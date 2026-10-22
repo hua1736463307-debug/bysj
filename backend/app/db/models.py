@@ -322,7 +322,7 @@ class ModelRegistry(Base):
     owner_id: Mapped[int | None] = mapped_column(BIGINT_FK, nullable=True, index=True)
     model_task: Mapped[str] = mapped_column(String(32), nullable=False, default="detect")
     trusted_source: Mapped[str] = mapped_column(String(32), nullable=False, default="platform")
-    training_job_id: Mapped[str | None] = mapped_column(UUID, nullable=True, index=True)
+    training_job_id: Mapped[str | None] = mapped_column(UUID, nullable=True, unique=True)
     available: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     class_map_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
 
@@ -496,8 +496,9 @@ class ArtifactRecord(Base):
 class ResourceLease(Base):
     __tablename__ = "resource_leases"
 
-    resource: Mapped[str] = mapped_column(String(32), primary_key=True)
-    holder: Mapped[str] = mapped_column(String(64), nullable=False)
+    resource: Mapped[str] = mapped_column(String(160), primary_key=True)
+    holder: Mapped[str] = mapped_column(String(160), nullable=False)
+    generation: Mapped[int] = mapped_column(BigInteger, nullable=False, default=1, server_default="1")
     job_id: Mapped[str | None] = mapped_column(UUID, nullable=True)
     acquired_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     heartbeat_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
