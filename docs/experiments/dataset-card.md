@@ -25,6 +25,10 @@ manifest sha256：`1f27a4d97179dfd787e7a8504766a84882ec6453acc1c246062700d409a33
 split_manifest_hash：`87b4200c6b5f50ee8a10f48158fbf329f30362634d21655695db56d51bc1c52a`
 完整性检查：364 个文件逐个重算 sha256，无交集（`scripts/check_split_integrity.py` 退出 0）。
 
+续作正式部署通过 v1 导入后，原图父版本为 `8f32546d-11ec-412d-a1c5-2c6aa41a1fa7`，服务器 manifest SHA256 为 `32988ed7845c5933d58a4c139c76b4e6f4e21dce38392c9f1b9b5df233887042`；上面的 manifest 是原始 prepared 文件摘要，两者包含的版本元数据不同。三集划分摘要一致。
+
+E2 训练切片子版本 `a4d2a2b5-2465-58ff-8e20-6126a2e0d3ef` 包含 1746 train / 37 val / 36 test。仅训练原图按 320 边长、0.2 重叠切片，标注最小可见比例 0.5；val/test 图像和标注摘要完全保持。固定原图 test 上使用整图推理。本次对比不评估测试时切片/拼接的收益。
+
 ## 3. 类别映射
 
 | class_id | 名称 | XML 名称 |

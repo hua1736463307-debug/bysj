@@ -53,6 +53,7 @@ OpenAPI：`GET /api/openapi.json`，交互文档 `GET /api/docs`。
 | POST | `/datasets/import` | multipart（files + 来源字段）→ 202 job |
 | GET | `/datasets` | 归属过滤 + 分页 |
 | GET | `/datasets/{id}` | 详情 + 最新版本 |
+| POST | `/datasets/{id}/train-tile-versions` | 已冻结 parent_version_id → 202 job；必需 Idempotency-Key；仅 train 切片，val/test 原图保持 |
 | GET | `/datasets/{id}/assets` | `version_id/page/page_size` |
 | GET | `/datasets/{id}/versions` | 版本列表 |
 | POST | `/datasets/{id}/versions` | 冻结任务（202） |

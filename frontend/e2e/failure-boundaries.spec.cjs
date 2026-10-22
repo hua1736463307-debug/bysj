@@ -56,7 +56,7 @@ test('bad image becomes partial run without discarding successful item',async({p
 
 test('training cancellation is reachable through the real UI',async({page,request},info)=>{
   const {headers,result}=await fixture(page,request)
-  const frozen=(await (await request.post(api+`/datasets/${result.dataset_id}/versions`,{headers,data:{version_id:result.version_id,seed:42,ratios:[.8,.1,.1]}})).json()).data
+  const frozen=(await (await request.post(api+`/datasets/${result.dataset_id}/versions`,{headers,data:{base_version_id:result.version_id,split_seed:42,ratios:[.8,.1,.1]}})).json()).data
   await expect.poll(async()=>(await (await request.get(api+'/jobs/'+frozen.job_id,{headers})).json()).data.status,{timeout:60000}).toBe('completed')
   const models=(await (await request.get(api+'/models?page_size=200',{headers})).json()).data.items
   await page.getByRole('link',{name:'模型训练',exact:true}).click()

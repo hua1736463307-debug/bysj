@@ -31,6 +31,7 @@ def main():
         if values:
             axes[2].bar(i,np.mean(values),color=colors[i],width=.55,yerr=np.std(values,ddof=1) if len(values)>1 else None,capsize=5)
             axes[2].scatter([i]*len(values),values,color='#252525',s=15,zorder=3)
+        else:axes[2].text(i,.1,'Not run',ha='center')
     axes[2].set(xticks=x,xticklabels=names,title='Training time',ylabel='Minutes per seed')
     fig.suptitle(f"E1 original training vs E2 train-only tiles — {data['status']}",y=1.04)
     fig.text(.5,-.04,'Error bars: sample SD across training seeds; shared original-image test set. Equal epoch ceiling, unequal compute.',ha='center',fontsize=9)
