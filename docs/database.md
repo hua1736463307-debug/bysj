@@ -29,7 +29,7 @@
 |---|---|
 | `state` | draft / validating / frozen / failed |
 | `manifest_sha256` | 规范化 manifest 的 hash（不含时间戳） |
-| `split_manifest_hash` | 三集内容 hash 的聚合 |
+| `split_manifest_hash` | 按三集分别排序的图像 SHA256 聚合；不含标注。实验比较另用含路径、来源组和标注的快照摘要 |
 | `class_map_hash` | 类别表 hash |
 | `split_config_json` | seed/ratios/group_level；回流子版本记录父版本 |
 | `parent_version_id` | 子版本血缘 |
@@ -58,12 +58,11 @@
 `backend/migrations/versions/304f405af95f_initial_medical_platform_schema.py` 在空库创建
 全部 21 张业务表（实测）。
 
-已有 bysj 实验库升级顺序：
+空库执行 `alembic upgrade head`，按迁移链创建业务表并补上 GPU 租约 generation；加上 `alembic_version` 共 22 张表。Compose 的一次性 migrate 服务成功后才允许 API/worker 启动。
 
-1. 备份数据库副本（禁止直接操作生产库）；
-2. `alembic stamp 304f405af95f`（表已存在，只登记版本）；
-3. 如需字段补齐，单独编写增量迁移（nullable → 回填 → 加约束）；
-4. 空库直接 `upgrade head`。
+已有由当前迁移链管理的 v1 库先做一致性备份，核对 `alembic current` 和 schema，再执行正常 `upgrade head`。未知旧库不能因为同名表存在就 `stamp`；表名相同不代表列、索引、约束和内容兼容。
+
+旧 schema 的迁移采用 `scripts/migrate_legacy_snapshot.py` 的离线拷贝函数：源库只读 REPEATABLE READ 事务、完整 schema 指纹匹配，目标必须是新建且已迁移的空库；逐项转换标注、身份、版本血缘和受控文件，并验证行数、摘要与序列。活动任务、未知 schema、缺失文件或模糊归属均拒绝。本轮仅有三项合成 PostgreSQL 演练通过；真实旧库副本仍未提供，不能声称已兼容真实历史数据。
 
 不得在生产对象上 `create_all`/`drop_all`；行业表不进入新应用 metadata，删除另列迁移。
 
@@ -72,5 +71,9 @@
 - 冻结版本内容 hash 不变；
 - 一次回流导出只产生一个子版本；
 - 预测原始记录不可被 review 覆写；
-- 终态任务不可回到运行态；
+- completed/failed/cancelled 不直接回到运行态；interrupted 只经显式 resume 增加 attempt 后重新排队，旧 attempt 无权回写；
 - 删除被模型/训练/子版本引用的版本返回 409。
+
+## 6. GPU 租约
+
+`resource_leases` 记录 `resource/holder/generation/job_id/expires_at`。训练、评估、推理在同一数据库内竞争 `gpu:0`。过期持有者进入隔离，不能仅凭到期时间被新 worker 抢占；旧 holder/generation 必须在确认对应进程停止后精确恢复。作业 attempt、租约 generation 与心跳分别限制旧执行者回写。另一套数据库无法参与此互斥，恢复演练启动 GPU worker 前必须停止原项目的 GPU worker。

@@ -139,3 +139,7 @@ Content-Type: application/json
  "width":640,"height":480,"predictions":[{"class_id":0,"class_name":"RBC",
  "confidence":0.87,"bbox_xyxy":[12.0,20.0,48.0,60.0]}],"timing":{"total_ms":23.4}}]}
 ```
+
+上例数字仅演示字段，不是性能验收。`total_ms` 为整批受理到该图写入阶段的累计时间，随批内位置增长；`processing_ms` 为本图预测及产物处理区间，`model_ms` 为框架同步后的推理区间。`queue_ms` 是领取前等待，`gpu_wait_ms` 是领取后 GPU 租约等待；不能把累计 `total_ms` 解释成单图 GPU 耗时。完整定义和实测样本见 [E4 性能报告](experiments/2026-10-22/PERFORMANCE.md)。
+
+正式训练应显式固定 `optimizer/lr0/lrf/momentum/weight_decay/warmup_epochs`；当前只接受 AdamW 或 SGD，不接受随迭代规模改变行为的 auto。有效参数、增强、早停与锁/源码摘要保存在训练结果中。被取消的训练不能经 `/resume` 复活；工具的 `--retry-cancelled` 是显式创建新任务并保留旧证据。

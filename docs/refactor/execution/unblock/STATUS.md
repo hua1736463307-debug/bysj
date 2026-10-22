@@ -3,6 +3,8 @@
 执行目录：`D:\毕业设计\bysj-unblock`；分支：`graduation/unblock-20261022`。
 起点：`113181f498bac6d16988f97261ad628c9cdc8ea8`。原 DS 目录保持不变。
 
+接手步骤、精确命令和额度停线流程见 [CONTINUATION](CONTINUATION.md)。
+
 用户停止条件：周限额剩余 <=20% 时先写状态书，再停止。起始剩余 72%；2026-10-22 09:28（America/Los_Angeles）最近检查剩余 40%。尚未达到停止条件。
 
 当前正式运行源码：`bc3602e62e3b73b4aaeec4456c184dfe1bfc4a13`。运行项目 `bysj-restore2-20261022`，网页 http://127.0.0.1:18084，API http://127.0.0.1:18004。原候选 API/三 worker 已停，卷和容器保留。正式实验执行中，不得重启 trainer 或启动另一套 GPU worker。
