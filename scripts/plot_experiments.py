@@ -46,12 +46,14 @@ def main():
         ax.set(xticks=cx,xticklabels=list(labels.values()),ylim=(0,1.1),title=title,ylabel='Score');ax.legend()
     fig.tight_layout();save(fig,'per-class')
     fig,axes=plt.subplots(1,2,figsize=(11,4.5))
+    matrices=[np.array(r['metrics']['confusion_matrix']) for g in groups.values() for r in g['completed'] if r['seed']==42]
+    common_max=max((float(matrix.max()) for matrix in matrices),default=1)
     for ax,name in zip(axes,names):
         row=next((r for r in groups[name]['completed'] if r['seed']==42),None)
         if row is None:ax.text(.5,.5,'Seed 42 not completed',ha='center');ax.set_axis_off();continue
         matrix=np.array(row['metrics']['confusion_matrix']);labels=row['metrics']['confusion_matrix_labels']
-        image=ax.imshow(matrix,cmap='Blues');fig.colorbar(image,ax=ax,fraction=.046)
-        for (r,c),v in np.ndenumerate(matrix):ax.text(c,r,str(int(v)),ha='center',va='center',color='white' if v>matrix.max()/2 else 'black',fontsize=8)
+        image=ax.imshow(matrix,cmap='Blues',vmin=0,vmax=max(1,common_max));fig.colorbar(image,ax=ax,fraction=.046)
+        for (r,c),v in np.ndenumerate(matrix):ax.text(c,r,str(int(v)),ha='center',va='center',color='white' if v>common_max/2 else 'black',fontsize=8)
         ax.set(xticks=range(len(labels)),xticklabels=labels,yticks=range(len(labels)),yticklabels=labels,xlabel='True',ylabel='Predicted',title=name+' seed 42: test counts')
         ax.tick_params(axis='x',rotation=25)
     fig.tight_layout();save(fig,'confusion-seed42')

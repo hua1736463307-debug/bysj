@@ -32,7 +32,7 @@
 
 本文件为进行中记录，不能作为最终验收报告。真实旧库副本、真实人工复核质量、学校/导师认可均不能由工程测试代替。
 
-E1 已完成 68/77/78 epoch（预设早停）；三 seed test mAP50=0.9398±0.0150，mAP50–95=0.6518±0.0155，样本标准差。详见 docs/experiments/2026-10-22/RESULTS.md。E4 见同目录 PERFORMANCE.md。E2 当前 job 151bbfb6-a33e-48fc-830d-28a0c81518fb，运行时间明显更长；约 09:12 同机另一项目启动（无 GPU 请求），保留其运行状态，E2 耗时不作纯粹切片因果归因。
+E1 已完成 68/77/78 epoch（预设早停）；三 seed test mAP50=0.9398±0.0150，mAP50–95=0.6518±0.0155，样本标准差。详见 docs/experiments/2026-10-22/RESULTS.md。E4 见同目录 PERFORMANCE.md。E2 seed42 已于 38 epoch 早停并完成独立 test（mAP50–95=0.6150；同 seed 差值 −0.0422，n=1 不作总体结论），训练 job 151bbfb6-a33e-48fc-830d-28a0c81518fb；seed43 当前 job 01950a5c-2a7a-4739-b7a9-54f318cd00c5。约 09:12 同机另一项目启动（无 GPU 请求），保留其运行状态，E2 耗时不作纯粹切片因果归因。
 
 已推送独立分支，草稿 PR：https://github.com/hua1736463307-debug/bysj/pull/1 。远端提交 9acf611 的 medical-ci 39809041778 success：后端 114、PG 15、工具 36 项通过，前端测试/build 与 Compose 通过；远端 GPU job 按配置 skipped，本机另有实际 GPU 证据。后续新提交需看各自 CI。
 
