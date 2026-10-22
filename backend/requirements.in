@@ -1,0 +1,19 @@
+# 毕业版后端运行时依赖输入（PR-00A 建立）。
+# 精确版本由 backend/requirements.lock.txt 固定；本文件只声明范围。
+# 安装：python -m pip install --require-hashes -r backend/requirements.lock.txt
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.7,<3.0
+pydantic-settings>=2.3,<3.0
+sqlalchemy>=2.0,<2.2
+alembic>=1.13,<2.0
+psycopg[binary]>=3.1.18,<4.0
+python-jose[cryptography]>=3.3,<4.0
+passlib[bcrypt]>=1.7.4,<2.0
+bcrypt==4.0.1
+python-multipart>=0.0.9,<1.0
+pillow>=10.0,<14.0
+numpy>=1.26,<3.0
+pyyaml>=6.0,<7.0
+aiofiles>=23.0,<25.0
+email-validator>=2.0,<3.0

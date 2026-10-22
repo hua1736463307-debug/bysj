@@ -29,3 +29,12 @@ logs/
 *.tgz
 frontend/auto-imports.d.ts
 frontend/components.d.ts
+
+# 执行期产物（不提交）
+artifacts/
+.smoke/
+.smoke-ml/
+.locks/
+.venv-ml/
+.venv-locktest/
+deploy/.env

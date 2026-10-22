@@ -1,0 +1,9 @@
+# 训练/推理镜像额外的 ML 依赖输入（PR-00A 建立，PR-00B 锁定）。
+# 只在 worker 镜像或 GPU 环境安装；API 镜像默认不安装，避免把 torch 带入请求进程。
+torch>=2.2,<3.0
+torchvision>=0.17,<1.0
+ultralytics>=8.2,<9.0
+opencv-python-headless>=4.8,<5.0
+pandas>=2.0,<3.0
+matplotlib>=3.8,<4.0
+scikit-learn>=1.4,<2.0
