@@ -1,5 +1,7 @@
 # 后续执行入口与证据导航
 
+**已按用户指令停止实施。当前接手先读 [停止状态书](STATEBOOK-20261022.md)。运行后端已更新到 5c4b1d3，分组准备包未导入，最新最终备份未做。下文保留旧执行导航，旧 E1/E2 续跑命令已被数据质量门禁阻断。**
+
 本文件用于接手当前实施，最新是否停线、额度、正在执行的任务见 [STATUS](STATUS.md)。不能根据历史任务书里的旧路径重新覆盖本轮成果。
 
 > 10:00 数据质量门禁覆盖下文旧 E2 续跑步骤：原 E1/E2 目录已有 BLOCKED.json，禁止续跑旧协议，包括 --retry-cancelled。先阅读 docs/experiments/2026-10-22/DATA-QUALITY-REVIEW.md。新保守分组准备包为 artifacts/bccd-grouped-20261022，364 图/363 组；后续需使用 image_cluster/source_groups 导入新版本，按新的事后开发协议评估，不能冒充未见 test。
