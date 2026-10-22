@@ -1,0 +1,350 @@
+[
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "startup_auth_system",
+    "line": 458,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "put_annotation_draft",
+    "line": 7020,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "upload_dataset",
+    "line": 6250,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "list_dataset_version_assets",
+    "line": 8048,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "save_dataset_annotation_version",
+    "line": 8083,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "_build_training_preflight",
+    "line": 10150,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "start_training",
+    "line": 10341,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "predict_image",
+    "line": 10488,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "predict_batch",
+    "line": 10637,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/yolo_api.py",
+    "symbol": "upload_model",
+    "line": 11774,
+    "git_blob_sha1": "27e9ff75b662899337c14a106079fb56e0e87450"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "User",
+    "line": 64,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "DatasetResource",
+    "line": 360,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "DatasetVersion",
+    "line": 321,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "DatasetAsset",
+    "line": 389,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "AnnotationDraft",
+    "line": 425,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "JobTask",
+    "line": 546,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "JobEvent",
+    "line": 595,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "ModelRegistry",
+    "line": 868,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/database.py",
+    "symbol": "init_db",
+    "line": 1078,
+    "git_blob_sha1": "055514088f4c0608dfaa176314aa868fac978a41"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "validate_dataset",
+    "line": 181,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "persist_manifest_version",
+    "line": 362,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "_asset_source_group",
+    "line": 638,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "_grouped_three_way_split",
+    "line": 814,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "export_training_version",
+    "line": 1032,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/dataset_versioning.py",
+    "symbol": "delete_dataset_version_records",
+    "line": 58,
+    "git_blob_sha1": "698369ec3157db42f0458df9a8e0a86b032d35cb"
+  },
+  {
+    "path": "backend/image_size_processing.py",
+    "symbol": "plan_annotation_tiles",
+    "line": 459,
+    "git_blob_sha1": "c48c6a36a51fade29dab6e2817c252c323a41b39"
+  },
+  {
+    "path": "backend/image_size_processing.py",
+    "symbol": "render_annotation_tile",
+    "line": 737,
+    "git_blob_sha1": "c48c6a36a51fade29dab6e2817c252c323a41b39"
+  },
+  {
+    "path": "backend/image_size_processing.py",
+    "symbol": "resolve_tiling_profile",
+    "line": 958,
+    "git_blob_sha1": "c48c6a36a51fade29dab6e2817c252c323a41b39"
+  },
+  {
+    "path": "backend/annotation_drafts.py",
+    "symbol": "get_draft_for_update",
+    "line": 125,
+    "git_blob_sha1": "f4c727993b663dd7b9d052ca5aa8a5707655b6b1"
+  },
+  {
+    "path": "backend/annotation_drafts.py",
+    "symbol": "upsert_draft",
+    "line": 172,
+    "git_blob_sha1": "f4c727993b663dd7b9d052ca5aa8a5707655b6b1"
+  },
+  {
+    "path": "backend/annotation_export.py",
+    "symbol": "frontend_annotation_to_manifest",
+    "line": 85,
+    "git_blob_sha1": "9a4c3a577b612e51c8022134befcb8e9c038c9d0"
+  },
+  {
+    "path": "backend/utils/archive_utils.py",
+    "symbol": "safe_extract_zip",
+    "line": 71,
+    "git_blob_sha1": "651002b156f075e24c328a1e28940ceaae86c95c"
+  },
+  {
+    "path": "backend/dataset_access.py",
+    "symbol": "require_dataset_read",
+    "line": 120,
+    "git_blob_sha1": "d31e90476a094114a32f0857d914b62cd2b0c3e1"
+  },
+  {
+    "path": "backend/dataset_access.py",
+    "symbol": "require_dataset_manage",
+    "line": 132,
+    "git_blob_sha1": "d31e90476a094114a32f0857d914b62cd2b0c3e1"
+  },
+  {
+    "path": "backend/job_store.py",
+    "symbol": "create_job",
+    "line": 50,
+    "git_blob_sha1": "3a37057bf1f3127c877ec55a842ddd5cfba79f36"
+  },
+  {
+    "path": "backend/job_store.py",
+    "symbol": "update_job",
+    "line": 83,
+    "git_blob_sha1": "3a37057bf1f3127c877ec55a842ddd5cfba79f36"
+  },
+  {
+    "path": "backend/job_store.py",
+    "symbol": "request_job_cancel",
+    "line": 193,
+    "git_blob_sha1": "3a37057bf1f3127c877ec55a842ddd5cfba79f36"
+  },
+  {
+    "path": "backend/job_store.py",
+    "symbol": "claim_pending_training_job",
+    "line": 231,
+    "git_blob_sha1": "3a37057bf1f3127c877ec55a842ddd5cfba79f36"
+  },
+  {
+    "path": "backend/job_store.py",
+    "symbol": "fail_orphaned_training_jobs",
+    "line": 570,
+    "git_blob_sha1": "3a37057bf1f3127c877ec55a842ddd5cfba79f36"
+  },
+  {
+    "path": "backend/training_worker.py",
+    "symbol": "get_training_mp_context",
+    "line": 128,
+    "git_blob_sha1": "3b83fe13fb0c38155a29bb923adb3f55c3c94d8c"
+  },
+  {
+    "path": "backend/training_worker.py",
+    "symbol": "training_worker_process",
+    "line": 327,
+    "git_blob_sha1": "3b83fe13fb0c38155a29bb923adb3f55c3c94d8c"
+  },
+  {
+    "path": "backend/training_worker.py",
+    "symbol": "stop_training_process",
+    "line": 839,
+    "git_blob_sha1": "3b83fe13fb0c38155a29bb923adb3f55c3c94d8c"
+  },
+  {
+    "path": "backend/training_worker_service.py",
+    "symbol": "TrainingWorkerService",
+    "line": 33,
+    "git_blob_sha1": "f053581121883093ead475124bd410135e46eda3"
+  },
+  {
+    "path": "backend/model_registry.py",
+    "symbol": "register_model_file",
+    "line": 44,
+    "git_blob_sha1": "60bbe3384d84d8e61ec32b8504403eb23845adee"
+  },
+  {
+    "path": "backend/model_registry.py",
+    "symbol": "build_model_lineage",
+    "line": 108,
+    "git_blob_sha1": "60bbe3384d84d8e61ec32b8504403eb23845adee"
+  },
+  {
+    "path": "backend/model_registry.py",
+    "symbol": "filter_available_model_records",
+    "line": 88,
+    "git_blob_sha1": "60bbe3384d84d8e61ec32b8504403eb23845adee"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const saveHistory =",
+    "line": 1197,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const undo =",
+    "line": 1227,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const redo =",
+    "line": 1247,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const buildAnnotationDraftPayload =",
+    "line": 1391,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const saveAnnotationDraft =",
+    "line": 1458,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const loadImageToCanvas =",
+    "line": 3228,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Annotation.vue",
+    "symbol": "const exportDataset =",
+    "line": 4131,
+    "git_blob_sha1": "208a7f7b4605bf69e81c8db32b6bb5f0af67784f"
+  },
+  {
+    "path": "frontend/src/views/Training.vue",
+    "symbol": "const buildTrainingRequest =",
+    "line": 1258,
+    "git_blob_sha1": "d19700bbf571ba47fbef77fe6acdd6b714ce430c"
+  },
+  {
+    "path": "frontend/src/views/Training.vue",
+    "symbol": "const startTraining =",
+    "line": 1293,
+    "git_blob_sha1": "d19700bbf571ba47fbef77fe6acdd6b714ce430c"
+  },
+  {
+    "path": "frontend/src/views/Inference.vue",
+    "symbol": "const getPayload =",
+    "line": 613,
+    "git_blob_sha1": "17a7cb919686c98203e5ff21e6c751640f2eb2ea"
+  },
+  {
+    "path": "frontend/src/views/Inference.vue",
+    "symbol": "const extractDetections =",
+    "line": 682,
+    "git_blob_sha1": "17a7cb919686c98203e5ff21e6c751640f2eb2ea"
+  },
+  {
+    "path": "frontend/src/views/Inference.vue",
+    "symbol": "const downloadResults =",
+    "line": 1081,
+    "git_blob_sha1": "17a7cb919686c98203e5ff21e6c751640f2eb2ea"
+  }
+]

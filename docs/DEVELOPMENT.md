@@ -1,3 +1,5 @@
+> 历史筛选阶段记录，保留追溯。当前医学方向、实施范围和详细任务已由 [重构执行入口](refactor/START_HERE.md) 与 [详细任务书](refactor/TASK_BOOK.md) 明确；下文的“题目未定/后续确定”等描述不再作为当前计划。
+
 # 开发与环境边界
 
 本次目标是代码筛选与保存，尚未完成独立部署重构。前端为 Vue 3/Vite 4，后端为 FastAPI、SQLAlchemy、PyTorch、Ultralytics；保留原依赖声明，不宣称已锁定可复现版本。
