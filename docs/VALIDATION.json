@@ -1,4 +1,6 @@
 {
+  "record_scope": "historical source-selection baseline; not current refactor acceptance",
+  "current_status": "docs/refactor/execution/unblock/STATUS.md",
   "files": 192,
   "retained_source_files": 183,
   "excluded_source_files": 298,

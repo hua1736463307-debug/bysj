@@ -16,7 +16,9 @@ PYTHONPATH=backend APP_ENV=test python -m pytest backend/tests/medical backend/t
 
 PostgreSQL 集成测试独立于 SQLite fixture：设置专用本地 `BYSJ_TEST_DATABASE_URL`，数据库名必须以 `bysj_test_` 开头，然后执行 `PYTHONPATH=backend python -m pytest tests/integration -q`。每次用随机 schema，Alembic 初始化，不得指向共享库。
 
-前端使用 Node 22：在 `frontend/` 执行 `npm ci`、`npm test`、`npm run build`。浏览器用例需要真实独立后端、数据及用户，配置 `BYSJ_E2E_URL`、`BYSJ_E2E_USERNAME`、`BYSJ_E2E_PASSWORD`、`BYSJ_E2E_DATA` 后执行 `npm run test:e2e`；具体变量以 e2e 文件为准，凭据仅放进程环境。
+前端使用 Node 22：在 `frontend/` 执行 `npm ci`、`npm test`、`npm run build`。浏览器用例需要真实独立后端、数据及用户，配置 `BYSJ_E2E_URL`、`BYSJ_E2E_API`（完整 `/api/v1` URL）、`BYSJ_E2E_USERNAME`、`BYSJ_E2E_PASSWORD`、`BYSJ_E2E_DATA` 后执行 `npm run test:e2e`；凭据仅放进程环境。当前正式环境分别为 `http://127.0.0.1:18084` 与 `http://127.0.0.1:18004/api/v1`，不要误用用例的旧默认 API 端口 18000。浏览器验收会创建样本与 GPU 任务，应在正式实验空闲时执行。
+
+Windows 沙箱若无法创建系统临时文件，先把 `TEMP/TMP` 设置为本工作区专用临时目录再运行 pytest；不得把临时目录权限故障当作业务断言失败，也不要为解决它更改系统目录权限。
 
 ## 本机开发
 

@@ -6,6 +6,26 @@
 `annotation_drafts`、`annotation_draft_assets`、`job_tasks`、`job_events`、`model_registry`。
 新增表用于版本治理、评估、推理、复核与血缘，见下表。
 
+下图只表达主要逻辑引用，不代表已声明 SQL 外键；完整检查范围见第 7 节。
+
+```mermaid
+erDiagram
+    dataset_resources ||--o{ dataset_versions : contains
+    dataset_versions ||--o{ dataset_assets : snapshots
+    dataset_versions o|--o{ dataset_versions : derives
+    job_tasks o|--o{ model_registry : trains
+    dataset_versions o|--o{ model_registry : source
+    model_registry ||--o{ evaluation_runs : evaluates
+    dataset_versions ||--o{ evaluation_runs : fixed_split
+    model_registry ||--o{ inference_runs : predicts
+    inference_runs ||--o{ inference_items : contains
+    inference_items ||--o{ inference_predictions : records
+    inference_items o|--o{ review_records : reviews
+    review_records ||--o{ review_items : decisions
+    dataset_versions ||--o{ feedback_exports : parent
+    dataset_versions o|--o{ feedback_exports : child
+```
+
 | 表 | 用途 | 关键约束 |
 |---|---|---|
 | `auth_sessions` | JWT 会话与登出撤销 | `jti` 唯一 |

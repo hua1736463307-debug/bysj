@@ -1,5 +1,7 @@
 # 环境矩阵（PR-00A 实测）
 
+> 历史快照：以下“Docker 未启动 / GPU_PENDING / PG 阻塞”描述的是 2026-10-21，已不代表当前运行。2026-10-22 的干净 Linux/Python 3.12、torch 2.6.0+cu124、CUDA 12.4、PostgreSQL 16 和实际 GPU 证据见 [U01](refactor/execution/unblock/U01.md)、[U08](refactor/execution/unblock/U08.md) 与 [当前状态](refactor/execution/unblock/STATUS.md)。保留旧记录用于追溯，不按旧目标 Python 3.11 重建当前环境。
+
 采集时间：2026-10-21（America/Los_Angeles），脚本 `scripts/environment_probe.py`，
 原始 JSON：[`refactor/execution/env-probe-pr00a.json`](refactor/execution/env-probe-pr00a.json)。
 

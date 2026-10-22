@@ -5,7 +5,7 @@
 
 接手步骤、精确命令和额度停线流程见 [CONTINUATION](CONTINUATION.md)。
 
-用户停止条件：周限额剩余 <=20% 时先写状态书，再停止。起始剩余 72%；2026-10-22 09:28（America/Los_Angeles）最近检查剩余 40%。尚未达到停止条件。
+用户停止条件：周限额剩余 <=20% 时先写状态书，再停止。起始剩余 72%；2026-10-22 09:48（America/Los_Angeles）最近检查剩余 33%。尚未达到停止条件。
 
 当前正式运行源码：`bc3602e62e3b73b4aaeec4456c184dfe1bfc4a13`。运行项目 `bysj-restore2-20261022`，网页 http://127.0.0.1:18084，API http://127.0.0.1:18004。原候选 API/三 worker 已停，卷和容器保留。正式实验执行中，不得重启 trainer 或启动另一套 GPU worker。
 
@@ -35,3 +35,7 @@
 E1 已完成 68/77/78 epoch（预设早停）；三 seed test mAP50=0.9398±0.0150，mAP50–95=0.6518±0.0155，样本标准差。详见 docs/experiments/2026-10-22/RESULTS.md。E4 见同目录 PERFORMANCE.md。E2 当前 job 151bbfb6-a33e-48fc-830d-28a0c81518fb，运行时间明显更长；约 09:12 同机另一项目启动（无 GPU 请求），保留其运行状态，E2 耗时不作纯粹切片因果归因。
 
 已推送独立分支，草稿 PR：https://github.com/hua1736463307-debug/bysj/pull/1 。远端提交 9acf611 的 medical-ci 39809041778 success：后端 114、PG 15、工具 36 项通过，前端测试/build 与 Compose 通过；远端 GPU job 按配置 skipped，本机另有实际 GPU 证据。后续新提交需看各自 CI。
+
+09:48 后续证据：d6b54f1 的 medical-ci 39816096597 success，后端 114、PG 15、工具 41 项；前端和 Compose 均成功，GPU job skipped。新增恢复库 48 项标量引用只读检查全部通过；数据库没有声明 SQL 外键，不能把原先 FK 查询为空解释为全部关系完整。详见 U08 与 database-links-20261022.json。
+
+E3 本地待审 ZIP：`D:\毕业设计\bysj-E3人工待审包-20261022.zip`，16 文件，SHA256 `8464c39815b98f35cee0f892212e20eacf546a06a68326588978d2e1c2efb765`，CRC 和逐项内容 hash 已核验；人工字段保持空白。
