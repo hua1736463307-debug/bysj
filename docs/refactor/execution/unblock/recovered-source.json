@@ -1,0 +1,44 @@
+[
+  {
+    "path": "backend/app/domains/datasets/__init__.py",
+    "sha256": "502E5C32EE68BE355C609F5FD4197F023596D60497C2462A411BFCCD7034124D",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/datasets/import_service.py",
+    "sha256": "124D14E68235EBCD175AD0488E77BC15088D2900216FE9225E8D35FCAE5F6993",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/datasets/service.py",
+    "sha256": "22F2EEE46516E17DF0D57CB1C7CD6FAF2B2B72932A9549EE00DF08005CA5ADF6",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/datasets/split_service.py",
+    "sha256": "8FC4051DDA4C67F1789DD9206101246EB04DFD6E6EB0A50883D7153BF3CCFC4B",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/datasets/version_service.py",
+    "sha256": "6E0F0F2633D75FCA4597EB1D84E1F7B21F5F1BDE16549B14F23D197B48DECF7C",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/models/__init__.py",
+    "sha256": "3259861C04116D737DEDA7004181E027623434015D9307F0279D9D40236B0569",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  },
+  {
+    "path": "backend/app/domains/models/service.py",
+    "sha256": "914B4A9AEA75B8C85B299A6A395178C6C885B8BC0A66A403EC215B98FEF6B791",
+    "source": "D:\\智能体\\bysj",
+    "reason": "unanchored ignore omitted source"
+  }
+]
