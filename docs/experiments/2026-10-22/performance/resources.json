@@ -1,0 +1,917 @@
+{
+  "samples": [
+    {
+      "time": 1792685131.9168382,
+      "phase": "idle",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116264960,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 128024576,
+          "processes": 2
+        },
+        "worker": {
+          "rss_sum_bytes": 2018029568,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1716.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685134.9072273,
+      "phase": "import_and_annotation",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116760576,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 92340224,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2018029568,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1728.0,
+      "gpu_util_percent": 9.0
+    },
+    {
+      "time": 1792685137.9074435,
+      "phase": "import_and_annotation",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116273152,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 92340224,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2018029568,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1728.0,
+      "gpu_util_percent": 8.0
+    },
+    {
+      "time": 1792685140.964678,
+      "phase": "import_and_annotation",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116273152,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 92340224,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2018029568,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1727.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685143.9864638,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2411663360,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1729.0,
+      "gpu_util_percent": 8.0
+    },
+    {
+      "time": 1792685147.022727,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2758610944,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1820.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685150.0251315,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2880401408,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1559048192,
+          "processes": 2
+        }
+      },
+      "device_memory_mib": 1855.0,
+      "gpu_util_percent": 5.0
+    },
+    {
+      "time": 1792685153.148111,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 123744256,
+          "processes": 2
+        },
+        "worker": {
+          "rss_sum_bytes": 4239478784,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4244.0,
+      "gpu_util_percent": 21.0
+    },
+    {
+      "time": 1792685156.2870567,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4368265216,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485791232,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4247.0,
+      "gpu_util_percent": 5.0
+    },
+    {
+      "time": 1792685159.3131635,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4473049088,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4250.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685162.3524263,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 114323456,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4413403136,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2236.0,
+      "gpu_util_percent": 4.0
+    },
+    {
+      "time": 1792685165.3866363,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2044375040,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1728.0,
+      "gpu_util_percent": 4.0
+    },
+    {
+      "time": 1792685168.4184432,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2598539264,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1727.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685171.608031,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2756714496,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1553362944,
+          "processes": 2
+        }
+      },
+      "device_memory_mib": 1809.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685174.6387444,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 106299392,
+          "processes": 2
+        },
+        "worker": {
+          "rss_sum_bytes": 4225069056,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 3880.0,
+      "gpu_util_percent": 12.0
+    },
+    {
+      "time": 1792685177.7027154,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4351070208,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4303.0,
+      "gpu_util_percent": 4.0
+    },
+    {
+      "time": 1792685180.6798823,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93716480,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4500525056,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485594624,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4310.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685183.675309,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2281.0,
+      "gpu_util_percent": 8.0
+    },
+    {
+      "time": 1792685186.7314758,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1728.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685189.7525842,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2467168256,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1729.0,
+      "gpu_util_percent": 8.0
+    },
+    {
+      "time": 1792685192.811651,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2787237888,
+          "processes": 3
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1529581568,
+          "processes": 2
+        }
+      },
+      "device_memory_mib": 1815.0,
+      "gpu_util_percent": 7.0
+    },
+    {
+      "time": 1792685195.9021535,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2729365504,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1821.0,
+      "gpu_util_percent": 6.0
+    },
+    {
+      "time": 1792685198.8641033,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4185714688,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4308.0,
+      "gpu_util_percent": 12.0
+    },
+    {
+      "time": 1792685202.0877597,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4338651136,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4313.0,
+      "gpu_util_percent": 5.0
+    },
+    {
+      "time": 1792685205.1825185,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4486848512,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 4331.0,
+      "gpu_util_percent": 13.0
+    },
+    {
+      "time": 1792685208.297239,
+      "phase": "training_api_and_queue",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 4481863680,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1485398016,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2271.0,
+      "gpu_util_percent": 5.0
+    },
+    {
+      "time": 1792685211.6351562,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 116289536,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1486184448,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1757.0,
+      "gpu_util_percent": 11.0
+    },
+    {
+      "time": 1792685214.7248225,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2059943936,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1548820480,
+          "processes": 2
+        }
+      },
+      "device_memory_mib": 1790.0,
+      "gpu_util_percent": 17.0
+    },
+    {
+      "time": 1792685218.2119493,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 160849920,
+          "processes": 2
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488150528,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1809.0,
+      "gpu_util_percent": 13.0
+    },
+    {
+      "time": 1792685221.5368462,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488150528,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 1999.0,
+      "gpu_util_percent": 13.0
+    },
+    {
+      "time": 1792685224.6355193,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488740352,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2008.0,
+      "gpu_util_percent": 5.0
+    },
+    {
+      "time": 1792685227.6314328,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488936960,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2014.0,
+      "gpu_util_percent": 10.0
+    },
+    {
+      "time": 1792685230.6464455,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488936960,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2015.0,
+      "gpu_util_percent": 15.0
+    },
+    {
+      "time": 1792685234.056653,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1488936960,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2221.0,
+      "gpu_util_percent": 52.0
+    },
+    {
+      "time": 1792685237.24522,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 117657600,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1489723392,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2222.0,
+      "gpu_util_percent": 1.0
+    },
+    {
+      "time": 1792685240.5203054,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 119623680,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1490313216,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2284.0,
+      "gpu_util_percent": 72.0
+    },
+    {
+      "time": 1792685243.937479,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 119623680,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 1987358720,
+          "processes": 1
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1490313216,
+          "processes": 1
+        }
+      },
+      "device_memory_mib": 2282.0,
+      "gpu_util_percent": 78.0
+    },
+    {
+      "time": 1792685247.305358,
+      "phase": "inference",
+      "rss": {
+        "api": {
+          "rss_sum_bytes": 119623680,
+          "processes": 1
+        },
+        "dataset-worker": {
+          "rss_sum_bytes": 93519872,
+          "processes": 1
+        },
+        "worker": {
+          "rss_sum_bytes": 2052046848,
+          "processes": 2
+        },
+        "inference-worker": {
+          "rss_sum_bytes": 1543151616,
+          "processes": 2
+        }
+      },
+      "device_memory_mib": 2274.0,
+      "gpu_util_percent": 6.0
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,171 @@
+{
+  "status": "completed",
+  "samples": 303,
+  "phases": {
+    "cold_model": {
+      "samples": 3,
+      "success": 3,
+      "failure_rate": 0.0,
+      "latency_ms": {
+        "queue_ms": {
+          "n": 3,
+          "mean": 1698.8016666666667,
+          "p50": 1826.2730000000001,
+          "p95": 1854.474,
+          "max": 1854.474
+        },
+        "gpu_wait_ms": {
+          "n": 3,
+          "mean": 6.473333333333334,
+          "p50": 6.613,
+          "p95": 7.813,
+          "max": 7.813
+        },
+        "load_ms": {
+          "n": 3,
+          "mean": 34.215333333333334,
+          "p50": 33.291,
+          "p95": 47.454,
+          "max": 47.454
+        },
+        "preprocess_ms": {
+          "n": 3,
+          "mean": 1.1058483335849207,
+          "p50": 1.1916959992959164,
+          "p95": 1.2506240018410608,
+          "max": 1.2506240018410608
+        },
+        "model_ms": {
+          "n": 3,
+          "mean": 10.588941666355822,
+          "p50": 11.172924998390954,
+          "p95": 12.78315000308794,
+          "max": 12.78315000308794
+        },
+        "postprocess_ms": {
+          "n": 3,
+          "mean": 1.6899630002929673,
+          "p50": 1.918003999890061,
+          "p95": 2.028243001404917,
+          "max": 2.028243001404917
+        },
+        "storage_ms": {
+          "n": 3,
+          "mean": 16.05,
+          "p50": 17.502,
+          "p95": 17.912,
+          "max": 17.912
+        },
+        "processing_ms": {
+          "n": 3,
+          "mean": 88.24433333333333,
+          "p50": 98.581,
+          "p95": 99.369,
+          "max": 99.369
+        },
+        "total_ms": {
+          "n": 3,
+          "mean": 1862.4133333333334,
+          "p50": 1976.5680000000002,
+          "p95": 2002.247,
+          "max": 2002.247
+        }
+      },
+      "peak_gpu_allocated_bytes": 123302400,
+      "peak_gpu_reserved_bytes": 159383552
+    },
+    "warm_model": {
+      "samples": 300,
+      "success": 300,
+      "failure_rate": 0.0,
+      "latency_ms": {
+        "queue_ms": {
+          "n": 300,
+          "mean": 1700.3615,
+          "p50": 1855.8239999999998,
+          "p95": 1867.8120000000001,
+          "max": 1867.8120000000001
+        },
+        "gpu_wait_ms": {
+          "n": 300,
+          "mean": 6.393083333333333,
+          "p50": 6.562,
+          "p95": 7.021,
+          "max": 15.511
+        },
+        "load_ms": {
+          "n": 300,
+          "mean": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "preprocess_ms": {
+          "n": 300,
+          "mean": 1.6214989066914616,
+          "p50": 1.3533150013245177,
+          "p95": 2.6045080012409016,
+          "max": 37.96986499946797
+        },
+        "model_ms": {
+          "n": 300,
+          "mean": 14.389632600129213,
+          "p50": 13.56954500079155,
+          "p95": 22.759085997677175,
+          "max": 33.98308299802011
+        },
+        "postprocess_ms": {
+          "n": 300,
+          "mean": 2.7537059099025405,
+          "p50": 2.1203069991315715,
+          "p95": 5.702358001144603,
+          "max": 8.4329550008988
+        },
+        "storage_ms": {
+          "n": 300,
+          "mean": 17.7368,
+          "p50": 17.494,
+          "p95": 24.056,
+          "max": 30.125
+        },
+        "processing_ms": {
+          "n": 300,
+          "mean": 43.16157666666667,
+          "p50": 41.363,
+          "p95": 64.302,
+          "max": 83.829
+        },
+        "total_ms": {
+          "n": 300,
+          "mean": 5003.540493333333,
+          "p50": 4860.021,
+          "p95": 8094.808999999999,
+          "max": 8845.565
+        }
+      },
+      "peak_gpu_allocated_bytes": 127380992,
+      "peak_gpu_reserved_bytes": 178257920
+    }
+  },
+  "concurrency": 1,
+  "api_acceptance_ms": {
+    "n": 9,
+    "mean": 65.97331111131805,
+    "p50": 53.6205999997037,
+    "p95": 139.96270000279765,
+    "max": 139.96270000279765
+  },
+  "batch_throughput_including_warmup_per_second": 8.356120700323254,
+  "notes": [
+    "Warmup excluded from sample statistics but included in explicitly labelled batch throughput.",
+    "total_ms is cumulative accepted-run to item persistence-start latency, not kernel time.",
+    "Cold model means a fresh model handle; process and OS caches are not reset.",
+    "CUDA allocated/reserved peaks are allocator measurements, not device-wide nvidia-smi memory."
+  ],
+  "not_measured": {
+    "peak_rss_bytes": "no process sampler",
+    "gpu_utilization": "no device sampler",
+    "device_memory_peak": "no device sampler",
+    "process_cold_start": "worker remains running"
+  }
+}

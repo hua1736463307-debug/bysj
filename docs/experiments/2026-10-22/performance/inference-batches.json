@@ -1,0 +1,110 @@
+[
+  {
+    "repeat": 0,
+    "phase": "cold_model",
+    "run_id": "6e7908e2-e1bf-4b8a-8b24-8039e4af4e3c",
+    "wall_ms": 2118.4611999997287,
+    "accepted_ms": 52.8532999996969,
+    "requested": 1,
+    "warmup_excluded": 0,
+    "completed": 1,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 0,
+    "phase": "warm_model",
+    "run_id": "97d602bb-4cdc-4348-b51c-670d200e6ce1",
+    "wall_ms": 8514.073300000746,
+    "accepted_ms": 139.96270000279765,
+    "requested": 100,
+    "warmup_excluded": 5,
+    "completed": 100,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 0,
+    "phase": "warm_model",
+    "run_id": "70b488ce-a748-45bd-987d-91f5897ea799",
+    "wall_ms": 2134.187600000587,
+    "accepted_ms": 48.80399999819929,
+    "requested": 10,
+    "warmup_excluded": 5,
+    "completed": 10,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 1,
+    "phase": "cold_model",
+    "run_id": "1a6c9678-3e48-4685-964d-d6330622992d",
+    "wall_ms": 2086.2006999996083,
+    "accepted_ms": 38.09189999810769,
+    "requested": 1,
+    "warmup_excluded": 0,
+    "completed": 1,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 1,
+    "phase": "warm_model",
+    "run_id": "2326b5c8-a884-4be3-b8e3-d6bf91da5534",
+    "wall_ms": 8293.699599998945,
+    "accepted_ms": 74.17279999936,
+    "requested": 100,
+    "warmup_excluded": 5,
+    "completed": 100,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 1,
+    "phase": "warm_model",
+    "run_id": "1b6da3ec-3783-4c4f-97cc-44f80dd9aa1b",
+    "wall_ms": 2156.0991000005743,
+    "accepted_ms": 54.84079999951064,
+    "requested": 10,
+    "warmup_excluded": 5,
+    "completed": 10,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 2,
+    "phase": "cold_model",
+    "run_id": "b25c0930-20c9-4b3b-bc71-f575ded0e346",
+    "wall_ms": 2097.2271999999066,
+    "accepted_ms": 41.12540000278386,
+    "requested": 1,
+    "warmup_excluded": 0,
+    "completed": 1,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 2,
+    "phase": "warm_model",
+    "run_id": "70dda560-cc77-4ccf-8ec0-f5c9a612ce2c",
+    "wall_ms": 9209.936500003096,
+    "accepted_ms": 90.28830000170274,
+    "requested": 100,
+    "warmup_excluded": 5,
+    "completed": 100,
+    "failed": 0,
+    "status": "completed"
+  },
+  {
+    "repeat": 2,
+    "phase": "warm_model",
+    "run_id": "56bffe07-170c-4b15-ab27-d272b8390913",
+    "wall_ms": 3241.1428000013984,
+    "accepted_ms": 53.6205999997037,
+    "requested": 10,
+    "warmup_excluded": 5,
+    "completed": 10,
+    "failed": 0,
+    "status": "completed"
+  }
+]

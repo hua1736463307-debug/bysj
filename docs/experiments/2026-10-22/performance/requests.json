@@ -1,0 +1,254 @@
+[
+  {
+    "operation": "import_accept",
+    "status": "passed",
+    "milliseconds": 40.46809999999823,
+    "job_id": "c40f816e-f28e-410f-bbcb-7c7b7a62c8ed"
+  },
+  {
+    "operation": "import_completion",
+    "status": "completed",
+    "milliseconds": 2102.8903999977047,
+    "job_id": "c40f816e-f28e-410f-bbcb-7c7b7a62c8ed"
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.785799998615403,
+    "revision": 1
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.100400000141235,
+    "revision": 2
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.76480000242009,
+    "revision": 3
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.603100000793347,
+    "revision": 4
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 15.804300001036609,
+    "revision": 5
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.762700000981567,
+    "revision": 6
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.93629999863333,
+    "revision": 7
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.4401000001817,
+    "revision": 8
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 14.793700000154786,
+    "revision": 9
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 17.541799999889918,
+    "revision": 10
+  },
+  {
+    "operation": "import_accept",
+    "status": "passed",
+    "milliseconds": 40.57160000229487,
+    "job_id": "85a3ffa7-cf83-4910-a2c1-63e5b2d67961"
+  },
+  {
+    "operation": "import_completion",
+    "status": "completed",
+    "milliseconds": 2622.8554000008444,
+    "job_id": "85a3ffa7-cf83-4910-a2c1-63e5b2d67961"
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.990299998724367,
+    "revision": 1
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.548299998248694,
+    "revision": 2
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 15.500800000154413,
+    "revision": 3
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.32140000219806,
+    "revision": 4
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.829100000904873,
+    "revision": 5
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 17.399000000295928,
+    "revision": 6
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 17.411900000297464,
+    "revision": 7
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 17.47350000005099,
+    "revision": 8
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.525400002137758,
+    "revision": 9
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 16.167400000995258,
+    "revision": 10
+  },
+  {
+    "operation": "import_accept",
+    "status": "passed",
+    "milliseconds": 29.371599997830344,
+    "job_id": "bca800ea-9f5b-4b45-ae0f-c0fd2b5e51fa"
+  },
+  {
+    "operation": "import_completion",
+    "status": "completed",
+    "milliseconds": 2881.8777999986196,
+    "job_id": "bca800ea-9f5b-4b45-ae0f-c0fd2b5e51fa"
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 20.38159999938216,
+    "revision": 1
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 19.188199999916833,
+    "revision": 2
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 17.189999998663552,
+    "revision": 3
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 18.454299999575596,
+    "revision": 4
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 18.34229999803938,
+    "revision": 5
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 20.508699999481905,
+    "revision": 6
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 19.943899998907,
+    "revision": 7
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 23.408099998050602,
+    "revision": 8
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 22.05649999814341,
+    "revision": 9
+  },
+  {
+    "operation": "annotation_save",
+    "status": "passed",
+    "milliseconds": 19.388900000194553,
+    "revision": 10
+  },
+  {
+    "operation": "training_accept",
+    "status": "passed",
+    "milliseconds": 33.69819999716128,
+    "job_id": "0ac0c56d-723f-43ae-ad2d-ce1d7c163772"
+  },
+  {
+    "operation": "training_claim_wait",
+    "status": "passed",
+    "milliseconds": 651.6619999999999,
+    "job_id": "0ac0c56d-723f-43ae-ad2d-ce1d7c163772"
+  },
+  {
+    "operation": "training_accept",
+    "status": "passed",
+    "milliseconds": 33.54849999959697,
+    "job_id": "2001fbf8-316b-46b1-9457-e9ba7b091e51"
+  },
+  {
+    "operation": "training_claim_wait",
+    "status": "passed",
+    "milliseconds": 1912.2250000000001,
+    "job_id": "2001fbf8-316b-46b1-9457-e9ba7b091e51"
+  },
+  {
+    "operation": "training_accept",
+    "status": "passed",
+    "milliseconds": 43.06519999954617,
+    "job_id": "1ff48f00-3b07-4712-8461-5590d4c90383"
+  },
+  {
+    "operation": "training_claim_wait",
+    "status": "passed",
+    "milliseconds": 1927.4150000000002,
+    "job_id": "1ff48f00-3b07-4712-8461-5590d4c90383"
+  }
+]

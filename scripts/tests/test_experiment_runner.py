@@ -103,3 +103,29 @@ def test_missing_input_not_silently_dropped(tmp_path):
     manifest.write_text(json.dumps({"assets": [{"relative_path": "missing.jpg"}]}))
     with pytest.raises(ValueError, match="missing input"):
         benchmark.select_inputs({"input_manifest": str(manifest), "count": 1})
+
+
+@pytest.mark.parametrize('explicit',[False,True])
+def test_cancelled_seed_requires_explicit_retry_and_preserves_prior_evidence(tmp_path,explicit):
+    keys=[]
+    metrics={**{k:.5 for k in runner.METRICS},'per_class':{'0':{}},'confusion_matrix':[[1,0],[0,0]]}
+    def transport(request):
+        body=json.loads(request.content) if request.content else {}
+        if request.url.path.endswith('/training/jobs'):
+            key=request.headers['Idempotency-Key'];keys.append(key)
+            data={'job_id':'new' if '-retry-' in key else 'old-cancelled','status':'completed' if '-retry-' in key else 'cancelled'}
+        elif request.url.path.endswith('/jobs/old-cancelled'):data={'job_id':'old-cancelled','status':'cancelled'}
+        elif request.url.path.endswith('/jobs/new'):data={'job_id':'new','status':'completed','result':{'model_id':'trained','backend':'ultralytics','environment':{}}}
+        elif request.url.path.endswith('/evaluations'):data={'evaluation':{'evaluation_id':'evaluation'},'job':{'job_id':'test'}}
+        elif request.url.path.endswith('/jobs/test'):data={'job_id':'test','status':'completed'}
+        else:data={'metrics':metrics}
+        return httpx.Response(200,json={'data':data})
+    with httpx.Client(transport=httpx.MockTransport(transport)) as client:
+        result=runner.execute(client,'http://test/api','token',{'config':config(),'build':{}},tmp_path,'digest',10,retry_cancelled=explicit)
+        assert result['status']==('completed' if explicit else 'failed')
+        if explicit:
+            assert list(tmp_path.glob('seed-0.cancelled-*.json'))
+            assert len(keys)==2 and '-retry-' in keys[-1]
+            runner.execute(client,'http://test/api','token',{'config':config(),'build':{}},tmp_path,'digest',10)
+            assert keys[-1]==keys[-2]  # resumed execution reuses new job key
+        else:assert len(keys)==1

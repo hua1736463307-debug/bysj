@@ -17,6 +17,8 @@ def main():
     names=list(groups);colors=['#2176ae','#d65c45'];x=np.arange(len(names))
     def save(fig,name):
         fig.savefig(args.output/(name+'.png'),dpi=220,bbox_inches='tight');fig.savefig(args.output/(name+'.svg'),bbox_inches='tight');plt.close(fig)
+        svg=args.output/(name+'.svg')
+        svg.write_text('\n'.join(line.rstrip() for line in svg.read_text(encoding='utf-8').splitlines())+'\n',encoding='utf-8')
     fig,axes=plt.subplots(1,3,figsize=(13,4))
     for ax,metric,title in zip(axes[:2],('map50','map50_95'),('Test mAP50','Test mAP50-95')):
         for i,name in enumerate(names):
@@ -24,14 +26,14 @@ def main():
             if s['n']:
                 ax.bar(i,s['mean'],color=colors[i],width=.55,yerr=s['std'] if s['n']>1 else None,capsize=5)
                 ax.text(i,s['mean']+.035,f"n={s['n']}",ha='center')
-            else:ax.text(i,.1,'Not run',ha='center')
+            else:ax.text(i,.1,'Not completed',ha='center')
         ax.set(xticks=x,xticklabels=names,ylim=(0,1.08),title=title,ylabel='Score')
     for i,name in enumerate(names):
         values=[r['training_seconds']/60 for r in groups[name]['completed']]
         if values:
             axes[2].bar(i,np.mean(values),color=colors[i],width=.55,yerr=np.std(values,ddof=1) if len(values)>1 else None,capsize=5)
             axes[2].scatter([i]*len(values),values,color='#252525',s=15,zorder=3)
-        else:axes[2].text(i,.1,'Not run',ha='center')
+        else:axes[2].text(i,.1,'Not completed',ha='center')
     axes[2].set(xticks=x,xticklabels=names,title='Training time',ylabel='Minutes per seed')
     fig.suptitle(f"E1 original training vs E2 train-only tiles — {data['status']}",y=1.04)
     fig.text(.5,-.04,'Error bars: sample SD across training seeds; shared original-image test set. Equal epoch ceiling, unequal compute.',ha='center',fontsize=9)

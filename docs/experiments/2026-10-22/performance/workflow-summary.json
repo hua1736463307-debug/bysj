@@ -1,0 +1,88 @@
+{
+  "status": "completed",
+  "error": null,
+  "protocol_sha256": "b6bac7941e33046fd4843d6885f8595139e8755ef7d6dadcc9986cfe60076acd",
+  "output": "artifacts\\E4-workflow\\b6bac7941e33046fd4843d6885f8595139e8755ef7d6dadcc9986cfe60076acd\\1792685131341971300",
+  "resource_summary": {
+    "samples": 38,
+    "errors": [],
+    "device_memory_peak_mib": 4331.0,
+    "gpu_util_percent": {
+      "n": 38,
+      "mean": 12.763157894736842,
+      "p50": 6.0,
+      "p95": 72.0,
+      "max": 78.0
+    },
+    "rss_sum_peak_bytes_by_role": {
+      "api": 119623680,
+      "dataset-worker": 160849920,
+      "worker": 4500525056,
+      "inference-worker": 1559048192
+    },
+    "notes": [
+      "Host device memory includes display/other processes.",
+      "Container process RSS sum can double-count shared pages; it is not private working set.",
+      "Peaks are sampled lower bounds. Sample timestamps give actual interval; configured delay follows each sweep."
+    ]
+  },
+  "operations": {
+    "annotation_save": {
+      "n": 30,
+      "mean": 17.685419999907026,
+      "p50": 16.93629999863333,
+      "p95": 22.05649999814341,
+      "max": 23.408099998050602,
+      "attempted": 30,
+      "failed": 0,
+      "failure_rate": 0.0
+    },
+    "import_accept": {
+      "n": 3,
+      "mean": 36.803766666707816,
+      "p50": 40.46809999999823,
+      "p95": 40.57160000229487,
+      "max": 40.57160000229487,
+      "attempted": 3,
+      "failed": 0,
+      "failure_rate": 0.0
+    },
+    "import_completion": {
+      "n": 3,
+      "mean": 2535.8745333323895,
+      "p50": 2622.8554000008444,
+      "p95": 2881.8777999986196,
+      "max": 2881.8777999986196,
+      "attempted": 3,
+      "failed": 0,
+      "failure_rate": 0.0
+    },
+    "training_accept": {
+      "n": 3,
+      "mean": 36.770633332101475,
+      "p50": 33.69819999716128,
+      "p95": 43.06519999954617,
+      "max": 43.06519999954617,
+      "attempted": 3,
+      "failed": 0,
+      "failure_rate": 0.0
+    },
+    "training_claim_wait": {
+      "n": 3,
+      "mean": 1497.1006666666667,
+      "p50": 1912.2250000000001,
+      "p95": 1927.4150000000002,
+      "max": 1927.4150000000002,
+      "attempted": 3,
+      "failed": 0,
+      "failure_rate": 0.0
+    }
+  },
+  "notes": [
+    "Import completion includes upload, worker queue and polling delay (0.25 s).",
+    "Annotation measurements save existing public labels on disposable engineering copies.",
+    "Training claim wait excludes GPU waiting; inference reports GPU waiting separately.",
+    "Three import/training samples give descriptive p95 only; no population tail claim.",
+    "Cold inference is cold model handle, not reboot or process cold start."
+  ]
+}

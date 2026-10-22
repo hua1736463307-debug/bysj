@@ -172,7 +172,7 @@ def summarize(runs, seeds):
             "Interrupted/timeout tasks require explicit recovery; rerun reuses the same idempotency keys."]}
 
 
-def execute(client, api, token, protocol, output, digest, timeout):
+def execute(client, api, token, protocol, output, digest, timeout, retry_cancelled=False):
     config = protocol["config"]
     headers = {"Authorization": f"Bearer {token}"}
     runs = []
@@ -180,7 +180,23 @@ def execute(client, api, token, protocol, output, digest, timeout):
         record = {"seed": seed, "status": "pending"}
         target = output / f"seed-{seed}.json"
         try:
-            job = request_data(client, "POST", api + "/training/jobs", headers={**headers, "Idempotency-Key": f"exp-{digest}-seed{seed}-train"}, json=training_body(config, seed))
+            saved = json.loads(target.read_text(encoding='utf-8')) if target.exists() else {}
+            base_key = f"exp-{digest}-seed{seed}-train"
+            key = saved.get('training_idempotency_key', base_key)
+            submit = lambda request_key: request_data(client, "POST", api + "/training/jobs", headers={**headers, "Idempotency-Key": request_key}, json=training_body(config, seed))
+            job = submit(key)
+            if job['status']=='cancelled' and retry_cancelled:
+                # Explicit operator action only. A new job keeps old logs and
+                # checkpoints intact; the frozen experiment parameters do not
+                # change. Never retry failed, interrupted or ambiguous jobs here.
+                archive=output/f"seed-{seed}.cancelled-{job['job_id']}.json"
+                if not archive.exists():write_json(archive,{'previous_record':saved,'cancelled_job':job,'reason':'explicit cancelled-seed retry'})
+                record['retry_of_training_job_id']=job['job_id']
+                key=base_key+'-retry-'+job['job_id'].replace('-','')[:16]
+                record.update(status='submitting_retry',training_idempotency_key=key)
+                write_json(target,record)  # an ambiguous POST reuses this key
+                job=submit(key)
+            record['training_idempotency_key']=key
             record.update(training_job_id=job["job_id"], status=job["status"])
             write_json(target, record)
             job = wait_job(client, api, token, job["job_id"], timeout)
@@ -221,7 +237,7 @@ def execute(client, api, token, protocol, output, digest, timeout):
         runs.append(record)
         write_json(output / "summary.json", {"protocol_sha256": digest, **summarize(runs, config["seeds"])})
         # Do not stack additional long jobs behind an unresolved owner.
-        if record["status"] in {"timeout", "interrupted"}:
+        if record["status"] in {"timeout", "interrupted", "cancelled", "failed"}:
             break
     return summarize(runs, config["seeds"])
 
@@ -233,6 +249,7 @@ def main():
     parser.add_argument("--base-url", default=os.environ.get("BYSJ_BASE_URL", "http://127.0.0.1:8000"))
     parser.add_argument("--timeout", type=float, default=7200)
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--retry-cancelled", action="store_true", help="Explicitly start fresh jobs only for server-confirmed cancelled seeds; retain old evidence")
     args = parser.parse_args()
     try:
         config = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -248,7 +265,7 @@ def main():
             if args.prepare_only:
                 print(json.dumps({"status": "prepared", "protocol_sha256": digest, "output": str(output)}))
                 return 0
-            summary = execute(client, api, token, protocol, output, digest, args.timeout)
+            summary = execute(client, api, token, protocol, output, digest, args.timeout, retry_cancelled=args.retry_cancelled)
             print(json.dumps({"status": summary["status"], "protocol_sha256": digest, "output": str(output), "completed_seeds": summary["completed_seeds"]}))
             return 0 if summary["status"] == "completed" else 1
     except Exception as exc:

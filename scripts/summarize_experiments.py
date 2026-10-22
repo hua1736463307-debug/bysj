@@ -47,6 +47,8 @@ def read_group(root):
             compact={'seed':seed,'status':'completed','training_job_id':train['job_id'],'evaluation_id':record['evaluation_id'],
                 'evaluation_job_id':record['evaluation_job_id'],'model_id':result['model_id'],'model_sha256':result['model_sha256'],
                 'epochs_completed':result['epochs_completed'],'training_seconds':result['training_seconds'],
+                'nominal_training_batches':math.ceil(protocol['version']['split_counts']['train']/requested['batch'])*result['epochs_completed'],
+                'optimizer_steps':None,'optimizer_steps_reason':'Not directly instrumented; gradient accumulation varies during warmup. Nominal loader batches are derived separately.',
                 'peak_gpu_allocated_bytes':result['peak_gpu_allocated_bytes'],'peak_gpu_reserved_bytes':result['peak_gpu_reserved_bytes'],
                 'metrics':evaluation['metrics'],'seed_record_sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
             completed.append(compact)
@@ -114,11 +116,12 @@ def main():
         '## 分类别结果','', '| 组 | 类别 | P | R | mAP50 | mAP50–95 |','|---|---|---|---|---|---|']
     for name,g in groups.items():
         for cid,label in g['protocol']['config']['class_map'].items():lines.append('| '+name+' | '+label+' | '+' | '.join(cell(g['per_class'][cid][m]) for m in METRICS)+' |')
-    lines+=['','## 种子与计算成本','', '| 组 | seed | 状态 | 实际 epoch | 训练秒数 |','|---|---|---|---|---|']
+    lines+=['','## 种子与计算成本','', '| 组 | seed | 状态 | 实际 epoch | 名义训练 batch 数 | 训练秒数 |','|---|---|---|---|---|---|']
     for name,g in groups.items():
         for seed in g['seeds']:
             row=next((r for r in g['completed'] if r['seed']==seed['seed']),{})
-            lines.append(f"| {name} | {seed['seed']} | {seed['status']} | {row.get('epochs_completed','—')} | {number(row.get('training_seconds'))} |")
+            lines.append(f"| {name} | {seed['seed']} | {seed['status']} | {row.get('epochs_completed','—')} | {row.get('nominal_training_batches','—')} | {number(row.get('training_seconds'))} |")
+    lines += ['', '名义 batch 数按 ceil(train 图数 / batch) × 实际 epoch 推导；梯度累积随 warmup 变化，优化器实际 step 次数未直接记录，不把该推导值冒充 optimizer steps。']
     lines+=['','## 配对差值','',f"E2−E1 的配对种子：{comparison['paired_seeds']}。仅对两组均成功的相同 seed 计算。",'']
     for m in METRICS:lines.append(f"- {m}：{cell(comparison['metrics'][m])}")
     lines+=['','## 证据与限制','']
@@ -126,6 +129,8 @@ def main():
     lines += [f"- 共同 test 摘要：`{groups['E1']['protocol']['split_asset_sha256']['test']}`。",
         f"- 源码：`{groups['E1']['protocol']['build']['code_sha']}`；具体锁、任务/模型/评估 ID 和 seed 文件 hash 见 results.json。",
         '- 原始训练 CSV、混淆矩阵、曲线和评估产物保存在受控卷与 artifacts，未伪造缺失结果。',
+        '- 种子状态取自 runner 最近一次落盘；pending 不表示当前没有训练。进行中进度以任务 API 为准，未完成者不参与均值。',
+        '- E2 期间观察到同机另一非 GPU 项目启动，CPU/内存为共享资源；训练秒数是当时环境实测，不作切片导致耗时变化的单因果估计。',
         '- BCCD 仅 364 图、test 36 图，无患者/载玻片分组，未验证近重复或跨设备泛化；本结果不构成临床能力结论。',
         '- E3 缺少真实人工审核记录，仍待补；E4 单独按预登记性能方案测量。','']
     (args.output/'RESULTS.md').write_text('\n'.join(lines),encoding='utf-8')

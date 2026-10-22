@@ -1,0 +1,1066 @@
+{
+  "status": "partial",
+  "groups": {
+    "E1": {
+      "status": "completed",
+      "protocol_sha256": "3c6b56d39497202c8e1babc9370f0993e2eb13632c29837987022d0cf763ebb1",
+      "protocol": {
+        "base": {
+          "model_id": "ebc82da059d24213b1b47965587204b7",
+          "sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+        },
+        "build": {
+          "code_sha": "bc3602e62e3b73b4aaeec4456c184dfe1bfc4a13",
+          "ml_lock_sha256": "df3dcfeaec0af29b7951751184a6b982b73dac7ef64f6cf59db6f271ada55970",
+          "requirements_lock_sha256": "af3f2d357933e8b4872486173ff9eecc054cc38a0fd27d579ec438107c7400b4"
+        },
+        "config": {
+          "approved_model_id": "ebc82da059d24213b1b47965587204b7",
+          "augmentation": {
+            "close_mosaic": 10,
+            "degrees": 0.0,
+            "fliplr": 0.5,
+            "flipud": 0.0,
+            "hsv_h": 0.015,
+            "hsv_s": 0.7,
+            "hsv_v": 0.4,
+            "mosaic": 1.0,
+            "scale": 0.5,
+            "translate": 0.1
+          },
+          "base_weight_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+          "batch": 8,
+          "class_map": {
+            "0": "RBC",
+            "1": "WBC",
+            "2": "Platelets"
+          },
+          "dataset_version_id": "8f32546d-11ec-412d-a1c5-2c6aa41a1fa7",
+          "deterministic": true,
+          "device": "0",
+          "early_stopping": {
+            "monitor": "val/mAP50-95",
+            "patience": 20
+          },
+          "epochs": 80,
+          "evaluation_protocol": {
+            "budget": "80 maximum epochs per group; identical batch/seeds/optimizer. E2 has 6x train examples; report total updates and runtime, not equal compute.",
+            "evaluation_space": "whole original images; ordinary whole-image prediction",
+            "human_feedback": "E3 pending genuine independent human annotation audit; not part of this confirmation experiment",
+            "note": "test 只在预先固定的协议下评估一次，不用于调参",
+            "primary_metric": "map50_95",
+            "secondary_metrics": [
+              "map50",
+              "precision",
+              "recall"
+            ],
+            "selection": "best checkpoint selected by validation only",
+            "test_usage": "one independent fixed test evaluation per preregistered group/seed"
+          },
+          "group_level": "original_image",
+          "imgsz": 640,
+          "lr0": 0.001,
+          "lrf": 0.01,
+          "momentum": 0.937,
+          "optimizer": "AdamW",
+          "processing": {
+            "kind": "identity"
+          },
+          "profile": "formal",
+          "purpose": "E1 preregistered original-test comparison",
+          "schema_version": 1,
+          "seeds": [
+            42,
+            43,
+            44
+          ],
+          "source_license_ref": "MIT (BCCD_Dataset LICENSE)",
+          "source_repository": "https://github.com/Shenggan/BCCD_Dataset",
+          "source_revision": "d272fb14cdff6e473fafeeeba32aba5f560e9e43",
+          "split_seed": 42,
+          "test_manifest_sha256": "b9a692230de845bc85ee9afe6cf749bf3a7f1274e8e05d3181f556fc281ee16b",
+          "test_ratio": 0.1,
+          "train_ratio": 0.8,
+          "val_ratio": 0.1,
+          "warmup_epochs": 3,
+          "weight_decay": 0.0005
+        },
+        "effective_requests": [
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 42,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 42
+          },
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 43,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 43
+          },
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 44,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 44
+          }
+        ],
+        "split_asset_sha256": {
+          "test": "b9a692230de845bc85ee9afe6cf749bf3a7f1274e8e05d3181f556fc281ee16b",
+          "train": "88a0ce39521b07b0db0ef6b146fac2d8a2bd6fe3f67fbddc45d13b68e26267cf",
+          "val": "e63d0f8df7f2bb4f3d2845616331117e144ebc0ec82ba45a539ed5833a16e890"
+        },
+        "test_digest_definition": "canonical JSON sorted by relative_path: relative_path, sha256, source_group, annotations",
+        "version": {
+          "asset_count": 364,
+          "class_map": {
+            "0": "RBC",
+            "1": "WBC",
+            "2": "Platelets"
+          },
+          "class_map_hash": "56d2a3b97e2056f4cae1d8ea7c1e5b59879862e92d47cf0b78255b3a70bcd9f7",
+          "created_at": "2026-10-22T13:55:07.007539",
+          "dataset_id": "5cd56307-5cd4-477f-8dc5-75cacfa49a0f",
+          "frozen_at": "2026-10-22T13:55:14.646163",
+          "manifest_sha256": "32988ed7845c5933d58a4c139c76b4e6f4e21dce38392c9f1b9b5df233887042",
+          "parent_version_id": null,
+          "split_config": {
+            "group_level": "original_image",
+            "ratios": {
+              "test": 0.1,
+              "train": 0.8,
+              "val": 0.1
+            },
+            "seed": 42
+          },
+          "split_counts": {
+            "test": 36,
+            "train": 291,
+            "val": 37
+          },
+          "split_manifest_hash": "87b4200c6b5f50ee8a10f48158fbf329f30362634d21655695db56d51bc1c52a",
+          "state": "frozen",
+          "version_id": "8f32546d-11ec-412d-a1c5-2c6aa41a1fa7"
+        }
+      },
+      "seeds": [
+        {
+          "seed": 42,
+          "status": "completed",
+          "job_id": "60eaeba3-d367-44ec-a277-5443b8be468f",
+          "error": null
+        },
+        {
+          "seed": 43,
+          "status": "completed",
+          "job_id": "54a238a0-00ae-41eb-b2cf-40c71e1a232f",
+          "error": null
+        },
+        {
+          "seed": 44,
+          "status": "completed",
+          "job_id": "ff3d94f9-abdf-4786-95c3-8f5a09ddd9e5",
+          "error": null
+        }
+      ],
+      "completed": [
+        {
+          "seed": 42,
+          "status": "completed",
+          "training_job_id": "60eaeba3-d367-44ec-a277-5443b8be468f",
+          "evaluation_id": "f713f348-1be5-5762-ad65-f3ce37766c2e",
+          "evaluation_job_id": "47ae85fc-9ffd-4ee3-bbd1-e9ee45f27798",
+          "model_id": "e98aeb6fb7c746e98eebeec6c99ea640",
+          "model_sha256": "3fcba6ace15a11035bdd3e9e60cc11f1271f913a094e55d0f8f4a59dd1781953",
+          "epochs_completed": 68,
+          "training_seconds": 473.5778689050003,
+          "nominal_training_batches": 2516,
+          "optimizer_steps": null,
+          "optimizer_steps_reason": "Not directly instrumented; gradient accumulation varies during warmup. Nominal loader batches are derived separately.",
+          "peak_gpu_allocated_bytes": 2247574528,
+          "peak_gpu_reserved_bytes": 2709520384,
+          "metrics": {
+            "precision": 0.8854446595758879,
+            "recall": 0.9173951964649638,
+            "map50": 0.9482770744831206,
+            "map50_95": 0.6572103894111397,
+            "per_class": {
+              "0": {
+                "precision": 0.7757221272810022,
+                "recall": 0.8452088452088452,
+                "map50": 0.8842655420043701,
+                "map50_95": 0.6259845464972911
+              },
+              "1": {
+                "precision": 0.9689373067822576,
+                "recall": 1.0,
+                "map50": 0.995,
+                "map50_95": 0.802497886655128
+              },
+              "2": {
+                "precision": 0.9116745446644039,
+                "recall": 0.9069767441860465,
+                "map50": 0.9655656814449917,
+                "map50_95": 0.543148735081
+              }
+            },
+            "confusion_matrix": [
+              [
+                352.0,
+                0.0,
+                0.0,
+                105.0
+              ],
+              [
+                0.0,
+                37.0,
+                0.0,
+                1.0
+              ],
+              [
+                0.0,
+                0.0,
+                39.0,
+                4.0
+              ],
+              [
+                55.0,
+                0.0,
+                4.0,
+                0.0
+              ]
+            ],
+            "confusion_matrix_labels": [
+              "RBC",
+              "WBC",
+              "Platelets",
+              "background"
+            ],
+            "confusion_matrix_axes": {
+              "rows": "predicted",
+              "columns": "true"
+            },
+            "missing": {}
+          },
+          "seed_record_sha256": "1c83abf1a1c8730299264db0ecbdf76774260124e4cd89b1f47e967aca6206af"
+        },
+        {
+          "seed": 43,
+          "status": "completed",
+          "training_job_id": "54a238a0-00ae-41eb-b2cf-40c71e1a232f",
+          "evaluation_id": "bd9d7c7a-b3d1-5ce6-a1ad-042f5a7a24a1",
+          "evaluation_job_id": "95637e29-0598-4691-a41f-cdf073c4c380",
+          "model_id": "c39fc19a2d40404cadc7b6007b1e69e4",
+          "model_sha256": "8032f6b15a3f5d2b5b58b411c7745c0ef5d708f06522598879617acddaf128f4",
+          "epochs_completed": 77,
+          "training_seconds": 536.4315759309993,
+          "nominal_training_batches": 2849,
+          "optimizer_steps": null,
+          "optimizer_steps_reason": "Not directly instrumented; gradient accumulation varies during warmup. Nominal loader batches are derived separately.",
+          "peak_gpu_allocated_bytes": 2246472192,
+          "peak_gpu_reserved_bytes": 2560622592,
+          "metrics": {
+            "precision": 0.853116374104184,
+            "recall": 0.9400617190296687,
+            "map50": 0.9486622244595494,
+            "map50_95": 0.6638575050672461,
+            "per_class": {
+              "0": {
+                "precision": 0.7674834682720454,
+                "recall": 0.8434409710424944,
+                "map50": 0.8839634155433702,
+                "map50_95": 0.6280075854834589
+              },
+              "1": {
+                "precision": 0.9855635457123878,
+                "recall": 1.0,
+                "map50": 0.995,
+                "map50_95": 0.8163080063899889
+              },
+              "2": {
+                "precision": 0.8063021083281187,
+                "recall": 0.9767441860465116,
+                "map50": 0.9670232578352783,
+                "map50_95": 0.5472569233282903
+              }
+            },
+            "confusion_matrix": [
+              [
+                366.0,
+                0.0,
+                0.0,
+                148.0
+              ],
+              [
+                0.0,
+                37.0,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                43.0,
+                14.0
+              ],
+              [
+                41.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            ],
+            "confusion_matrix_labels": [
+              "RBC",
+              "WBC",
+              "Platelets",
+              "background"
+            ],
+            "confusion_matrix_axes": {
+              "rows": "predicted",
+              "columns": "true"
+            },
+            "missing": {}
+          },
+          "seed_record_sha256": "1b6465a22d551e7422411d6fc47bb9b22c50e49343f82a58f7b6447aaea4be91"
+        },
+        {
+          "seed": 44,
+          "status": "completed",
+          "training_job_id": "ff3d94f9-abdf-4786-95c3-8f5a09ddd9e5",
+          "evaluation_id": "a92b39e8-5c71-5d4c-ad15-3548705cd8b7",
+          "evaluation_job_id": "b4b2533c-6f51-4d23-a0b1-b09f0f1f315d",
+          "model_id": "18946e647a8c4e3fac35b2d7acedda5e",
+          "model_sha256": "61479bf1513552fdfe85e2befcaa7b82c9c422e4e943e481d419fe5ac8eec7ed",
+          "epochs_completed": 78,
+          "training_seconds": 585.8572802739982,
+          "nominal_training_batches": 2886,
+          "optimizer_steps": null,
+          "optimizer_steps_reason": "Not directly instrumented; gradient accumulation varies during warmup. Nominal loader batches are derived separately.",
+          "peak_gpu_allocated_bytes": 2249464320,
+          "peak_gpu_reserved_bytes": 2569011200,
+          "metrics": {
+            "precision": 0.8584079487822499,
+            "recall": 0.9296802087499761,
+            "map50": 0.922454638064782,
+            "map50_95": 0.6343342494386806,
+            "per_class": {
+              "0": {
+                "precision": 0.7370544342247636,
+                "recall": 0.8820638820638821,
+                "map50": 0.8870989878922866,
+                "map50_95": 0.6322207512631302
+              },
+              "1": {
+                "precision": 0.9720207659424414,
+                "recall": 1.0,
+                "map50": 0.995,
+                "map50_95": 0.8003565315315315
+              },
+              "2": {
+                "precision": 0.8661486461795448,
+                "recall": 0.9069767441860465,
+                "map50": 0.8852649263020594,
+                "map50_95": 0.4704254655213803
+              }
+            },
+            "confusion_matrix": [
+              [
+                362.0,
+                0.0,
+                0.0,
+                140.0
+              ],
+              [
+                0.0,
+                37.0,
+                0.0,
+                1.0
+              ],
+              [
+                0.0,
+                0.0,
+                39.0,
+                7.0
+              ],
+              [
+                45.0,
+                0.0,
+                4.0,
+                0.0
+              ]
+            ],
+            "confusion_matrix_labels": [
+              "RBC",
+              "WBC",
+              "Platelets",
+              "background"
+            ],
+            "confusion_matrix_axes": {
+              "rows": "predicted",
+              "columns": "true"
+            },
+            "missing": {}
+          },
+          "seed_record_sha256": "86c5709303fafb28b9937eab47cb16f6886dbf4085697df0bbc7d39e554103a4"
+        }
+      ],
+      "aggregate": {
+        "precision": {
+          "n": 3,
+          "mean": 0.8656563274874406,
+          "std": 0.017340235170706098,
+          "values": [
+            0.8854446595758879,
+            0.853116374104184,
+            0.8584079487822499
+          ]
+        },
+        "recall": {
+          "n": 3,
+          "mean": 0.9290457080815362,
+          "std": 0.011346574576397817,
+          "values": [
+            0.9173951964649638,
+            0.9400617190296687,
+            0.9296802087499761
+          ]
+        },
+        "map50": {
+          "n": 3,
+          "mean": 0.939797979002484,
+          "std": 0.015021008331237725,
+          "values": [
+            0.9482770744831206,
+            0.9486622244595494,
+            0.922454638064782
+          ]
+        },
+        "map50_95": {
+          "n": 3,
+          "mean": 0.6518007146390221,
+          "std": 0.015487223494948039,
+          "values": [
+            0.6572103894111397,
+            0.6638575050672461,
+            0.6343342494386806
+          ]
+        }
+      },
+      "per_class": {
+        "0": {
+          "precision": {
+            "n": 3,
+            "mean": 0.7600866765926038,
+            "std": 0.020367425387973422,
+            "values": [
+              0.7757221272810022,
+              0.7674834682720454,
+              0.7370544342247636
+            ]
+          },
+          "recall": {
+            "n": 3,
+            "mean": 0.8569045661050739,
+            "std": 0.021806529513046506,
+            "values": [
+              0.8452088452088452,
+              0.8434409710424944,
+              0.8820638820638821
+            ]
+          },
+          "map50": {
+            "n": 3,
+            "mean": 0.8851093151466757,
+            "std": 0.0017297162558001587,
+            "values": [
+              0.8842655420043701,
+              0.8839634155433702,
+              0.8870989878922866
+            ]
+          },
+          "map50_95": {
+            "n": 3,
+            "mean": 0.62873762774796,
+            "std": 0.0031815536694101156,
+            "values": [
+              0.6259845464972911,
+              0.6280075854834589,
+              0.6322207512631302
+            ]
+          }
+        },
+        "1": {
+          "precision": {
+            "n": 3,
+            "mean": 0.9755072061456956,
+            "std": 0.00884445612847927,
+            "values": [
+              0.9689373067822576,
+              0.9855635457123878,
+              0.9720207659424414
+            ]
+          },
+          "recall": {
+            "n": 3,
+            "mean": 1.0,
+            "std": 0.0,
+            "values": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "map50": {
+            "n": 3,
+            "mean": 0.995,
+            "std": 0.0,
+            "values": [
+              0.995,
+              0.995,
+              0.995
+            ]
+          },
+          "map50_95": {
+            "n": 3,
+            "mean": 0.8063874748588828,
+            "std": 0.008657890033725937,
+            "values": [
+              0.802497886655128,
+              0.8163080063899889,
+              0.8003565315315315
+            ]
+          }
+        },
+        "2": {
+          "precision": {
+            "n": 3,
+            "mean": 0.8613750997240225,
+            "std": 0.05284815648803082,
+            "values": [
+              0.9116745446644039,
+              0.8063021083281187,
+              0.8661486461795448
+            ]
+          },
+          "recall": {
+            "n": 3,
+            "mean": 0.9302325581395349,
+            "std": 0.04028025133881111,
+            "values": [
+              0.9069767441860465,
+              0.9767441860465116,
+              0.9069767441860465
+            ]
+          },
+          "map50": {
+            "n": 3,
+            "mean": 0.9392846218607764,
+            "std": 0.046788104935183414,
+            "values": [
+              0.9655656814449917,
+              0.9670232578352783,
+              0.8852649263020594
+            ]
+          },
+          "map50_95": {
+            "n": 3,
+            "mean": 0.5202770413102236,
+            "std": 0.04322156879547387,
+            "values": [
+              0.543148735081,
+              0.5472569233282903,
+              0.4704254655213803
+            ]
+          }
+        }
+      },
+      "training_seconds": {
+        "n": 3,
+        "mean": 531.9555750366659,
+        "std": 56.273372853834864,
+        "values": [
+          473.5778689050003,
+          536.4315759309993,
+          585.8572802739982
+        ]
+      }
+    },
+    "E2": {
+      "status": "partial",
+      "protocol_sha256": "528ff6b86e2b07d2e7f4686bd210ff3085415cc89888dc729f628d6348baee38",
+      "protocol": {
+        "base": {
+          "model_id": "ebc82da059d24213b1b47965587204b7",
+          "sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1"
+        },
+        "build": {
+          "code_sha": "bc3602e62e3b73b4aaeec4456c184dfe1bfc4a13",
+          "ml_lock_sha256": "df3dcfeaec0af29b7951751184a6b982b73dac7ef64f6cf59db6f271ada55970",
+          "requirements_lock_sha256": "af3f2d357933e8b4872486173ff9eecc054cc38a0fd27d579ec438107c7400b4"
+        },
+        "config": {
+          "approved_model_id": "ebc82da059d24213b1b47965587204b7",
+          "augmentation": {
+            "close_mosaic": 10,
+            "degrees": 0.0,
+            "fliplr": 0.5,
+            "flipud": 0.0,
+            "hsv_h": 0.015,
+            "hsv_s": 0.7,
+            "hsv_v": 0.4,
+            "mosaic": 1.0,
+            "scale": 0.5,
+            "translate": 0.1
+          },
+          "base_weight_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+          "batch": 8,
+          "class_map": {
+            "0": "RBC",
+            "1": "WBC",
+            "2": "Platelets"
+          },
+          "dataset_version_id": "a4d2a2b5-2465-58ff-8e20-6126a2e0d3ef",
+          "deterministic": true,
+          "device": "0",
+          "early_stopping": {
+            "monitor": "val/mAP50-95",
+            "patience": 20
+          },
+          "epochs": 80,
+          "evaluation_protocol": {
+            "budget": "80 maximum epochs per group; identical batch/seeds/optimizer. E2 has 6x train examples; report total updates and runtime, not equal compute.",
+            "evaluation_space": "whole original images; ordinary whole-image prediction",
+            "human_feedback": "E3 pending genuine independent human annotation audit; not part of this confirmation experiment",
+            "note": "test 只在预先固定的协议下评估一次，不用于调参",
+            "primary_metric": "map50_95",
+            "secondary_metrics": [
+              "map50",
+              "precision",
+              "recall"
+            ],
+            "selection": "best checkpoint selected by validation only",
+            "test_usage": "one independent fixed test evaluation per preregistered group/seed"
+          },
+          "group_level": "original_image",
+          "imgsz": 640,
+          "lr0": 0.001,
+          "lrf": 0.01,
+          "momentum": 0.937,
+          "optimizer": "AdamW",
+          "processing": {
+            "kind": "train_only_tiles",
+            "min_visibility": 0.5,
+            "overlap": 0.2,
+            "test_tiling": false,
+            "tile_size": 320
+          },
+          "profile": "formal",
+          "purpose": "E2 preregistered original-test comparison",
+          "schema_version": 1,
+          "seeds": [
+            42,
+            43,
+            44
+          ],
+          "source_license_ref": "MIT (BCCD_Dataset LICENSE)",
+          "source_repository": "https://github.com/Shenggan/BCCD_Dataset",
+          "source_revision": "d272fb14cdff6e473fafeeeba32aba5f560e9e43",
+          "split_seed": 42,
+          "test_manifest_sha256": "b9a692230de845bc85ee9afe6cf749bf3a7f1274e8e05d3181f556fc281ee16b",
+          "test_ratio": 0.1,
+          "train_ratio": 0.8,
+          "val_ratio": 0.1,
+          "warmup_epochs": 3,
+          "weight_decay": 0.0005
+        },
+        "effective_requests": [
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 42,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 42
+          },
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 43,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 43
+          },
+          {
+            "params": {
+              "augmentation": {
+                "close_mosaic": 10,
+                "degrees": 0.0,
+                "fliplr": 0.5,
+                "flipud": 0.0,
+                "hsv_h": 0.015,
+                "hsv_s": 0.7,
+                "hsv_v": 0.4,
+                "mixup": 0.0,
+                "mosaic": 1.0,
+                "scale": 0.5,
+                "translate": 0.1
+              },
+              "batch": 8,
+              "deterministic": true,
+              "device": "0",
+              "early_stopping": {
+                "monitor": "val/mAP50-95",
+                "patience": 20
+              },
+              "epochs": 80,
+              "imgsz": 640,
+              "lr0": 0.001,
+              "lrf": 0.01,
+              "momentum": 0.937,
+              "optimizer": "AdamW",
+              "seed": 44,
+              "warmup_epochs": 3.0,
+              "weight_decay": 0.0005
+            },
+            "seed": 44
+          }
+        ],
+        "split_asset_sha256": {
+          "test": "b9a692230de845bc85ee9afe6cf749bf3a7f1274e8e05d3181f556fc281ee16b",
+          "train": "72ab72f17611f60c960fb8e6cc0bfc4456dfb933ef108ec95e45a4513692f444",
+          "val": "e63d0f8df7f2bb4f3d2845616331117e144ebc0ec82ba45a539ed5833a16e890"
+        },
+        "test_digest_definition": "canonical JSON sorted by relative_path: relative_path, sha256, source_group, annotations",
+        "version": {
+          "asset_count": 1819,
+          "class_map": {
+            "0": "RBC",
+            "1": "WBC",
+            "2": "Platelets"
+          },
+          "class_map_hash": "56d2a3b97e2056f4cae1d8ea7c1e5b59879862e92d47cf0b78255b3a70bcd9f7",
+          "created_at": "2026-10-22T15:26:44.107717",
+          "dataset_id": "5cd56307-5cd4-477f-8dc5-75cacfa49a0f",
+          "frozen_at": "2026-10-22T15:26:43.787968",
+          "manifest_sha256": "dadbb80769f2936c37d8b612c64a74e21ee36666dc1c1b45cf8523a03bf81045",
+          "parent_version_id": "8f32546d-11ec-412d-a1c5-2c6aa41a1fa7",
+          "split_config": {
+            "group_level": "original_image",
+            "ratios": {
+              "test": 0.1,
+              "train": 0.8,
+              "val": 0.1
+            },
+            "seed": 42
+          },
+          "split_counts": {
+            "test": 36,
+            "train": 1746,
+            "val": 37
+          },
+          "split_manifest_hash": "445c2272936dc47735cc0a663e7a45a520f54e80c1c0afce58039a4407b51ffc",
+          "state": "frozen",
+          "version_id": "a4d2a2b5-2465-58ff-8e20-6126a2e0d3ef"
+        }
+      },
+      "seeds": [
+        {
+          "seed": 42,
+          "status": "pending",
+          "job_id": "151bbfb6-a33e-48fc-830d-28a0c81518fb",
+          "error": null
+        },
+        {
+          "seed": 43,
+          "status": "not_run"
+        },
+        {
+          "seed": 44,
+          "status": "not_run"
+        }
+      ],
+      "completed": [],
+      "aggregate": {
+        "precision": {
+          "n": 0,
+          "mean": null,
+          "std": null,
+          "values": []
+        },
+        "recall": {
+          "n": 0,
+          "mean": null,
+          "std": null,
+          "values": []
+        },
+        "map50": {
+          "n": 0,
+          "mean": null,
+          "std": null,
+          "values": []
+        },
+        "map50_95": {
+          "n": 0,
+          "mean": null,
+          "std": null,
+          "values": []
+        }
+      },
+      "per_class": {
+        "0": {
+          "precision": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "recall": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50_95": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          }
+        },
+        "1": {
+          "precision": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "recall": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50_95": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          }
+        },
+        "2": {
+          "precision": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "recall": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          },
+          "map50_95": {
+            "n": 0,
+            "mean": null,
+            "std": null,
+            "values": []
+          }
+        }
+      },
+      "training_seconds": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "values": []
+      }
+    }
+  },
+  "comparison": {
+    "direction": "E2 minus E1",
+    "paired_seeds": [],
+    "metrics": {
+      "precision": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "values": []
+      },
+      "recall": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "values": []
+      },
+      "map50": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "values": []
+      },
+      "map50_95": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "values": []
+      }
+    },
+    "pairs": [],
+    "note": "Equal epoch ceiling, not equal optimizer steps/compute. No significance or clinical claim."
+  }
+}
