@@ -23,6 +23,12 @@ def test_no_finished_seeds_are_missing_not_zero(tmp_path):
     assert compare({'E1':g,'E2':g})['paired_seeds']==[]
 
 
+def test_quality_warning_is_retained_separately_from_numerical_completeness(tmp_path):
+    p=protocol();root=tmp_path/config_hash(p);root.mkdir();(root/'config.frozen.json').write_text(json.dumps(p))
+    (root/'BLOCKED.json').write_text(json.dumps({'reason':'cross-split candidate'}))
+    assert read_group(root)['validity_warning']['reason']=='cross-split candidate'
+
+
 @pytest.mark.parametrize('change',['test','build','params'])
 def test_incomparable_protocols_are_rejected(change):
     a={'protocol':protocol(),'completed':[]};b=copy.deepcopy(a)

@@ -1,6 +1,8 @@
 # E1/E2 实验结果（真实记录汇总）
 
-状态：**partial**。缺失种子不计零分；n 不足 3 时为中间结果。
+状态：**blocked_data_quality**。缺失种子不计零分；n 不足 3 时为中间结果。
+
+> 数据有效性门禁：事后筛查发现 train/test 跨集近重复风险。以下为真实历史数值，不能作为已通过独立性验收的泛化结果；旧协议停止续跑。见 DATA-QUALITY-REVIEW.md。
 
 ## 协议与比较边界
 
@@ -34,7 +36,7 @@ E1 为完整原图训练；E2 只对训练集做 320 像素、0.2 重叠切片�
 | E1 | 43 | completed | 77 | 2849 | 536.4316 |
 | E1 | 44 | completed | 78 | 2886 | 585.8573 |
 | E2 | 42 | completed | 38 | 8322 | 2550.9645 |
-| E2 | 43 | pending | — | — | — |
+| E2 | 43 | cancelled | — | — | — |
 | E2 | 44 | not_run | — | — | — |
 
 名义 batch 数按 ceil(train 图数 / batch) × 实际 epoch 推导；梯度累积随 warmup 变化，优化器实际 step 次数未直接记录，不把该推导值冒充 optimizer steps。

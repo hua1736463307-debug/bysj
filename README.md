@@ -10,6 +10,6 @@
 - [E1/E2 结果与图表](docs/experiments/2026-10-22/RESULTS.md) / [E4 性能实测](docs/experiments/2026-10-22/PERFORMANCE.md) / [E3 人工待审说明](docs/refactor/execution/unblock/E3-HUMAN-HANDOFF.md)。
 - [续作计划](docs/refactor/execution/unblock/PLAN.md) / [原始任务书](docs/refactor/TASK_BOOK.md) / [原始需求](docs/requirements/医学信息系统开发_v1.0.md)。
 
-当前已实测干净 GPU 镜像、PG 并发、取消/崩溃/断库恢复、正式浏览器闭环和新卷备份恢复。E1 三种子、E4 性能测量完成；E2 固定方案执行中，E3 等待真实人工审核。各项证据以续作状态为准。合成旧 schema 迁移已通过；真实旧库副本兼容性尚未验证。
+当前已实测干净 GPU 镜像、PG 并发、取消/崩溃/断库恢复、正式浏览器闭环和新卷备份恢复。E1 三种子、E2 首种子已取得真实数值，但事后发现跨集近重复风险，已停止旧协议续跑，不能作为通过独立性验收的泛化结果；见 [数据质量说明](docs/experiments/2026-10-22/DATA-QUALITY-REVIEW.md)。E4 工程性能测量完成，E3 等待真实人工审核。合成旧 schema 迁移已通过；真实旧库副本兼容性尚未验证。
 
 源码源于 [xtythpt](https://github.com/hua1736463307-debug/xtythpt) 的筛选基线，再沿 bysj 历史连续重构。保留许可证、来源记录和历史提交；本项目不连接原生产系统，不包含患者数据或模型权重。原始资料和历史执行记录中的旧路径仅供追溯，启动以本手册为准。

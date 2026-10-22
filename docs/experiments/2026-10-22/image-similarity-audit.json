@@ -1,0 +1,2950 @@
+{
+  "status": "screening_complete_not_human_adjudicated",
+  "created_at": "2026-10-22T16:57:25.980929+00:00",
+  "timing": "post-hoc: E1 and first E2 seed test were already evaluated; no split or experiment parameters changed",
+  "manifest_file_sha256": "4e72e6d572bfa7339077f195582f6dd1d34916746390fcf77f342d554cd984c9",
+  "split_manifest_hash": "87b4200c6b5f50ee8a10f48158fbf329f30362634d21655695db56d51bc1c52a",
+  "images_verified": 364,
+  "pairs_examined": 66066,
+  "method": {
+    "exact": "SHA256 of dimensions and decoded RGB bytes; no EXIF rotation applied",
+    "candidate": "64 horizontal adjacent-pixel comparisons of LANCZOS 9x8 grayscale; Hamming distance <= threshold",
+    "threshold": 6
+  },
+  "decoded_identical_pairs": [],
+  "decoded_identical_cross_split": 0,
+  "candidate_pairs": [
+    {
+      "a": "BloodImage_00037.jpg",
+      "a_split": "test",
+      "b": "BloodImage_00038.jpg",
+      "b_split": "train",
+      "cross_split": true,
+      "hamming_distance": 3,
+      "human_decision": null
+    }
+  ],
+  "candidate_cross_split": 1,
+  "candidate_split_pairs": {
+    "test/train": 1
+  },
+  "limitations": [
+    "Perceptual proximity is not proof of duplication; no candidates does not prove absence.",
+    "Rotation/crop/stain changes and patient/slide provenance are not resolved. Human decisions remain empty.",
+    "Do not silently repair the already-used test split; any later adjudication and rerun require a new disclosed protocol."
+  ],
+  "image_fingerprints": [
+    {
+      "path": "BloodImage_00000.jpg",
+      "split": "train",
+      "source_group": "img:e1dcc488889acba2",
+      "sha256": "e1dcc488889acba247a895df7be839e514850030217b4025048619f664fd4cb3",
+      "decoded_rgb_sha256": "a8bb3ceb3b75ea792ff349aa2c88082f434e416dfc2d98ae71b0f7884ed0b828",
+      "dhash64": "352de9d0b49a2d25"
+    },
+    {
+      "path": "BloodImage_00001.jpg",
+      "split": "train",
+      "source_group": "img:791ac5f11494bb9c",
+      "sha256": "791ac5f11494bb9c0ce39080d25fc97731f7584a6df99fac2555a3d1613dfe9a",
+      "decoded_rgb_sha256": "e94675bc7e1ed982c14016b15e726409c2def564672cfc63a383f9a9b7af19ec",
+      "dhash64": "525366e2160ec354"
+    },
+    {
+      "path": "BloodImage_00002.jpg",
+      "split": "train",
+      "source_group": "img:5d2b7aec254e5442",
+      "sha256": "5d2b7aec254e54424feccff89587d81439005e78bb107840c2aa7535bfaf6fb6",
+      "decoded_rgb_sha256": "176ac49041a02ea43fda7b674d4beeb39c1ff45b91a59707d225736963df0ac9",
+      "dhash64": "5d511535229d595a"
+    },
+    {
+      "path": "BloodImage_00003.jpg",
+      "split": "train",
+      "source_group": "img:3098554473a00586",
+      "sha256": "3098554473a0058685116a6229494d2e960603eec8e949a80baafc24766e8492",
+      "decoded_rgb_sha256": "49ed04dc8117890c6af803da37b15af1167a358ffb61f8156a0bf2da82e341ad",
+      "dhash64": "36a6a08c84644b8a"
+    },
+    {
+      "path": "BloodImage_00004.jpg",
+      "split": "train",
+      "source_group": "img:72c2d29469396fee",
+      "sha256": "72c2d29469396feed85154df25dddcc88e94dc541c44503e14b6ce0f30051b40",
+      "decoded_rgb_sha256": "91817ad3e6f303854b530a6cef348e5bd905f9a8b74f23f38f73ad332e2a4042",
+      "dhash64": "363738e6a4351a1a"
+    },
+    {
+      "path": "BloodImage_00005.jpg",
+      "split": "val",
+      "source_group": "img:58b83046e13e19f5",
+      "sha256": "58b83046e13e19f55e28298e36f859fb9ac3bcf147711ddb06f7884aa9a979a7",
+      "decoded_rgb_sha256": "8cf563abbb64e8df5f3908d1394e079a98aae2039d5dc33e6acd03aeb1bd973d",
+      "dhash64": "b0b5176c8c4a70d0"
+    },
+    {
+      "path": "BloodImage_00006.jpg",
+      "split": "train",
+      "source_group": "img:41744239a3211392",
+      "sha256": "41744239a3211392b74df58f0e061eec67fc4525cfbba876af6902cc92b905a2",
+      "decoded_rgb_sha256": "1109540683e813348341e965d7640b1ef09d4751933922cf07cbc34fcfe6381e",
+      "dhash64": "ac2c044e4e57380f"
+    },
+    {
+      "path": "BloodImage_00007.jpg",
+      "split": "val",
+      "source_group": "img:9bbeb1779f6c06d6",
+      "sha256": "9bbeb1779f6c06d624ad5303749513a2d7567d6a142aa67306964c4122edb309",
+      "decoded_rgb_sha256": "fb1eb0face50aceb2e47e7e8d4093e51a380fe281dd16d7937210cdcefb140b5",
+      "dhash64": "73a331376f2a9b93"
+    },
+    {
+      "path": "BloodImage_00008.jpg",
+      "split": "train",
+      "source_group": "img:41c10341e68981da",
+      "sha256": "41c10341e68981da9a596348f50a359fb5d1af5909dfddd5b922d0b061bbe7fa",
+      "decoded_rgb_sha256": "7ddca1e139e063df8cde353a17982b1851dc482500a766849f31c5da4bce81f1",
+      "dhash64": "36d3cbc7c585b736"
+    },
+    {
+      "path": "BloodImage_00009.jpg",
+      "split": "train",
+      "source_group": "img:734527f21c96fd1a",
+      "sha256": "734527f21c96fd1a78e5a4bf6b0505c01e0c2e0eecd3a7f663369d3ad868257b",
+      "decoded_rgb_sha256": "7375c4d9ce17d16f209d5f8e569e1da70bc34f0a07cf4450c1a27167d10e114a",
+      "dhash64": "436b329a5946de53"
+    },
+    {
+      "path": "BloodImage_00010.jpg",
+      "split": "train",
+      "source_group": "img:814dad6947309a9a",
+      "sha256": "814dad6947309a9ada5383ab622c6f548302c91be9db436d1f2a6030088cedca",
+      "decoded_rgb_sha256": "5fc38f3b349a039cd41d572ceffb87032248a46d53ad869134680964ddb84ef7",
+      "dhash64": "3a131397a3999d01"
+    },
+    {
+      "path": "BloodImage_00011.jpg",
+      "split": "val",
+      "source_group": "img:c9a111704fc84b4a",
+      "sha256": "c9a111704fc84b4a5c9f4176f5408de6c054f2f276b77899108b2cc0ab6453c9",
+      "decoded_rgb_sha256": "d00d159a02f382706501a6453bf572f9df383e3c0c9cb55f7e7c55029cbb305f",
+      "dhash64": "c2916acfcbc95112"
+    },
+    {
+      "path": "BloodImage_00012.jpg",
+      "split": "train",
+      "source_group": "img:af2e2f7f66b94cf7",
+      "sha256": "af2e2f7f66b94cf7bb468e33c3fd61314bd194c7be833238ca6fa757e9a95fc2",
+      "decoded_rgb_sha256": "12c127ddc53686579dee1722eabf129384a79aecd09ecacb66265b0018b24212",
+      "dhash64": "dbc30b0a8f96364b"
+    },
+    {
+      "path": "BloodImage_00013.jpg",
+      "split": "train",
+      "source_group": "img:d21f777d3736e55d",
+      "sha256": "d21f777d3736e55d77169fa0a3e876f784198d55116420480b4734fc082756d7",
+      "decoded_rgb_sha256": "307f545c76f06c25b19d6c70c631674af99bf941656170db242b0497a3bf7acf",
+      "dhash64": "6b8b0d8f9695252d"
+    },
+    {
+      "path": "BloodImage_00014.jpg",
+      "split": "train",
+      "source_group": "img:2011aeb37909f1a7",
+      "sha256": "2011aeb37909f1a73c565c1e305e1a1593bff713cc2c97c1d80f7f2938c861e7",
+      "decoded_rgb_sha256": "8c70c821702278235bbb873b0ca18dc98425ed96f82fa16fc7dc044b6bebeff4",
+      "dhash64": "9f92b34736b7cfe6"
+    },
+    {
+      "path": "BloodImage_00015.jpg",
+      "split": "train",
+      "source_group": "img:f04ce854d8dfa6d5",
+      "sha256": "f04ce854d8dfa6d5fe765a6d2acdcf831dc0cb8b012bb65845d81bfc748dd961",
+      "decoded_rgb_sha256": "d62e142eaf892168027c4fecfa0489d9b3cb0b0a1e249abeb51cfba89ebbbf4a",
+      "dhash64": "64e3a5a9e1071436"
+    },
+    {
+      "path": "BloodImage_00016.jpg",
+      "split": "train",
+      "source_group": "img:e00f8a7b7840fd7d",
+      "sha256": "e00f8a7b7840fd7d4cae0cf37d0c0a5c6977fa95b685e7bd674bf874462e5b67",
+      "decoded_rgb_sha256": "3dc6fd474295a85dd3c715a734dc838941fbd644e18ccc1200945208cb157c44",
+      "dhash64": "07176ae98c4f6426"
+    },
+    {
+      "path": "BloodImage_00017.jpg",
+      "split": "train",
+      "source_group": "img:0317c72ae1486ac1",
+      "sha256": "0317c72ae1486ac1fff77409e890cd119fcb0e87a9dda073470ea3a430d136d3",
+      "decoded_rgb_sha256": "5c79b3a537b2e184fa1b118805f3b936a27c6ba2fbbe3711179b31456d553f50",
+      "dhash64": "cf72256e67462c58"
+    },
+    {
+      "path": "BloodImage_00018.jpg",
+      "split": "train",
+      "source_group": "img:6ed175f33a783ee1",
+      "sha256": "6ed175f33a783ee1bf8f2a2b4e25090398d0f3ede340ce11aa6eb353fe4ba7d6",
+      "decoded_rgb_sha256": "6ecd5149275f92fb0827661d015ba08e4277f400c88bfaccaed5032a4633ba98",
+      "dhash64": "39192cac02c8cd9d"
+    },
+    {
+      "path": "BloodImage_00019.jpg",
+      "split": "val",
+      "source_group": "img:2ca2fc8c0b920c9e",
+      "sha256": "2ca2fc8c0b920c9edd4aa5ba2b609823c38f146cb945249a9affce78f4598fb1",
+      "decoded_rgb_sha256": "81baf0ac9e43d6fe3d4c2bd766e00050f16f55671f32a7c5f3bcd2b05b7518be",
+      "dhash64": "c94b4949d24e4e26"
+    },
+    {
+      "path": "BloodImage_00020.jpg",
+      "split": "train",
+      "source_group": "img:9a451f4c73509cb3",
+      "sha256": "9a451f4c73509cb3f4412cb57a2065a6b85f2759b84be5d662a419c316f59504",
+      "decoded_rgb_sha256": "bc107a12f5f8cd32b6d7aa7061aa1b490af349d524cfe546f259a3701ac44256",
+      "dhash64": "464e2624c60b48ce"
+    },
+    {
+      "path": "BloodImage_00021.jpg",
+      "split": "train",
+      "source_group": "img:42d1ac3d40be8d1d",
+      "sha256": "42d1ac3d40be8d1d339d769c4395f659c47edd6704e833c9a0d23ee30c23b752",
+      "decoded_rgb_sha256": "809167044292d769b520582baedfeda250c96318ab29c32d3be96b3595dec9fe",
+      "dhash64": "e4e34b498609d999"
+    },
+    {
+      "path": "BloodImage_00022.jpg",
+      "split": "train",
+      "source_group": "img:916d8d1cd4854a96",
+      "sha256": "916d8d1cd4854a96809333ac2a42111ef815d802141c27c9b78b3fbd6a0fb256",
+      "decoded_rgb_sha256": "dc7a50209ffea99407ffe9879bfc844e62f8614df2c875642dd27088981fcbad",
+      "dhash64": "59121a2e4c495915"
+    },
+    {
+      "path": "BloodImage_00023.jpg",
+      "split": "train",
+      "source_group": "img:5620163d509abfa3",
+      "sha256": "5620163d509abfa32d23e18bb68c05a01674bbff26d66f8a1a1e2bcfb883fbee",
+      "decoded_rgb_sha256": "ac22b8ab69f48b1892dc19b439789c814aee9099a3f8c66dc0c967a2a9221d8a",
+      "dhash64": "5bc9c513232b1b9a"
+    },
+    {
+      "path": "BloodImage_00024.jpg",
+      "split": "train",
+      "source_group": "img:9fe0083fb8d21143",
+      "sha256": "9fe0083fb8d21143a87bbc0c5bbea1ceb989606c7ef335896288c89304800e73",
+      "decoded_rgb_sha256": "4a408a37becf08bcd8d3220a6af262fa1018a7f7210a2c0db0fdeae8f121f738",
+      "dhash64": "189894d64e0d1c19"
+    },
+    {
+      "path": "BloodImage_00026.jpg",
+      "split": "val",
+      "source_group": "img:6152049fdc6f65e1",
+      "sha256": "6152049fdc6f65e152d550b51a49435b9a0360973ae1936b3fde55e449202644",
+      "decoded_rgb_sha256": "56e7cc0df090232a43d354ce4399535332f2b53f293d8ae888c197a6b704fb81",
+      "dhash64": "6c9c9a181e26d359"
+    },
+    {
+      "path": "BloodImage_00028.jpg",
+      "split": "train",
+      "source_group": "img:39db2c35962afa7a",
+      "sha256": "39db2c35962afa7ad5c867c5c44f6918ba164858d7585bdaa6b3ba80aadec3d1",
+      "decoded_rgb_sha256": "7965f04fc02263bac992bcff0492aea9e238314c044506fad5f249901dada016",
+      "dhash64": "7332564c8e0e364a"
+    },
+    {
+      "path": "BloodImage_00029.jpg",
+      "split": "train",
+      "source_group": "img:e055fd2c08d26982",
+      "sha256": "e055fd2c08d26982366ab2290c057e79c41f58b42be496fe0352d1a137198fd7",
+      "decoded_rgb_sha256": "2838d872133338dbc11d1e3248a3e526ff48d60d1a07eee6be50be7e86cf9b4d",
+      "dhash64": "f4a7369c85654d37"
+    },
+    {
+      "path": "BloodImage_00030.jpg",
+      "split": "test",
+      "source_group": "img:183f58fa41dbbd82",
+      "sha256": "183f58fa41dbbd82ab256b359bbf8104f0ed19d684de1f883c4aa6f1abc86c91",
+      "decoded_rgb_sha256": "edea4dd9cdd6254c7364fba924bf3dbd39afce694efe236161ab64295b183d45",
+      "dhash64": "636652181b5a1f1b"
+    },
+    {
+      "path": "BloodImage_00031.jpg",
+      "split": "test",
+      "source_group": "img:21d5e32572856a56",
+      "sha256": "21d5e32572856a565be97deddb6a93490cc63ccd3b2276076878c252af9ec206",
+      "decoded_rgb_sha256": "6a587e2b587e2afd927074808a753b5fbbe4b16f058053905cab190e40b073a8",
+      "dhash64": "1a2b0bc933278b5b"
+    },
+    {
+      "path": "BloodImage_00032.jpg",
+      "split": "train",
+      "source_group": "img:0c80e9db69b9664b",
+      "sha256": "0c80e9db69b9664b93fb85b2459c91a59817244532f107043fe564d6865cb5ba",
+      "decoded_rgb_sha256": "8ea79eae428d521058cb05969c2e717834cea79ccf380052a9f5f95c342c0878",
+      "dhash64": "8e6d644c2985dc1a"
+    },
+    {
+      "path": "BloodImage_00033.jpg",
+      "split": "train",
+      "source_group": "img:0efd35031deafd16",
+      "sha256": "0efd35031deafd16fc38ffd322a364ea80afa0f583e68adf65c10193ae1f126a",
+      "decoded_rgb_sha256": "025cad1efb7da7f20fd6114b0377a6835fa423871cc345753859e0d7d5045b62",
+      "dhash64": "b4b9496c94346c6c"
+    },
+    {
+      "path": "BloodImage_00034.jpg",
+      "split": "train",
+      "source_group": "img:ea24f192384e453d",
+      "sha256": "ea24f192384e453df82bbfc0178366b598bf495482ec131855c16f1debe0a974",
+      "decoded_rgb_sha256": "e7675b001173298de62117ef61aa8d5eadf87240f283bebe99e2f8c35d47c1d0",
+      "dhash64": "7254714c4ced3999"
+    },
+    {
+      "path": "BloodImage_00035.jpg",
+      "split": "train",
+      "source_group": "img:bf0e308ae2dd6ac0",
+      "sha256": "bf0e308ae2dd6ac07b2a31574c74e7cb0925ebea29ce5c7db376ffdc7a97dcb5",
+      "decoded_rgb_sha256": "cf809ebfd68338deae3fb0b03a04bc95dea45273f5d57492d3018740001f6b18",
+      "dhash64": "9b1b948483262613"
+    },
+    {
+      "path": "BloodImage_00036.jpg",
+      "split": "train",
+      "source_group": "img:78e00b573ef8c7ff",
+      "sha256": "78e00b573ef8c7ff8ecce8174f0c5ae95c1620c55296513a287660e484b26ccc",
+      "decoded_rgb_sha256": "84e481f0cc86992ba2ba4b6aa828314b26ff0c3f884c09a9602f05afac9b7496",
+      "dhash64": "c898262c4f4ec686"
+    },
+    {
+      "path": "BloodImage_00037.jpg",
+      "split": "test",
+      "source_group": "img:07d03c016d409f76",
+      "sha256": "07d03c016d409f76d1a230ef4c28e25fb35d51e203aa245f30eec20d4f9ee9f5",
+      "decoded_rgb_sha256": "5e7512668b7ab0c9912fadcd1a109d0c38bd7ab310450837c689a997a8d32fb6",
+      "dhash64": "d4b62bad864c049e"
+    },
+    {
+      "path": "BloodImage_00038.jpg",
+      "split": "train",
+      "source_group": "img:9b9556abde05b6b3",
+      "sha256": "9b9556abde05b6b387af3f3bb104beb4bc404547c7e8ab2803bd4456f01ab7fc",
+      "decoded_rgb_sha256": "f478b34af48b61a3e5435fcd2c9a9a4d8e58771604dbe605cc4fc4cd2c1bd6ee",
+      "dhash64": "d4f62bad8644069e"
+    },
+    {
+      "path": "BloodImage_00039.jpg",
+      "split": "train",
+      "source_group": "img:85f18d2ee41d64be",
+      "sha256": "85f18d2ee41d64be1075b6675f8262ec4e3e21ce5535059eb6863763b3241ce0",
+      "decoded_rgb_sha256": "62824bd94f12cfd11deb2bd2dd5aa2ca69dcb30642e4caa0897b7b61b6695540",
+      "dhash64": "5aca94ccced8981e"
+    },
+    {
+      "path": "BloodImage_00040.jpg",
+      "split": "test",
+      "source_group": "img:4aca6afce265c06d",
+      "sha256": "4aca6afce265c06dead7de07e3ca636629b15e4012343f6423495546f0170b37",
+      "decoded_rgb_sha256": "ea825819f17c268772b2f619729e571fa0dda67bfd23bbd45cbaa6bad4580eeb",
+      "dhash64": "03271a91935a521d"
+    },
+    {
+      "path": "BloodImage_00041.jpg",
+      "split": "train",
+      "source_group": "img:471439e501e03c64",
+      "sha256": "471439e501e03c645c103b970904b71fa52eb72fb041f00f031a4bc0378ae618",
+      "decoded_rgb_sha256": "b1e8dac9ba148c2c09feae3751cae3e8e5529635b9240373a570af9ac1601956",
+      "dhash64": "1534a2a610121696"
+    },
+    {
+      "path": "BloodImage_00042.jpg",
+      "split": "train",
+      "source_group": "img:dc8c9c1199409a25",
+      "sha256": "dc8c9c1199409a25af11cbe81ced254ff93be86d618c65338efb5a8f427769de",
+      "decoded_rgb_sha256": "b95a6d823de51d9d8901b7a3b72f6f5fb362855fd4d294b2e550cbf8f2841c3f",
+      "dhash64": "71c3a3734e585852"
+    },
+    {
+      "path": "BloodImage_00043.jpg",
+      "split": "train",
+      "source_group": "img:9923062f901872e9",
+      "sha256": "9923062f901872e92ffc2d1444a9af467878cfe776216576f15d9c982b69a0f2",
+      "decoded_rgb_sha256": "581d6074c044b7d3f9611c5c72c634046358874dfe332fa49a2fe7b10002ee41",
+      "dhash64": "4d1fde9b894d0fc7"
+    },
+    {
+      "path": "BloodImage_00044.jpg",
+      "split": "train",
+      "source_group": "img:940ead9438d259f2",
+      "sha256": "940ead9438d259f20729a9f707096236d8794ff0b443898fadc284033fefc306",
+      "decoded_rgb_sha256": "a6bc838becaf010f178bc419a9cc9df43b9e56d9f8a2102207ced7787d69c1a8",
+      "dhash64": "1a3327a2272525d3"
+    },
+    {
+      "path": "BloodImage_00045.jpg",
+      "split": "train",
+      "source_group": "img:6ae003994ea1b8f4",
+      "sha256": "6ae003994ea1b8f4f35ee564385d88cfd1f524561bda86afcc881639e955d212",
+      "decoded_rgb_sha256": "d390c79aefdcbb3cbb4c94084bdf3f90eaee379b449e0c2b745142f848b0d474",
+      "dhash64": "92925464266e9491"
+    },
+    {
+      "path": "BloodImage_00046.jpg",
+      "split": "train",
+      "source_group": "img:7a43e512a59b8e4a",
+      "sha256": "7a43e512a59b8e4afd176f242224440e21d2358ce271bfc854d4313aaec49471",
+      "decoded_rgb_sha256": "c0e3a4f23a3a4486d32ec6f309c3962581159e283ef9375ff6044690c1791f7d",
+      "dhash64": "595336388fc31333"
+    },
+    {
+      "path": "BloodImage_00047.jpg",
+      "split": "train",
+      "source_group": "img:291474f1edb22750",
+      "sha256": "291474f1edb227500d623d2566ed878b97fa8dbb686b216ee2632a683319f1c5",
+      "decoded_rgb_sha256": "b1eebd83f07d998a4e16ccabba50d243264ac39b8b618e093a5587c651a79c1b",
+      "dhash64": "654d98911d397074"
+    },
+    {
+      "path": "BloodImage_00048.jpg",
+      "split": "train",
+      "source_group": "img:3e78e5eceb247964",
+      "sha256": "3e78e5eceb2479640ad43464aaaff284afdb926559fbf9e2228dc3d63fd776d2",
+      "decoded_rgb_sha256": "d5436d870d13e520c9b544d4556c4e0fb59065324ea5cdc9d875ca5bf2b36dd9",
+      "dhash64": "b5312526a6cdcd8d"
+    },
+    {
+      "path": "BloodImage_00049.jpg",
+      "split": "val",
+      "source_group": "img:8caeee271ae9bdfe",
+      "sha256": "8caeee271ae9bdfe63d5e161ba848845f06fa304672fb56e713bd532c80388ba",
+      "decoded_rgb_sha256": "e51833fa6730a5805e3b56d07b92e4d8f1f7f5d1f39c9eca40df2dc0329d3b0c",
+      "dhash64": "9294523849611113"
+    },
+    {
+      "path": "BloodImage_00050.jpg",
+      "split": "train",
+      "source_group": "img:5d8435480d4c89cf",
+      "sha256": "5d8435480d4c89cf71c4bd9c424ae592d46a687cb560d298c3c2cd061fdbc198",
+      "decoded_rgb_sha256": "9a25cc3a23b3822129321c81975c3a12dfa9e4cddcfa81d85be51d2d4caa1f15",
+      "dhash64": "636234e1636d6d7b"
+    },
+    {
+      "path": "BloodImage_00052.jpg",
+      "split": "train",
+      "source_group": "img:54780cf59f78ed22",
+      "sha256": "54780cf59f78ed2271d17fdeb5a11d360a5bb590fce7ff8a2156c82e8239b845",
+      "decoded_rgb_sha256": "0511c056aed31561c602bfe1ca72429855245e817e89e6a3b70e0addabbdd6f7",
+      "dhash64": "0d3b22294d4d3934"
+    },
+    {
+      "path": "BloodImage_00053.jpg",
+      "split": "test",
+      "source_group": "img:d463d4d08936ffcc",
+      "sha256": "d463d4d08936ffccb36c5df89dd91bcc681e156132225a6529d304b9267eb177",
+      "decoded_rgb_sha256": "f9861773b0b8eb3cef85c49d7b7d2aa76999c76d99a3570de36264801240a445",
+      "dhash64": "c5cc198f0c1c5647"
+    },
+    {
+      "path": "BloodImage_00054.jpg",
+      "split": "val",
+      "source_group": "img:78c0f76b0d6f9ba5",
+      "sha256": "78c0f76b0d6f9ba58be743b8a45f93d0c9e3e6a06a9af724dcb46b5a1e46aeb7",
+      "decoded_rgb_sha256": "e939fec836ae1c3897d223ee4fe9636f3b34e7503b8153896dfd7a9c0b50f2f4",
+      "dhash64": "964e4da70b179396"
+    },
+    {
+      "path": "BloodImage_00055.jpg",
+      "split": "train",
+      "source_group": "img:80a9ecce90d33407",
+      "sha256": "80a9ecce90d33407c1e3221d751fe8b5857d8238b84c2f1064649956ca393203",
+      "decoded_rgb_sha256": "e9c447d28180b6e1aafe8f75fca6ecea82c87462a428ac36926422f2d323338e",
+      "dhash64": "2b3b464e1d1d1733"
+    },
+    {
+      "path": "BloodImage_00056.jpg",
+      "split": "train",
+      "source_group": "img:569d3074e36ddda0",
+      "sha256": "569d3074e36ddda0d40e37ad79b3f661f6de578f791b3f559c19153fb9273f53",
+      "decoded_rgb_sha256": "dfd3bf37a3587bbd449012f2bf70b5f113a3d8f4a62dc456fede58183a50f168",
+      "dhash64": "f6b4e0a052d3cf29"
+    },
+    {
+      "path": "BloodImage_00057.jpg",
+      "split": "train",
+      "source_group": "img:8d339dedf80e69fe",
+      "sha256": "8d339dedf80e69fecb8ff440f59e26d276330fc45618eec813688b68255e2292",
+      "decoded_rgb_sha256": "6ba6a665af253cc405bb1a18ad5301c45982b8313e6bc182536f1a936d76885c",
+      "dhash64": "6b6b6b711336341b"
+    },
+    {
+      "path": "BloodImage_00058.jpg",
+      "split": "train",
+      "source_group": "img:69b59c23469435d0",
+      "sha256": "69b59c23469435d015295f14d9826c9da79f871721518f12dbadf113dcafbde5",
+      "decoded_rgb_sha256": "7a27e19f13da1277f38db27be458378b09f4ad01217db6a58a2b61e41b2d7fe3",
+      "dhash64": "66a74f67c74b4b8f"
+    },
+    {
+      "path": "BloodImage_00059.jpg",
+      "split": "train",
+      "source_group": "img:89f9f4445b2a5a35",
+      "sha256": "89f9f4445b2a5a357d082073d24e6c425cb88af0ed3df18ed1f03b5acee8aa1c",
+      "decoded_rgb_sha256": "dec077235599e0619f81e89e6d1051676d8bb188fe3754a034afad55d16efeb5",
+      "dhash64": "93382b65e483c54f"
+    },
+    {
+      "path": "BloodImage_00062.jpg",
+      "split": "train",
+      "source_group": "img:000c11e8d702d3fa",
+      "sha256": "000c11e8d702d3fac0fa32614ebe9475283ed395303f46cbd9e5c12adde2e3ea",
+      "decoded_rgb_sha256": "9d6d077057289cce27727917b1f3ecf1c90d809201f3ea307c352d49b1b5a0ab",
+      "dhash64": "a62f4d4dcfce0c19"
+    },
+    {
+      "path": "BloodImage_00063.jpg",
+      "split": "train",
+      "source_group": "img:2858af6e06d32466",
+      "sha256": "2858af6e06d32466e0e1f9c1f22cc591203578be50a774aa40944866f3aad111",
+      "decoded_rgb_sha256": "126a4b2a55cafcdbbae60f379410b231a269b0aebd6b02a61ee67611f48d7a80",
+      "dhash64": "9e8c89b03339690b"
+    },
+    {
+      "path": "BloodImage_00064.jpg",
+      "split": "train",
+      "source_group": "img:2c78c7ff9e0699bf",
+      "sha256": "2c78c7ff9e0699bffb775b6ceefb941b85c0e64d53eb385c1007070e9bf068dd",
+      "decoded_rgb_sha256": "be25266225130c7bbff891f787248cff10120de83b71c297fb44ba046d7b488e",
+      "dhash64": "296893924a73351e"
+    },
+    {
+      "path": "BloodImage_00065.jpg",
+      "split": "train",
+      "source_group": "img:288ae7b96fa7e5cc",
+      "sha256": "288ae7b96fa7e5cc45846bf81cf825318ddf587c66341e06e7ff9a9afb1fe555",
+      "decoded_rgb_sha256": "2b3bece0a15272bdcefa6d06b1a3d0e6d14f04af058afcefcc1fc2043b789db1",
+      "dhash64": "036284cd633234b4"
+    },
+    {
+      "path": "BloodImage_00066.jpg",
+      "split": "train",
+      "source_group": "img:043145400c33a593",
+      "sha256": "043145400c33a59335160ea1267c0bf8f182704c0d7d78f570f9ae1936b9daaa",
+      "decoded_rgb_sha256": "f89e516f92d09b101c1ac676ed78da2b81f33981b610b030a04680374d660879",
+      "dhash64": "17170c1606181bd3"
+    },
+    {
+      "path": "BloodImage_00067.jpg",
+      "split": "train",
+      "source_group": "img:23bc1b3d19bd6f08",
+      "sha256": "23bc1b3d19bd6f083f6322695453f05c288a9bd2f68ba58c93e798d82fbd3532",
+      "decoded_rgb_sha256": "aed520d90568a1f2d39b2d3a3513553464c23e6d4ae2496eed29380493d0e524",
+      "dhash64": "390a4c25928f4b4f"
+    },
+    {
+      "path": "BloodImage_00068.jpg",
+      "split": "train",
+      "source_group": "img:d415114ea0c39340",
+      "sha256": "d415114ea0c39340b5bdc3b8d278e4f31445b68b3026fed111deafe3ef25922e",
+      "decoded_rgb_sha256": "819760d57198a2641f4ef7d2a7004bef3f1ade5250d78fa77f88381893cf10fb",
+      "dhash64": "373319cc4e69b6a4"
+    },
+    {
+      "path": "BloodImage_00069.jpg",
+      "split": "train",
+      "source_group": "img:5c065644960f4d8e",
+      "sha256": "5c065644960f4d8eb647856541b0ec27ff0c1c3dca5db7016e7cccf582d38076",
+      "decoded_rgb_sha256": "b472ed47cf42bf371c76748a4fc631cde266697afb647b28ce70012632997a20",
+      "dhash64": "68523b6b29292f26"
+    },
+    {
+      "path": "BloodImage_00070.jpg",
+      "split": "train",
+      "source_group": "img:5b295e9e4d2d01d2",
+      "sha256": "5b295e9e4d2d01d2989a756bb86c9a1a67f152a6d56e9cdf91f8ffbe7312f2c4",
+      "decoded_rgb_sha256": "6bcc6427760d1700ffc87e1e69f744e339540b56e09e03de904c638567fe86ab",
+      "dhash64": "42ca6c189e8e0c0c"
+    },
+    {
+      "path": "BloodImage_00071.jpg",
+      "split": "train",
+      "source_group": "img:218f65bb41bd3d81",
+      "sha256": "218f65bb41bd3d819ff4293735dc8f492b45559047f40f520d545be00641cd34",
+      "decoded_rgb_sha256": "4866b80b43c43ba01ccf510e3fe716a8851fefeb6598052fd70a1dabbfb9599c",
+      "dhash64": "9292e1cd49c9eb6b"
+    },
+    {
+      "path": "BloodImage_00072.jpg",
+      "split": "train",
+      "source_group": "img:f318b910741d2f4f",
+      "sha256": "f318b910741d2f4f29cccaa519e35b1b8ce0f42448b8a8cb07f05450b89af5a9",
+      "decoded_rgb_sha256": "2544f1f62392e8c4462ec8510eeb5ade83ceda84935adf31b7d96ed7a0a0da30",
+      "dhash64": "89a3b693cba7251b"
+    },
+    {
+      "path": "BloodImage_00073.jpg",
+      "split": "val",
+      "source_group": "img:91d73de2ca1f9036",
+      "sha256": "91d73de2ca1f9036d0993f4c44360a2bae29036628b222b10fdb96a80297ae1b",
+      "decoded_rgb_sha256": "7d2226ed0b5f7af948a0ebdebc451b9376c8674162c6d3ba0deac082b2eca242",
+      "dhash64": "aba7341999c74563"
+    },
+    {
+      "path": "BloodImage_00074.jpg",
+      "split": "train",
+      "source_group": "img:bca64c26f383ba89",
+      "sha256": "bca64c26f383ba89f8cac8d9670fccf1c04db93aee4978bd12001bfbc02e97ec",
+      "decoded_rgb_sha256": "8cee7ef9e152655dddbdb890649b4794ca76b131cc9714d9fee8578518eeda30",
+      "dhash64": "0a0e4eca99991919"
+    },
+    {
+      "path": "BloodImage_00075.jpg",
+      "split": "train",
+      "source_group": "img:f8e1a328c4810169",
+      "sha256": "f8e1a328c48101695a172dd4c21e7efc33d56dfef5b032ccac070e8e2bc53cbd",
+      "decoded_rgb_sha256": "3be528e77788d1c6e8336dc10a83fe0e47d1915e0f390ab332ebb865e5654a59",
+      "dhash64": "67e79551361a5834"
+    },
+    {
+      "path": "BloodImage_00076.jpg",
+      "split": "train",
+      "source_group": "img:ed68654c6c3e2b6a",
+      "sha256": "ed68654c6c3e2b6a9a53f15c9952685f4da5826257e4acbd58157e9bf4b86d6c",
+      "decoded_rgb_sha256": "b04cfed3ac2ce21374ebdbad2a6e0a26aa5e5960616a831cec482787d0bb8dd8",
+      "dhash64": "d79e9933c7dc0c4b"
+    },
+    {
+      "path": "BloodImage_00077.jpg",
+      "split": "train",
+      "source_group": "img:b57ff9b4317d6a33",
+      "sha256": "b57ff9b4317d6a33cee180264eff2f4bc918bde830e981a45777dca9b5317c6f",
+      "decoded_rgb_sha256": "b17af697b161d8ee9d55f66804caad66f9de0cd848fa4154e24d0821bebf9ab4",
+      "dhash64": "2d49637635150c1e"
+    },
+    {
+      "path": "BloodImage_00078.jpg",
+      "split": "train",
+      "source_group": "img:ac348d4a3744daa9",
+      "sha256": "ac348d4a3744daa96d86559f74c8bdfeda30a4ddab8d9958f81993c267de6b12",
+      "decoded_rgb_sha256": "7a71aa93b02e32efb220e220034ce3ca19b7e7b0907cd8ea34fbdf75cc941149",
+      "dhash64": "269a32276544dd59"
+    },
+    {
+      "path": "BloodImage_00079.jpg",
+      "split": "train",
+      "source_group": "img:4027323d89a078db",
+      "sha256": "4027323d89a078db0a8cf6f07391b1d484425560ad4008b5a740e2c740a0e292",
+      "decoded_rgb_sha256": "22174948c2bb9017d3b85e0147e9d7d6f2f559a97a3f7fb9629f312308d4f097",
+      "dhash64": "3a72d4362e4c5c99"
+    },
+    {
+      "path": "BloodImage_00081.jpg",
+      "split": "val",
+      "source_group": "img:1e7deb22d9bef10f",
+      "sha256": "1e7deb22d9bef10fdcd8e8933c00089615c8b9813a4fd8ddbfdb2011a5aa88bd",
+      "decoded_rgb_sha256": "9a96c293bddefa5e16e1761084f4d744dc6609a35bc3c3001587b139869dc8c5",
+      "dhash64": "ccda33313133796b"
+    },
+    {
+      "path": "BloodImage_00082.jpg",
+      "split": "train",
+      "source_group": "img:846be70901b94764",
+      "sha256": "846be70901b9476437d9e3a95ed37e6ec6287dd0428f3bf726342532db2db214",
+      "decoded_rgb_sha256": "f678fed0270d33b3fc7672a1531eefbf8c66519f268b632f3fc85aa8178c7c1f",
+      "dhash64": "6326711795c79695"
+    },
+    {
+      "path": "BloodImage_00083.jpg",
+      "split": "train",
+      "source_group": "img:3f9a2d31443e99f3",
+      "sha256": "3f9a2d31443e99f33c437b3406318956be0dfac45210defdae8d82c657526595",
+      "decoded_rgb_sha256": "995f65d285194d4a01ee638162e7842869562a80d3f0051988f8819312c06f27",
+      "dhash64": "5351333e4ecb4938"
+    },
+    {
+      "path": "BloodImage_00086.jpg",
+      "split": "train",
+      "source_group": "img:46545160bef8db5e",
+      "sha256": "46545160bef8db5e1ed444a6244ab0574ce19c117829caab9f60a4834943947f",
+      "decoded_rgb_sha256": "d04730a1c66ed61400eaffc045ea3bfee3ff870eba2b067aa48c9120c61d8b4e",
+      "dhash64": "8da684933319199b"
+    },
+    {
+      "path": "BloodImage_00087.jpg",
+      "split": "test",
+      "source_group": "img:4bbe3bbc2bb8d891",
+      "sha256": "4bbe3bbc2bb8d8910382e8b805b164099e8e9935016baf4e7eb477da3f3ccfaa",
+      "decoded_rgb_sha256": "d8f2b42ec20596df99ec15a677a10c35fd30adaab9b402fcaf38a49511cac921",
+      "dhash64": "4c487472696b8d19"
+    },
+    {
+      "path": "BloodImage_00088.jpg",
+      "split": "train",
+      "source_group": "img:b66c2723633e9490",
+      "sha256": "b66c2723633e94906741eb793b127d42430a097b897f76c1ed7a606db1441d72",
+      "decoded_rgb_sha256": "6b5af7e77f17ae86740f5ac1b7ceeb4821663a0c03a1f637f9907ecada366bc5",
+      "dhash64": "cf6b694c94353b28"
+    },
+    {
+      "path": "BloodImage_00089.jpg",
+      "split": "test",
+      "source_group": "img:fc50c8ae2300d33b",
+      "sha256": "fc50c8ae2300d33b79dd384eabb3420d031db970949743828928124953917da9",
+      "decoded_rgb_sha256": "62537f7716daefa6d9bede18d2e28bc59d648a25e652b1eb5e7798d8c679ba91",
+      "dhash64": "65262636191932da"
+    },
+    {
+      "path": "BloodImage_00090.jpg",
+      "split": "train",
+      "source_group": "img:3919ee2a16ee06e6",
+      "sha256": "3919ee2a16ee06e6ea52c1a75dae79067a664da816a3efc5e0ffdd2ea74468be",
+      "decoded_rgb_sha256": "7ccdd1bea1e3bd9e4551913d74f829d45b8dade45ad72af8a9d07f4f0ff5b069",
+      "dhash64": "b88e96969613460c"
+    },
+    {
+      "path": "BloodImage_00091.jpg",
+      "split": "test",
+      "source_group": "img:22b3c5fad575c3fa",
+      "sha256": "22b3c5fad575c3faa143e503758e0733bc32ec23b788c6ae14f37e3c2a741ccf",
+      "decoded_rgb_sha256": "41a74b9bbbe240b205f9119131d87ca67cc674673459729e88b79bc75bd98c0f",
+      "dhash64": "30246c7c181a1b99"
+    },
+    {
+      "path": "BloodImage_00092.jpg",
+      "split": "train",
+      "source_group": "img:cce70c5b721104ff",
+      "sha256": "cce70c5b721104ff68bff9f783558c24fdb63d16c20262bcbd0bbb0bf4da3e47",
+      "decoded_rgb_sha256": "93a277a2249a6dc47f7d637e73957281a7f20900a1ebde7acfd08b37a7712d86",
+      "dhash64": "a3b332361b1b191b"
+    },
+    {
+      "path": "BloodImage_00093.jpg",
+      "split": "val",
+      "source_group": "img:e9f260a5b3507d91",
+      "sha256": "e9f260a5b3507d9199b147d236d161e28767f8a14b0fc285395e52db52743648",
+      "decoded_rgb_sha256": "db77ec4c3be848f744bd03f6611ae52cf26ac93dc31b9e88a1c54e92cd10e619",
+      "dhash64": "a92d656646652133"
+    },
+    {
+      "path": "BloodImage_00094.jpg",
+      "split": "train",
+      "source_group": "img:cf52338719eb96b4",
+      "sha256": "cf52338719eb96b4f310a40db35f68bea8b8a0062d77e481023b65b8a8b09bfc",
+      "decoded_rgb_sha256": "8a7286b299e82d0f644ef87821a97278aa06b8515a86e7daa7e9e918fcaab965",
+      "dhash64": "899519d89ab92d16"
+    },
+    {
+      "path": "BloodImage_00095.jpg",
+      "split": "train",
+      "source_group": "img:e935713004b6cbef",
+      "sha256": "e935713004b6cbef5dad81b071a639de5a99d7c335693b4d912632c2121c981b",
+      "decoded_rgb_sha256": "7eceeb02a480114db442793f4005f5e9875950b329ff6635b685bfa1e4eeb9f8",
+      "dhash64": "60f892c7094b5d1d"
+    },
+    {
+      "path": "BloodImage_00097.jpg",
+      "split": "train",
+      "source_group": "img:50b8672cddc66aec",
+      "sha256": "50b8672cddc66aec61926ccfaea2aa37398e167a9a64765f81bdab7045404557",
+      "decoded_rgb_sha256": "1181074a5f42a7e2b633a080169f72b8bebecf93bb509a00b383327b17bd0f03",
+      "dhash64": "ca0a381949143725"
+    },
+    {
+      "path": "BloodImage_00098.jpg",
+      "split": "train",
+      "source_group": "img:a06b17a04a4fc89c",
+      "sha256": "a06b17a04a4fc89c190ced4b83c1b75031608616502c8a3946dcd5b366f40d7a",
+      "decoded_rgb_sha256": "1bae77cdc923abd533dcbf582677d664976151e9530fafd27fe1be36a49eeae2",
+      "dhash64": "2c864665650d2132"
+    },
+    {
+      "path": "BloodImage_00099.jpg",
+      "split": "train",
+      "source_group": "img:9c3eb562be625676",
+      "sha256": "9c3eb562be625676dc611a94e579f1f4215b03fb522055a8c815fb9ef7568fc3",
+      "decoded_rgb_sha256": "55803628938a34aa17a1c24e1c17cc5ff9abe9bc4b3f6f61080350bfa4ebe8b4",
+      "dhash64": "93144a4b75378f99"
+    },
+    {
+      "path": "BloodImage_00100.jpg",
+      "split": "train",
+      "source_group": "img:af005b91a03a5c1a",
+      "sha256": "af005b91a03a5c1a3f6b2075789e8fa9e0936655e36053747822a2576f81a3dd",
+      "decoded_rgb_sha256": "4addadeeb6fca7f33cf80c1f48b1935972d91b7d0caa7b9d1da5ee3d8dbdb944",
+      "dhash64": "0c0e0ccea40c1e19"
+    },
+    {
+      "path": "BloodImage_00101.jpg",
+      "split": "train",
+      "source_group": "img:70c21447f556f4fa",
+      "sha256": "70c21447f556f4fa6d8ca9161931769444844467ca3b42f944b4f4fbbdd1e028",
+      "decoded_rgb_sha256": "aaf74006b50a835ab1665d2fa4bcc5e75482abbe9ac110af42951cd92d34d108",
+      "dhash64": "c4753f3252cc4d25"
+    },
+    {
+      "path": "BloodImage_00103.jpg",
+      "split": "test",
+      "source_group": "img:07632cdd3dbcf940",
+      "sha256": "07632cdd3dbcf94038b7637b71ab829d14ddcd8163e554bbace7338baf562dc4",
+      "decoded_rgb_sha256": "245c0d438413d73f3e4c6077b2d17b134f3f9a85a1ccad9001c01a0b513a7a01",
+      "dhash64": "4e0b194f132b0f1f"
+    },
+    {
+      "path": "BloodImage_00104.jpg",
+      "split": "val",
+      "source_group": "img:bc75b95c506e467c",
+      "sha256": "bc75b95c506e467c421d1afd8c59277a78630b427fd54e8d332f8a42ec8b6fac",
+      "decoded_rgb_sha256": "510afa7ce64d08219aba66bdaf28cac38e0210264ac41aa2acf8304cbb35160f",
+      "dhash64": "d00a6e25f3921133"
+    },
+    {
+      "path": "BloodImage_00106.jpg",
+      "split": "train",
+      "source_group": "img:378d04e9d76b18eb",
+      "sha256": "378d04e9d76b18ebaaa45531cf5866d02e60aee3de6df46cd4950cc2a91cc061",
+      "decoded_rgb_sha256": "c5336f23eea1c82564e4c971ec8715326e192337de3a7363215b02e74a8b2c25",
+      "dhash64": "d262d39c8c2dc88c"
+    },
+    {
+      "path": "BloodImage_00107.jpg",
+      "split": "test",
+      "source_group": "img:f8bfd68fec39d55e",
+      "sha256": "f8bfd68fec39d55ef13d9137fe2ad9c61d4541c67b22b2f1daa28a390cf73aba",
+      "decoded_rgb_sha256": "1f10e9de07410877038f6734d28b7c98ba37efa3ff9809d791d14aea2e339f63",
+      "dhash64": "c9d333a3c66b6a5c"
+    },
+    {
+      "path": "BloodImage_00108.jpg",
+      "split": "train",
+      "source_group": "img:736d4735e8bed315",
+      "sha256": "736d4735e8bed3151a3d7c0a57c797f20971a7c45502219c0a62356c4b0a17fd",
+      "decoded_rgb_sha256": "382eb2df85065cfc590f414345113aeeea816770b6b4dd57c77b06943e30f210",
+      "dhash64": "695b4b4586537133"
+    },
+    {
+      "path": "BloodImage_00109.jpg",
+      "split": "train",
+      "source_group": "img:b6594a3dc657dd38",
+      "sha256": "b6594a3dc657dd38d312ba259bf18c8e3365b170ad93ef7d678a81d7c93d59c6",
+      "decoded_rgb_sha256": "8ed11574231f026e1205278fa87e149e5d7a03668cf7d958430794c073d1c02a",
+      "dhash64": "c4ec4f199d1d1c96"
+    },
+    {
+      "path": "BloodImage_00110.jpg",
+      "split": "test",
+      "source_group": "img:fb414828056cc52d",
+      "sha256": "fb414828056cc52dccb3d8282a80feeea9c8079b5fba6661543c0b49b87dfbe5",
+      "decoded_rgb_sha256": "f2ca397ac6d64fa3520c81d3e07e63bcce5505f6fed2eba174b8cce561b73cde",
+      "dhash64": "51192c46c3939313"
+    },
+    {
+      "path": "BloodImage_00111.jpg",
+      "split": "train",
+      "source_group": "img:fcdae8fb4f9880c1",
+      "sha256": "fcdae8fb4f9880c124f4c67734f277db188513892e4badb580d869645ccaca58",
+      "decoded_rgb_sha256": "0e5bb03f62befe9c62e7cd26881366366fbd7bf624643a6c3d46a84289a76614",
+      "dhash64": "634e9ec64c4dd94d"
+    },
+    {
+      "path": "BloodImage_00112.jpg",
+      "split": "train",
+      "source_group": "img:7c7a36505a3bf9da",
+      "sha256": "7c7a36505a3bf9da527b93e0a68ba9358c3bdd4b062e4386be063954a2564c3f",
+      "decoded_rgb_sha256": "5707308df505fb0da1a5f2b23e7b4815bcc499e5ddf335cb9c4d98a19a7e676c",
+      "dhash64": "892c1c1894142c14"
+    },
+    {
+      "path": "BloodImage_00113.jpg",
+      "split": "train",
+      "source_group": "img:7c0df35305f6a6d0",
+      "sha256": "7c0df35305f6a6d0ac7f57309fe5cd68afcdd55adb33b680b1d8e46d23ac9197",
+      "decoded_rgb_sha256": "43c42c868b94a100f3bb995745f13193b3b0332cee1fb0496f55e630df42f1f8",
+      "dhash64": "634b4848dc9d1b99"
+    },
+    {
+      "path": "BloodImage_00114.jpg",
+      "split": "train",
+      "source_group": "img:696da814deeec5f5",
+      "sha256": "696da814deeec5f53ff57d084299d38c8a1d093bb3a0abb99d847ec945ea0e27",
+      "decoded_rgb_sha256": "a2a7f24674ac01006ddca10129b13c3c212b20dd8139a360d4a2151fe66be989",
+      "dhash64": "4dc6322a6c454999"
+    },
+    {
+      "path": "BloodImage_00115.jpg",
+      "split": "train",
+      "source_group": "img:6972df10543d85d8",
+      "sha256": "6972df10543d85d83358437182251fc5592f59adb98d908f6b00035f7ea2ba73",
+      "decoded_rgb_sha256": "e2403f584f2b6072a1f8d0c91917c9624e90c2c2886770d9de8328b7719bfac3",
+      "dhash64": "915336cee7a7075a"
+    },
+    {
+      "path": "BloodImage_00117.jpg",
+      "split": "train",
+      "source_group": "img:b4af04c10e65f1e9",
+      "sha256": "b4af04c10e65f1e96f7350b365696d66d391b996e5a287b40c7fdd8a5171d347",
+      "decoded_rgb_sha256": "b7b09dbc360668746004c57f525b38a3b4dd132a0a8d0c298783c14197a6cbb9",
+      "dhash64": "1b6b7332e38f2696"
+    },
+    {
+      "path": "BloodImage_00120.jpg",
+      "split": "train",
+      "source_group": "img:4180f02c6494f304",
+      "sha256": "4180f02c6494f3045751c19d1718608b6e2e96bc1f0f12fbce29082c8aac2c53",
+      "decoded_rgb_sha256": "b3d113dd8e1f3297fa08c7e3d6951c5c6b70e320919f30b4344d4eb8cd641746",
+      "dhash64": "e2c3e5a4d5d9eec6"
+    },
+    {
+      "path": "BloodImage_00123.jpg",
+      "split": "train",
+      "source_group": "img:dff11cbd735b80ef",
+      "sha256": "dff11cbd735b80efddc6fc94f2ac0becaef56b73afcb75503ecbf27007fda35b",
+      "decoded_rgb_sha256": "0c207e0b0ecf48367ce3064fd60b0e1b02c442ec0f5823ecdab83782409f32a5",
+      "dhash64": "dbdb264ab931b199"
+    },
+    {
+      "path": "BloodImage_00124.jpg",
+      "split": "train",
+      "source_group": "img:b7a0c11c0c3f85d4",
+      "sha256": "b7a0c11c0c3f85d42f081b2231312696742280955a465c1308325ec54c989b50",
+      "decoded_rgb_sha256": "ab93ec9ac6b175cd34444ef157a7aaa7391c7a706d937c3a63e64438718aef9b",
+      "dhash64": "390c1849cfa93931"
+    },
+    {
+      "path": "BloodImage_00125.jpg",
+      "split": "val",
+      "source_group": "img:f6b0c18977072a41",
+      "sha256": "f6b0c18977072a41415fedfe6ea54342272850219a0c931cf86d5fddf87e5b1f",
+      "decoded_rgb_sha256": "f7a20780f307e790c0a963540239c6278bfa9400de3f93c992e3556841c661af",
+      "dhash64": "9cd84f494c0e43d3"
+    },
+    {
+      "path": "BloodImage_00126.jpg",
+      "split": "train",
+      "source_group": "img:1d9c782f96227766",
+      "sha256": "1d9c782f9622776665ac21c53014fa9bda02963b07188acab791555c34762300",
+      "decoded_rgb_sha256": "e8b540305c2c6c43d7af69948ba12b06c8a315453484133af4bb9f5a72108d4b",
+      "dhash64": "b2192966bc84dcdc"
+    },
+    {
+      "path": "BloodImage_00127.jpg",
+      "split": "val",
+      "source_group": "img:5bb893c3a00a6329",
+      "sha256": "5bb893c3a00a6329b1f0e0dc647a048ecf81176093946633fc6e2cc0d4142e1f",
+      "decoded_rgb_sha256": "bf853c6a37b052f2f98867fd03e2b42664aa260f9a7a02f027e739b02d20775b",
+      "dhash64": "064cad642791d148"
+    },
+    {
+      "path": "BloodImage_00130.jpg",
+      "split": "train",
+      "source_group": "img:a7778584434ca0dc",
+      "sha256": "a7778584434ca0dc115546f583bd2fea4896e2dd5fdce7b3641a690716ddba37",
+      "decoded_rgb_sha256": "38aa91bc172f6b5f29e42a4e08b7caa6b78881451a4494265e2643ab0d190e26",
+      "dhash64": "601333276626adad"
+    },
+    {
+      "path": "BloodImage_00132.jpg",
+      "split": "train",
+      "source_group": "img:6d963c660848538d",
+      "sha256": "6d963c660848538d990f674aa2ae8ff671052a6c6251e781a7c50d2e42bf1da9",
+      "decoded_rgb_sha256": "13a36054e560056236a250faed1d34786ea020125efabcf1da13ace111acb96f",
+      "dhash64": "89c5642e87970789"
+    },
+    {
+      "path": "BloodImage_00133.jpg",
+      "split": "train",
+      "source_group": "img:25659472d002f8f9",
+      "sha256": "25659472d002f8f9bfb5f1eb410162326685138c2354438e18a3a25993b52278",
+      "decoded_rgb_sha256": "2807efaf7960a36e927a894a6519da2f2011c6c6efa49ce2406d035278e51f4c",
+      "dhash64": "cc2e32b1b3839b91"
+    },
+    {
+      "path": "BloodImage_00134.jpg",
+      "split": "train",
+      "source_group": "img:0ef7d8bb338f348c",
+      "sha256": "0ef7d8bb338f348c79efcf4c2762167d39a8c3eeaf4121f293fb9dc6fb70920a",
+      "decoded_rgb_sha256": "2df65ea7c4337e8045054c0e7c4d170d8046d7b4f1fbd3e48359ddd72c050a89",
+      "dhash64": "940425a5f3434b93"
+    },
+    {
+      "path": "BloodImage_00135.jpg",
+      "split": "train",
+      "source_group": "img:650a566b92fa767f",
+      "sha256": "650a566b92fa767f831c57bef6d452958734917da1a6caaff92bc8bb6052de79",
+      "decoded_rgb_sha256": "a973557af77c86f06f1ea4934851424e2306b64dd589591b9711ed07f5e9cc74",
+      "dhash64": "c5d3d3d1c6af999a"
+    },
+    {
+      "path": "BloodImage_00136.jpg",
+      "split": "train",
+      "source_group": "img:3fa9bd76b6ebf832",
+      "sha256": "3fa9bd76b6ebf832be32c21afe367792fcfdfbbc4ff0084c041dbc07b714f723",
+      "decoded_rgb_sha256": "ac752545eb15f3c67ea14e5773b2e079f9695c474ee42a684f1f2fa60ea53be5",
+      "dhash64": "9099ca4a0b9c1929"
+    },
+    {
+      "path": "BloodImage_00137.jpg",
+      "split": "train",
+      "source_group": "img:73d93d1ddd8020a9",
+      "sha256": "73d93d1ddd8020a99922e7c012324ac7ee571b6658794e66e19f2780924721bc",
+      "decoded_rgb_sha256": "f0ba663e134116cf792a59b0079e53a46256aa8abca447bc5f641530f6259432",
+      "dhash64": "56f3530c386d4f4b"
+    },
+    {
+      "path": "BloodImage_00139.jpg",
+      "split": "train",
+      "source_group": "img:c239ae3a353417a5",
+      "sha256": "c239ae3a353417a596a883c9172c8c335a3cab095da76ab9907ba3b185a8d400",
+      "decoded_rgb_sha256": "9393e22dc6154086b1e4d5a3c17e30b96e956c18d2e46fd56176f65829aa1926",
+      "dhash64": "35e6cecfd59f9a5a"
+    },
+    {
+      "path": "BloodImage_00140.jpg",
+      "split": "train",
+      "source_group": "img:0ae2706e74c1f0d0",
+      "sha256": "0ae2706e74c1f0d037bf2630c5d6c522ccbbcaf783513938ef33730dbe0338f3",
+      "decoded_rgb_sha256": "366ff69b5446d258d045f656e010237df1a82b8d12183dadd4589654d260809f",
+      "dhash64": "312176930b9a8e9a"
+    },
+    {
+      "path": "BloodImage_00141.jpg",
+      "split": "train",
+      "source_group": "img:30f25d7570706bf6",
+      "sha256": "30f25d7570706bf6a05dc15734616f28d3e95299156b491451edf1c05e492bc9",
+      "decoded_rgb_sha256": "1f6a4760c9452fca4e111e98bc0a09441662fe7d3b007bdc63973b31128583d7",
+      "dhash64": "042843564e4ecd0d"
+    },
+    {
+      "path": "BloodImage_00142.jpg",
+      "split": "test",
+      "source_group": "img:d92009d43aa72f65",
+      "sha256": "d92009d43aa72f65abbc8832565a8d4d55eff7810fe214f69da66d86b58025e4",
+      "decoded_rgb_sha256": "2548bb1313f558379a19fc64eb619b52195fa5c3f9b0a0d06182a1357d3a9d35",
+      "dhash64": "99da49d7d707991b"
+    },
+    {
+      "path": "BloodImage_00143.jpg",
+      "split": "train",
+      "source_group": "img:a992799ca501fdda",
+      "sha256": "a992799ca501fddab170872591ba4c941c5fff6ff2e1cb1253bd0f7669af2cd2",
+      "decoded_rgb_sha256": "dde78299345691575b6c863faeb694b252be48979b2555e163cbb2f70b4f04e9",
+      "dhash64": "cf999d964e499c9e"
+    },
+    {
+      "path": "BloodImage_00144.jpg",
+      "split": "train",
+      "source_group": "img:8d02f17b55899dac",
+      "sha256": "8d02f17b55899daca740a1e3f2a36558b24249b84004d1ca2b565ce1ce261475",
+      "decoded_rgb_sha256": "056bf306cb9fd24d1495cd2c710d295fb8c0f545e92ac8c3fe77f32074f52559",
+      "dhash64": "e5c34f88864c1b26"
+    },
+    {
+      "path": "BloodImage_00145.jpg",
+      "split": "train",
+      "source_group": "img:7de582e6ed55bb1d",
+      "sha256": "7de582e6ed55bb1d026d9eaffcf72fd9c590db202be101db67b79a1da35a741f",
+      "decoded_rgb_sha256": "416409d36568149e0a4767283efa7f9ae578c4f344396095110dd1cfa641c326",
+      "dhash64": "4c2f2bcc8c5a5a58"
+    },
+    {
+      "path": "BloodImage_00147.jpg",
+      "split": "val",
+      "source_group": "img:fab299b94eec0921",
+      "sha256": "fab299b94eec0921875e56604260a58b66ddd67b83cbd639ef9d94e034d15031",
+      "decoded_rgb_sha256": "574858816fa8dc9d62b25f54326911e4b96a6b29ae6b32eb955c0f10c1596c46",
+      "dhash64": "4b6d399032365f4d"
+    },
+    {
+      "path": "BloodImage_00148.jpg",
+      "split": "train",
+      "source_group": "img:886f8bd08655e1d3",
+      "sha256": "886f8bd08655e1d3e6aed575c811f8f6da67ebc489b62ae044f3af20c2392efb",
+      "decoded_rgb_sha256": "5e355ab32f055e6c38ba5dbc30243df10ccd716911fadd146ea463b83ff253f7",
+      "dhash64": "98190db33224a5c7"
+    },
+    {
+      "path": "BloodImage_00149.jpg",
+      "split": "train",
+      "source_group": "img:8d2fda122679af69",
+      "sha256": "8d2fda122679af6959e548fa6611fc50cd5fe6678ea525c89780a1b62d80f7ac",
+      "decoded_rgb_sha256": "02a080d54af022287e510df39c196b0767367b5478af31abf8aa45e66ffd0503",
+      "dhash64": "2993951e0ecdcb23"
+    },
+    {
+      "path": "BloodImage_00150.jpg",
+      "split": "train",
+      "source_group": "img:73fd038572304948",
+      "sha256": "73fd03857230494841a1af307dbc3532adcac8cbba68108ef2758f8f015f404e",
+      "decoded_rgb_sha256": "d1e96958e8d6e2f102a33b9c7d330000a6bef0a972531a781337706fab976e90",
+      "dhash64": "1352d28e5b332933"
+    },
+    {
+      "path": "BloodImage_00152.jpg",
+      "split": "train",
+      "source_group": "img:781ac7ad46471d8e",
+      "sha256": "781ac7ad46471d8e5138e97607d6467e00df4575e1cfe48811adbdca30518fa4",
+      "decoded_rgb_sha256": "027e9dcd7957f3a7e5d34ab4eea73b08fad92de672157b2155627f9328f4556e",
+      "dhash64": "2bca8294c7828999"
+    },
+    {
+      "path": "BloodImage_00154.jpg",
+      "split": "val",
+      "source_group": "img:02305fe804634070",
+      "sha256": "02305fe804634070adfd837a404049b31be537b53305b0b0cfddca7e2037bd59",
+      "decoded_rgb_sha256": "8ffabf7af1be26af0f44c577e14941380c5920f5ea573e96acf75639deef9b6c",
+      "dhash64": "6d4c071a36264b4a"
+    },
+    {
+      "path": "BloodImage_00156.jpg",
+      "split": "val",
+      "source_group": "img:b09a58fd7b167fcd",
+      "sha256": "b09a58fd7b167fcdee8dd77f675fd18a6a40c18f69fd7f622832aecf61bccb82",
+      "decoded_rgb_sha256": "6440aba3e0709dbf24eab2dece9ea18a76016fa353ec9fc71581896f0d2a5f75",
+      "dhash64": "5b710725ad0faf2c"
+    },
+    {
+      "path": "BloodImage_00157.jpg",
+      "split": "train",
+      "source_group": "img:11d2aa7385337655",
+      "sha256": "11d2aa7385337655d08bef37846d002fd9c9e6051cd5043bd9e7667bbcffefd3",
+      "decoded_rgb_sha256": "f359a71c69620b7f126ecc6c18b83d21f2ee8266641cad32c4e6eec101504e2e",
+      "dhash64": "6249997326a71919"
+    },
+    {
+      "path": "BloodImage_00158.jpg",
+      "split": "test",
+      "source_group": "img:40034e4609b6c2b6",
+      "sha256": "40034e4609b6c2b61521c84372cfb65d4a935a2c8b69faf70f7d899d7f4dd6bb",
+      "decoded_rgb_sha256": "f9f49ab2a8dc72c925b0511c315c73885d8e17dab914756e960e661f4543032e",
+      "dhash64": "d29994d25999928e"
+    },
+    {
+      "path": "BloodImage_00159.jpg",
+      "split": "train",
+      "source_group": "img:2f27942363d6f325",
+      "sha256": "2f27942363d6f325dbbc53719f5b3747a85de40ab32db1bde4d0d712afa131f5",
+      "decoded_rgb_sha256": "835a1337bb6783e317429a79b981ff173a0d5c7d6c1d18fc30bfb354779e53ff",
+      "dhash64": "26662da4848f4133"
+    },
+    {
+      "path": "BloodImage_00160.jpg",
+      "split": "train",
+      "source_group": "img:e0737ee6571d458c",
+      "sha256": "e0737ee6571d458c7f370aab29804745f599767c0c3ae0aab035842bacd11565",
+      "decoded_rgb_sha256": "5f32fe669450a164bf6addfae978655200238ab683b3b96d3d8603ab69d17c9f",
+      "dhash64": "9192d244cd9999d9"
+    },
+    {
+      "path": "BloodImage_00161.jpg",
+      "split": "train",
+      "source_group": "img:9689e021b25437a7",
+      "sha256": "9689e021b25437a79440cdb213d94a750e93fcb8477f6abff8a82f07ba1e23e2",
+      "decoded_rgb_sha256": "dc76770b61b41d9c51056699897ce0b608453b3c614a9ec10edd981b58c88581",
+      "dhash64": "633374440e9fd95b"
+    },
+    {
+      "path": "BloodImage_00162.jpg",
+      "split": "train",
+      "source_group": "img:4f6f4638274ea036",
+      "sha256": "4f6f4638274ea036db81b7cb42bea9fe353d09aae61ed47948119c7e33a7c5f3",
+      "decoded_rgb_sha256": "af2de0ee5e8a0d659c85174ab581b944fb338408dfb1cdd6cdfe50a5de59fd44",
+      "dhash64": "e50f86b98f65c6c6"
+    },
+    {
+      "path": "BloodImage_00163.jpg",
+      "split": "train",
+      "source_group": "img:9e0ecb0cdce435b0",
+      "sha256": "9e0ecb0cdce435b057d3a90d1e8a28ececaa5acab6f90d389c331eaea3a26713",
+      "decoded_rgb_sha256": "f259115726ba5f02ea057ca1fbbebd9958fd5cf0b69632bcb074bfe91d0ae090",
+      "dhash64": "b6e690d86c646c24"
+    },
+    {
+      "path": "BloodImage_00164.jpg",
+      "split": "test",
+      "source_group": "img:943d0630c7fd2108",
+      "sha256": "943d0630c7fd210882897518a900604bf9a6e55331586c8704c7a78bae802839",
+      "decoded_rgb_sha256": "0aaccf7ad8adec52cb7c52d4a878bae4b4199d0ebf5e8ef5750cb852309d5aac",
+      "dhash64": "cdcede2b234ac527"
+    },
+    {
+      "path": "BloodImage_00165.jpg",
+      "split": "train",
+      "source_group": "img:ce170189031bbe4b",
+      "sha256": "ce170189031bbe4bde4212cdc3632976ec300e5bb25d36d105650a96d0d9a1ae",
+      "decoded_rgb_sha256": "24a8df7b7424247463e9d6d826ad4d188a41621754af3197921275ddaa8d224c",
+      "dhash64": "85a533f3a6a83416"
+    },
+    {
+      "path": "BloodImage_00166.jpg",
+      "split": "train",
+      "source_group": "img:9017631aa774ad56",
+      "sha256": "9017631aa774ad56a51d94d77f60e64e3b97fd2f67a1b51d3134fb7d90232b79",
+      "decoded_rgb_sha256": "14f43954330f4ac63b4ccecb711f5261e68afdf768eff1e0ee0130e5345d311b",
+      "dhash64": "425bd948acac8c9e"
+    },
+    {
+      "path": "BloodImage_00167.jpg",
+      "split": "val",
+      "source_group": "img:54328653f178017c",
+      "sha256": "54328653f178017c2f64de1a9cd4e2a66f75f918357f8d7f12a479c490cd7d01",
+      "decoded_rgb_sha256": "20bd81bc877b9fbab880855a77a0e2f0bd4f1e2587c7d91fbb5bdd7a9a7c4aa7",
+      "dhash64": "a98a5eede7b23371"
+    },
+    {
+      "path": "BloodImage_00168.jpg",
+      "split": "val",
+      "source_group": "img:bbb294cd8092462d",
+      "sha256": "bbb294cd8092462d438a783286b24ab3bf682e75a44e043f238e026726b2fd3c",
+      "decoded_rgb_sha256": "1fec6edb2889509f876fa79f2b52385cd5615ef779d64f7d244ac77eac57671b",
+      "dhash64": "cd2b6a8a8bd90f97"
+    },
+    {
+      "path": "BloodImage_00169.jpg",
+      "split": "val",
+      "source_group": "img:5878c62378bb58f6",
+      "sha256": "5878c62378bb58f6267817d0feb75d7aad1394982716e4db87aad4294931879d",
+      "decoded_rgb_sha256": "f1466d5a8ace94e8132e1878cf78fb12b23438aa04893d2dc524707edbc6cf90",
+      "dhash64": "a7e6649e89cc9d53"
+    },
+    {
+      "path": "BloodImage_00170.jpg",
+      "split": "train",
+      "source_group": "img:23a5eba7b5357095",
+      "sha256": "23a5eba7b53570958e33c210bf55c57428c7f18b076fd45262f699aa68b2f757",
+      "decoded_rgb_sha256": "47d3f26fa57ac3a2b8e7f92d024d804ec092d36b7a3f7ed2900eef166b452996",
+      "dhash64": "b1d38925676625ad"
+    },
+    {
+      "path": "BloodImage_00171.jpg",
+      "split": "train",
+      "source_group": "img:8bc9d72d1a27d24f",
+      "sha256": "8bc9d72d1a27d24f8177341cf41e39c07892633287508cedbaa299b1e74f22d0",
+      "decoded_rgb_sha256": "141c717d37b201be2ecc16d2160ded6bb4f06d453d5ba32b79eba65c7fbe6864",
+      "dhash64": "6061616a29991131"
+    },
+    {
+      "path": "BloodImage_00172.jpg",
+      "split": "train",
+      "source_group": "img:d699ac391261e80b",
+      "sha256": "d699ac391261e80b7b989325ab97e681594ca5f00687a6662640b24617417ab8",
+      "decoded_rgb_sha256": "66bf9810b81f07d1db9325db204ad7efe9caba5de9c42711f40c49aa3517aaf2",
+      "dhash64": "8e90999a461d190e"
+    },
+    {
+      "path": "BloodImage_00174.jpg",
+      "split": "train",
+      "source_group": "img:fd9e8f0c6fc18c8d",
+      "sha256": "fd9e8f0c6fc18c8d7700a5186e4fafc8c132a9e7998356985630ecc4bcd85b1f",
+      "decoded_rgb_sha256": "94657aebe664ede59e13732906db8ac48a056f9a11ec7db2ac8f7d6855de8e00",
+      "dhash64": "55a8866373e68b1b"
+    },
+    {
+      "path": "BloodImage_00175.jpg",
+      "split": "train",
+      "source_group": "img:8f0d6096e48aa1c7",
+      "sha256": "8f0d6096e48aa1c730717955af64af6ea9e6a3d59b2fe9fc9ec385218fe20787",
+      "decoded_rgb_sha256": "942cbc728bb47dffa9501bb31b5c5e05401631c834672554bad2907d487d1367",
+      "dhash64": "2323671b55b03232"
+    },
+    {
+      "path": "BloodImage_00176.jpg",
+      "split": "train",
+      "source_group": "img:1e95837763433540",
+      "sha256": "1e958377634335400e4f1fd62de05ae851e7ef21edd789450bb7dd1b26e03351",
+      "decoded_rgb_sha256": "1d02d52d4c26444a6a8751bf427664d85db660f613057a5149daaa1827f6d619",
+      "dhash64": "f56669d9974e8b99"
+    },
+    {
+      "path": "BloodImage_00177.jpg",
+      "split": "train",
+      "source_group": "img:13cb4515ae5d2344",
+      "sha256": "13cb4515ae5d23449994b8b83a3e8f6b8cd75374ae125aca29996e74d5c74dbc",
+      "decoded_rgb_sha256": "7c2eb7f8a7453302299077c07a611bccd7ec71f2ef6cdea00eda1e8205716c9d",
+      "dhash64": "a3b92167c6535e1a"
+    },
+    {
+      "path": "BloodImage_00178.jpg",
+      "split": "train",
+      "source_group": "img:5967498b9b0e85fc",
+      "sha256": "5967498b9b0e85fcc8b839dae314ae07377c76d127d236e3b15cc712e64b5e74",
+      "decoded_rgb_sha256": "00d93c4a175717cbf0af92bd73f9cf0ca81bf88494fedcb74bc20ed21a161939",
+      "dhash64": "2032648ddb5a4b23"
+    },
+    {
+      "path": "BloodImage_00179.jpg",
+      "split": "test",
+      "source_group": "img:59c4a80d806c09c6",
+      "sha256": "59c4a80d806c09c626ead3b90370cfb8c96980f6cebb2aa2342089b73719da99",
+      "decoded_rgb_sha256": "b5b236613929c941b8852799b98418cc6e8ef3eef561c1bbc8a65e2f1f689ed7",
+      "dhash64": "192563d359ac0a1a"
+    },
+    {
+      "path": "BloodImage_00180.jpg",
+      "split": "train",
+      "source_group": "img:9ff233f453dc1c94",
+      "sha256": "9ff233f453dc1c9408a96d1eaf42a055621613dee3465096ca4fad4d49160491",
+      "decoded_rgb_sha256": "d20c099220efaaa2f71da5b88a20361fa4c32819690cad47f3db9de8dc5f9777",
+      "dhash64": "61e12d87b76c5ba6"
+    },
+    {
+      "path": "BloodImage_00182.jpg",
+      "split": "train",
+      "source_group": "img:ddb09135e1f6a070",
+      "sha256": "ddb09135e1f6a07072c0065c917a8184a99479f4b93c18e3f44540854035c9e8",
+      "decoded_rgb_sha256": "3418e1598bf403eef2f303e03d392fc98f0e818ca6d863232804e46dcd9f806b",
+      "dhash64": "772c98d866640e93"
+    },
+    {
+      "path": "BloodImage_00183.jpg",
+      "split": "train",
+      "source_group": "img:9de741e95fe17b01",
+      "sha256": "9de741e95fe17b01d845805af9905d0367a246cc54944fc9cce49cec225f33d0",
+      "decoded_rgb_sha256": "6489a28ff3c93a2f7653b657cec44da5f7f215a97833c7c43eaeb370b69591ce",
+      "dhash64": "b39399b97045479e"
+    },
+    {
+      "path": "BloodImage_00184.jpg",
+      "split": "train",
+      "source_group": "img:68ade88fffdb957e",
+      "sha256": "68ade88fffdb957e47107c1a0901ca0927c4cef05f1d1b37e892d47e1fabce7d",
+      "decoded_rgb_sha256": "d15eced976dbcb7cfba931491c5f83709eb71e39bc9d69644343cfbed9ba41f5",
+      "dhash64": "4acbcad26c661848"
+    },
+    {
+      "path": "BloodImage_00187.jpg",
+      "split": "train",
+      "source_group": "img:318afa3f39825c52",
+      "sha256": "318afa3f39825c5256b71bb9394f2d4bdbbd10c2b536620c0ce884385d1a4618",
+      "decoded_rgb_sha256": "f3795b92e0a4a7f609046e20c960653e4307c4b974e3b503958031b894ddea52",
+      "dhash64": "d24c542a667273b6"
+    },
+    {
+      "path": "BloodImage_00189.jpg",
+      "split": "train",
+      "source_group": "img:89ca24e5cb47124b",
+      "sha256": "89ca24e5cb47124bd63001664d76e781602ab7cd2b3b818d63c961a8fd943634",
+      "decoded_rgb_sha256": "981e47b789c5c9072d2979049c8e8daa8afb8e20bb8a8f2e095b48e4fc94b4dd",
+      "dhash64": "34a6ad32b20d494b"
+    },
+    {
+      "path": "BloodImage_00190.jpg",
+      "split": "train",
+      "source_group": "img:82d64d95d8a619be",
+      "sha256": "82d64d95d8a619be1b1a1ff0ebca764db5f250f4dd419cefff52257b4b21e85b",
+      "decoded_rgb_sha256": "3be127135cad787fb349a04ee36a2af89357d7a2f30fcbacd6c56da910a4f1cb",
+      "dhash64": "11162663e54c5adb"
+    },
+    {
+      "path": "BloodImage_00191.jpg",
+      "split": "val",
+      "source_group": "img:465503c456b07d88",
+      "sha256": "465503c456b07d881ffac033d1dab33f7b2f77454e59e64e6a4483fae0bda8ee",
+      "decoded_rgb_sha256": "6394a957950db04251f72b747d8ad27ff2a3536c9c15a30031add1589a088bab",
+      "dhash64": "69a496468bcb531b"
+    },
+    {
+      "path": "BloodImage_00192.jpg",
+      "split": "train",
+      "source_group": "img:34a941b18c3b737f",
+      "sha256": "34a941b18c3b737ff97ec03c18d6e21f04ca06fab7a0678f6d60330b7d7386d0",
+      "decoded_rgb_sha256": "582126907789af3b95efe287f10f7f60db4ff3561e195679c75621ae4c74728e",
+      "dhash64": "5a1a154eae9e0d0e"
+    },
+    {
+      "path": "BloodImage_00193.jpg",
+      "split": "train",
+      "source_group": "img:f6c83914960f3eaf",
+      "sha256": "f6c83914960f3eaf14b9637bf4593c3446525b1d9c9f3f0c6afcabbd1e5b70d2",
+      "decoded_rgb_sha256": "de46ac09dab66dd58b1770fbc0c2a2d2b2e5568697b5aab52452148911778679",
+      "dhash64": "65654d6cac985636"
+    },
+    {
+      "path": "BloodImage_00195.jpg",
+      "split": "train",
+      "source_group": "img:f727b00877cb8ddb",
+      "sha256": "f727b00877cb8ddb7a839b87f69786a1d4cc3295d1e7908d99316f5bf1094993",
+      "decoded_rgb_sha256": "b13e5bf711dfdad27deca3b1e79de8fd82b4586ae6dfcfaae759cd45584c9b6e",
+      "dhash64": "6731294dcbb98925"
+    },
+    {
+      "path": "BloodImage_00196.jpg",
+      "split": "test",
+      "source_group": "img:823f4d11384110b6",
+      "sha256": "823f4d11384110b623b414cfb3078d7cc533713d852ef5544e4e17ce03b6ead8",
+      "decoded_rgb_sha256": "8d36d985b1792156bd12b03f6e25c3f730aa36a8c487aadbc8359fbe739c3824",
+      "dhash64": "949ab6a72d785892"
+    },
+    {
+      "path": "BloodImage_00197.jpg",
+      "split": "train",
+      "source_group": "img:052188b20794b44c",
+      "sha256": "052188b20794b44c19c78c7b35cfb2b964ec47b0d91299d368f7902475c2557c",
+      "decoded_rgb_sha256": "338310792981c6dfc36e87e5b38ae7afdedb20330644059590257eecae549515",
+      "dhash64": "5c0c9d8d64363229"
+    },
+    {
+      "path": "BloodImage_00198.jpg",
+      "split": "train",
+      "source_group": "img:b3db51e8a9b3b595",
+      "sha256": "b3db51e8a9b3b59520a80db67fb8efd2adcb675cd35642e8a8b9a1aae98c1e33",
+      "decoded_rgb_sha256": "b92525f5180349c1826a68c2b2c40de0625921b765f3b660b341486e42b3d75d",
+      "dhash64": "1a8b0a1b91581698"
+    },
+    {
+      "path": "BloodImage_00199.jpg",
+      "split": "train",
+      "source_group": "img:31ce36f820a6738c",
+      "sha256": "31ce36f820a6738c1756570c0c2ed08c437d046fe4facd01fd5509b68cc5ab33",
+      "decoded_rgb_sha256": "a2fa9c3b4e37430ade54d0d76f35411a54040e2764be234f967274e3cc330b98",
+      "dhash64": "4c4ccdcdcec8841e"
+    },
+    {
+      "path": "BloodImage_00200.jpg",
+      "split": "train",
+      "source_group": "img:e7c5c4b6f977f5a5",
+      "sha256": "e7c5c4b6f977f5a5915b51af9dc370eb09d5a73a636cd52bbc62d633f2a9c475",
+      "decoded_rgb_sha256": "72fd89870a54420fc1738b071e05ac988dcde6a09ee962b0c1a7e1a7537465bd",
+      "dhash64": "d25a29cba98c9c4d"
+    },
+    {
+      "path": "BloodImage_00201.jpg",
+      "split": "train",
+      "source_group": "img:d6e42567772597b8",
+      "sha256": "d6e42567772597b8c856d0f47917b7412b7548ba965c8f2f0576cbc3d9de3ec7",
+      "decoded_rgb_sha256": "cbf93caf9f2a654ca8fcb99c06fcc963d6f31e660999d6b759a44025d5af4080",
+      "dhash64": "9ad375693d189d19"
+    },
+    {
+      "path": "BloodImage_00202.jpg",
+      "split": "val",
+      "source_group": "img:b2f0492513f2852a",
+      "sha256": "b2f0492513f2852a5ee90e6eabd54f2b0294edf3f8f62f2163ebd2ede0dc96d5",
+      "decoded_rgb_sha256": "acaaf6565ed19ad78a8fabf247eaabd4c686469d844de2dfedba33ed68d30da9",
+      "dhash64": "41c5a4dacd94949e"
+    },
+    {
+      "path": "BloodImage_00203.jpg",
+      "split": "train",
+      "source_group": "img:6c22a5f6fca7f233",
+      "sha256": "6c22a5f6fca7f2336cfaaa5eb842bcc88311b5ea7c141fd08f4ce9034c624acb",
+      "decoded_rgb_sha256": "5f32416e378063bf628a2636cb96f7805cd81d76a64e89c2ff7c9859db47b228",
+      "dhash64": "7243069b1b6331b8"
+    },
+    {
+      "path": "BloodImage_00204.jpg",
+      "split": "train",
+      "source_group": "img:2562eb4bc9a2a85c",
+      "sha256": "2562eb4bc9a2a85c2fdf11045d024cc298d372284abcbf4c19d9357c01e3219b",
+      "decoded_rgb_sha256": "e7b624c67d1f638f15ea4487a14cfc0b77db09b96e915959d27a0870a97a0315",
+      "dhash64": "9b991427191212d2"
+    },
+    {
+      "path": "BloodImage_00205.jpg",
+      "split": "val",
+      "source_group": "img:7fecd893d0a0926e",
+      "sha256": "7fecd893d0a0926e01b554528aea5897ab2c9c1fd4dbe49147aace1dab8abcd3",
+      "decoded_rgb_sha256": "2cfc73721f1bca4dba9d45e678423d0c0a54a1041306635304c755ecab1f1804",
+      "dhash64": "8c8636516c65eb1f"
+    },
+    {
+      "path": "BloodImage_00206.jpg",
+      "split": "train",
+      "source_group": "img:92bcb5866bfc4c79",
+      "sha256": "92bcb5866bfc4c7918fba59b51373d76eb34303435aae7ee120dff9f36b4e371",
+      "decoded_rgb_sha256": "531126f0c8096d6ddd10cdceab69c0bf983298d912ba51ec5f1f9dd9469ea0f0",
+      "dhash64": "1b242dc3d352921e"
+    },
+    {
+      "path": "BloodImage_00207.jpg",
+      "split": "train",
+      "source_group": "img:58382424a5332062",
+      "sha256": "58382424a5332062d2efa477162b1f908896204992bfcc5d9eb975a41c4c5b34",
+      "decoded_rgb_sha256": "8eec8dda0be791fad8f624e912694adb0883e0d8c8f98c49f6374ed693782477",
+      "dhash64": "55cb3952cd161e9e"
+    },
+    {
+      "path": "BloodImage_00208.jpg",
+      "split": "train",
+      "source_group": "img:1d7a9da278928130",
+      "sha256": "1d7a9da278928130d84af93ed0d13aa36b5cbf84e1ce4810439578216455eba7",
+      "decoded_rgb_sha256": "9b78de76bcfa954e4669eb6d671c2e49c4797cded3b1bf055c10bc09aa0ad546",
+      "dhash64": "665939726c49200c"
+    },
+    {
+      "path": "BloodImage_00209.jpg",
+      "split": "train",
+      "source_group": "img:86e1d27ba7204a13",
+      "sha256": "86e1d27ba7204a13d07c77339c874511319aabe5a5a68ee914a7273a45b71143",
+      "decoded_rgb_sha256": "68cd2ea183e9876f07923d5b9e7bdc3c087e908ba1cb7e7b913a7db84348e785",
+      "dhash64": "915c0989d9792b07"
+    },
+    {
+      "path": "BloodImage_00210.jpg",
+      "split": "train",
+      "source_group": "img:b5ef0b8ae35517b0",
+      "sha256": "b5ef0b8ae35517b0818dbd06a83cf55f66e7af6f1689a4424c1e2e2b6ac4a12b",
+      "decoded_rgb_sha256": "769ebfb6d85341064e897e20d7da4694737e50a5f72dbb9838c5601399d1ee0f",
+      "dhash64": "b632528688191c28"
+    },
+    {
+      "path": "BloodImage_00211.jpg",
+      "split": "train",
+      "source_group": "img:b9ad468b1186bc92",
+      "sha256": "b9ad468b1186bc929a96e22cb51adab539091caec814e2e650ae34793970b355",
+      "decoded_rgb_sha256": "14d2bd399ffb9dcf43b45e7ca703b0a95fff75bc0c7f202a76a542a4e58b85f1",
+      "dhash64": "46a6173312d69415"
+    },
+    {
+      "path": "BloodImage_00212.jpg",
+      "split": "train",
+      "source_group": "img:985e88e39ded78bd",
+      "sha256": "985e88e39ded78bd8f2fd89d01a58df7f2ca781dd8e35d9d366d417097eca429",
+      "decoded_rgb_sha256": "53ec7c5659a755d1af96922c1f6004d8b472c6355ed22d06154cd1d953c04af2",
+      "dhash64": "896d2d5a8c868c8d"
+    },
+    {
+      "path": "BloodImage_00214.jpg",
+      "split": "train",
+      "source_group": "img:0e8b63a9882d347c",
+      "sha256": "0e8b63a9882d347c18980063f01c853736ba7107ec718c39091159c2a5cdf373",
+      "decoded_rgb_sha256": "e0bb19a4733984d3411d9707f3e306b2604002b6cafa20a7c5e3cc460665c9fe",
+      "dhash64": "5b9cacad9d148eca"
+    },
+    {
+      "path": "BloodImage_00215.jpg",
+      "split": "train",
+      "source_group": "img:e2750a80adf8c871",
+      "sha256": "e2750a80adf8c871efa34267ab85a52ff051ba9e7910b33d47c918c012e45238",
+      "decoded_rgb_sha256": "132a5b6ad5c287c2ef6fa9c6cf1438bf739577df343919243cee80dd08a2d394",
+      "dhash64": "46b494a58ccace97"
+    },
+    {
+      "path": "BloodImage_00216.jpg",
+      "split": "train",
+      "source_group": "img:20a8ee08a44cd9d6",
+      "sha256": "20a8ee08a44cd9d620d022da30f130f85013b3cb41082677eda4b5669d018aab",
+      "decoded_rgb_sha256": "12da7e0e9580dceaa293fe78f380d44b9f90cb785ed14d82818f5b6ffded18c2",
+      "dhash64": "4c87735999cd1aa6"
+    },
+    {
+      "path": "BloodImage_00217.jpg",
+      "split": "train",
+      "source_group": "img:22ac111b558e189f",
+      "sha256": "22ac111b558e189fbe96355628317626bf31fd0709aa5ec153321458f10802d2",
+      "decoded_rgb_sha256": "a05bfa4f375d0b9998556a7722852f9e3045ccc9b6c1d404f1f640025c7e9ddf",
+      "dhash64": "13c6ad8dd8d91519"
+    },
+    {
+      "path": "BloodImage_00218.jpg",
+      "split": "train",
+      "source_group": "img:c7a5a2f9c63e80d6",
+      "sha256": "c7a5a2f9c63e80d6f15a7cf8795f58f08afe8f8cec59f29df347931f943926e4",
+      "decoded_rgb_sha256": "2da8f95049459f35551bb6c199c01c24dfbb6b2cf49ba6c653c5926fb5a377f6",
+      "dhash64": "e4886c939a1e1849"
+    },
+    {
+      "path": "BloodImage_00219.jpg",
+      "split": "train",
+      "source_group": "img:bf47aa4bfb141750",
+      "sha256": "bf47aa4bfb141750fc0133713f09c28b860be99bf3323320d9abd9b1bf10d08f",
+      "decoded_rgb_sha256": "7c58fb69721963321b5fbd6c2da61865c00a6d1e4e282d88f950a01168b2bd5b",
+      "dhash64": "186c68b89a52543c"
+    },
+    {
+      "path": "BloodImage_00220.jpg",
+      "split": "train",
+      "source_group": "img:ddfa7c6cebe1d5da",
+      "sha256": "ddfa7c6cebe1d5da97661c5a068af0faf70fbc439f4d0fadf7fe8d0574c92d2e",
+      "decoded_rgb_sha256": "0133be9600153eab989c662daf05e0942bb8abd1c112b3c1d7ad088c64f3698f",
+      "dhash64": "53d219c84ccc8c39"
+    },
+    {
+      "path": "BloodImage_00221.jpg",
+      "split": "test",
+      "source_group": "img:4782a0f5a1b1ccb5",
+      "sha256": "4782a0f5a1b1ccb528d7020a4d5ebd7ad2341899fdaab9d7895fc09e8afb2a8c",
+      "decoded_rgb_sha256": "790d1d00d74a3be072dfb950bac4e04609555f614b6b2f38a55a4029fea6f686",
+      "dhash64": "27269039939a8876"
+    },
+    {
+      "path": "BloodImage_00222.jpg",
+      "split": "train",
+      "source_group": "img:e9d3f156d95597b9",
+      "sha256": "e9d3f156d95597b98c207986016e5d200786862abd835f0f056aae27d42fc82e",
+      "decoded_rgb_sha256": "92f67ec17f70075eafaf0879e931e7f2b95ea7517a718db7df602fa761ae054b",
+      "dhash64": "4565e52c57661909"
+    },
+    {
+      "path": "BloodImage_00223.jpg",
+      "split": "train",
+      "source_group": "img:5fbd92c4f0a2318f",
+      "sha256": "5fbd92c4f0a2318fd1fa3997deeb41eeccf3b097289c0c476d3f89cd865aec7d",
+      "decoded_rgb_sha256": "3993612c1c041e6fa9012a3d7566b0780a5d56e788b7196f1b6c819722832159",
+      "dhash64": "b93b3b282a8f1705"
+    },
+    {
+      "path": "BloodImage_00224.jpg",
+      "split": "train",
+      "source_group": "img:1b41e3681d6dbd73",
+      "sha256": "1b41e3681d6dbd737f9b211ee97e47e001ad165e966ba384dda027d7cc0a62aa",
+      "decoded_rgb_sha256": "b2b2a1925963db9b98f9058a7450b4aceed082b17d96c54d22228b1125ed81da",
+      "dhash64": "64a7b7b4569a9639"
+    },
+    {
+      "path": "BloodImage_00225.jpg",
+      "split": "train",
+      "source_group": "img:a7ddf33d1a76d936",
+      "sha256": "a7ddf33d1a76d936197f5015cebcf280f26536e5461445fadc409990d59d762a",
+      "decoded_rgb_sha256": "36d020c89fb9145caf6c519459199b6fcc78e55cbc720b12fb3044d715ca083e",
+      "dhash64": "d81859594ba8aa1a"
+    },
+    {
+      "path": "BloodImage_00226.jpg",
+      "split": "train",
+      "source_group": "img:7a833f51025c3be4",
+      "sha256": "7a833f51025c3be45d00eee1d5b49477fadbd702d3b8b8a2afbec92bf78a1859",
+      "decoded_rgb_sha256": "6e186760cf379f7e6054e79964c0692229d66c13cf5661ea098b1be1c4582c9e",
+      "dhash64": "684372b6bcadcb19"
+    },
+    {
+      "path": "BloodImage_00227.jpg",
+      "split": "train",
+      "source_group": "img:5d6250cbdfbf5d8f",
+      "sha256": "5d6250cbdfbf5d8f6d699a0d1e62551f3ff575dadce1f80c8e6be6c0cef27bd5",
+      "decoded_rgb_sha256": "67335fdaa5b1f0def57e26439e336bba107c7962ee4f2752b12f640bfb4baa15",
+      "dhash64": "cc4d6ace666627a4"
+    },
+    {
+      "path": "BloodImage_00228.jpg",
+      "split": "train",
+      "source_group": "img:380a69eb7d606fcf",
+      "sha256": "380a69eb7d606fcf3a4c69786bdcbd3b5b37f9a431ea415e44cfd3ece8c34a04",
+      "decoded_rgb_sha256": "6b32e13f84beac5cc2953e43726ea6b905cdd4ee99190a5ba4d87ae9baf464fd",
+      "dhash64": "323aab1db6920b3d"
+    },
+    {
+      "path": "BloodImage_00229.jpg",
+      "split": "train",
+      "source_group": "img:22cae77971cd1e16",
+      "sha256": "22cae77971cd1e16a4576f523daf3c056393ff326beffbd91e654f1e2cd588f2",
+      "decoded_rgb_sha256": "089636e641c613257a8485528ac0ac60f825bdac311600afc4ddc90f7883a17c",
+      "dhash64": "651c9a8ca5a7a91c"
+    },
+    {
+      "path": "BloodImage_00230.jpg",
+      "split": "train",
+      "source_group": "img:ba5a62b1b3c69f92",
+      "sha256": "ba5a62b1b3c69f9296b73e7885e91ef140d7a56a73b7123aa7b78b5d537703e5",
+      "decoded_rgb_sha256": "7dafea4775d6eb39ea1d3c3808f6d7df3f04fe6f9264262fa68a91a37f79471e",
+      "dhash64": "393632322c5cd28b"
+    },
+    {
+      "path": "BloodImage_00231.jpg",
+      "split": "train",
+      "source_group": "img:a21fa613830e0bbb",
+      "sha256": "a21fa613830e0bbb3ca0ff48a9a24f5f967a57cfcd47605a81d8cd290ab0ed1b",
+      "decoded_rgb_sha256": "d875282fd5c873936327ef17f74b3ab2efc06a0df3b79a71732e17c4bc0dbd29",
+      "dhash64": "cecd4d0ca323322a"
+    },
+    {
+      "path": "BloodImage_00232.jpg",
+      "split": "train",
+      "source_group": "img:5385a6084708557d",
+      "sha256": "5385a6084708557ddfbc1c62a38a2c94acac57c2dc42e6ea78d1de9e1ed4b7de",
+      "decoded_rgb_sha256": "b5c177732eb04d9853fb269e8ca57c95285f114a7295c38a9485e3f4c5f1b1ea",
+      "dhash64": "685825030a88949b"
+    },
+    {
+      "path": "BloodImage_00233.jpg",
+      "split": "test",
+      "source_group": "img:f488c315e46cab4e",
+      "sha256": "f488c315e46cab4efa83c543aa2c404e48baf1f39725d596d4553091bdd72bc4",
+      "decoded_rgb_sha256": "db30330c5d179e4e5ec6b107127f0502874a00254eb839072674790b4371e080",
+      "dhash64": "53c32121a6add11a"
+    },
+    {
+      "path": "BloodImage_00234.jpg",
+      "split": "val",
+      "source_group": "img:2ecba1a46829d5eb",
+      "sha256": "2ecba1a46829d5ebaf0d69add463edf3390d9c00ccd96cdf49ef61f3a5352f78",
+      "decoded_rgb_sha256": "3f8583a14c1e0b624bd38426b7d0d01381a0725e67e61bbe93ec9a4dd8482a59",
+      "dhash64": "1a165611398ccd1b"
+    },
+    {
+      "path": "BloodImage_00235.jpg",
+      "split": "train",
+      "source_group": "img:d53376038f053c1f",
+      "sha256": "d53376038f053c1f92e31d60c23aefc9e75595fbc7911a3f36271826c5274ccf",
+      "decoded_rgb_sha256": "4ab41fc280b21443ecd00e30808f19b66b2490a9ce81c94dd23688e9fd5a64ea",
+      "dhash64": "c3a7717171753b92"
+    },
+    {
+      "path": "BloodImage_00236.jpg",
+      "split": "train",
+      "source_group": "img:413d00ab7511b4cc",
+      "sha256": "413d00ab7511b4ccb094d0cec99d19c218c1fe903d760e864005236e761c2942",
+      "decoded_rgb_sha256": "2d460cfdb0d857cf1d9bf6a889b76a3c854f40c821b61f85b6eaa8a2a81f013f",
+      "dhash64": "a66c2d17426a30c4"
+    },
+    {
+      "path": "BloodImage_00237.jpg",
+      "split": "train",
+      "source_group": "img:29fcbd8c74e49078",
+      "sha256": "29fcbd8c74e490787870fd7144a8a523262e18c18b653b3cfb0697c160234dbc",
+      "decoded_rgb_sha256": "aa5e6c76e1ed2de30a4c89494bab542078017937310d5467fd63be094043ab7b",
+      "dhash64": "4a53713227697a86"
+    },
+    {
+      "path": "BloodImage_00239.jpg",
+      "split": "test",
+      "source_group": "img:dc77a95e5374060e",
+      "sha256": "dc77a95e5374060ed5eb9ae250eea926f62b96e6743f3e92aeb70c5df19e4ad3",
+      "decoded_rgb_sha256": "43f353437a1773d8c0d5b5785536a294d553aacec3aeb2b84128fed3f77bcfac",
+      "dhash64": "6c6e56d623737171"
+    },
+    {
+      "path": "BloodImage_00240.jpg",
+      "split": "test",
+      "source_group": "img:491005b8cb842631",
+      "sha256": "491005b8cb842631851f51dc6027ed4f62e78fedd794a4602901c2745955a16b",
+      "decoded_rgb_sha256": "54e249343c3f3e6a6072f3bd93b41be4228e08271d66b44de89f6674c0d9a6c0",
+      "dhash64": "58ca9c969e6c4ed6"
+    },
+    {
+      "path": "BloodImage_00241.jpg",
+      "split": "train",
+      "source_group": "img:3f74c034cdda017d",
+      "sha256": "3f74c034cdda017dcaa53b1fcb68eb6f5af4c6775cce1db277896505a8f07c41",
+      "decoded_rgb_sha256": "d4818e22762f30d97ed2fa1074405eb4c5f354092b41e9207fa5b6569215d9bc",
+      "dhash64": "0b93336d2999e91a"
+    },
+    {
+      "path": "BloodImage_00242.jpg",
+      "split": "train",
+      "source_group": "img:90eeea9a9e8141ee",
+      "sha256": "90eeea9a9e8141ee34b7b198429a20421a235bfd716f34e93f760fc8cc5a714d",
+      "decoded_rgb_sha256": "7bcd96c5270cd46cf2ce744708eaa432cc00191599e75bc9438e808b0c33e5ad",
+      "dhash64": "44434e928e8d3632"
+    },
+    {
+      "path": "BloodImage_00243.jpg",
+      "split": "train",
+      "source_group": "img:b7e201bedc096bb2",
+      "sha256": "b7e201bedc096bb299d9d06bb64fb6ac3d05d37c29b52124c25994d1e5992770",
+      "decoded_rgb_sha256": "3e1d98ce5dc75086214399ab63eac0123b471a0518d68f46970b3e98e4fd9ea9",
+      "dhash64": "9e9a2d259bd9cb5b"
+    },
+    {
+      "path": "BloodImage_00244.jpg",
+      "split": "train",
+      "source_group": "img:10722792afe45e8a",
+      "sha256": "10722792afe45e8a076541dd3f4281270b184a3a29bde3cc69254db6ac501a7d",
+      "decoded_rgb_sha256": "b04d024499015192b067ae17a459f874ae7ad01407c0868bcf7ffcda61cce76f",
+      "dhash64": "6bd8b898e29a1b1b"
+    },
+    {
+      "path": "BloodImage_00245.jpg",
+      "split": "train",
+      "source_group": "img:c075c4add5050a82",
+      "sha256": "c075c4add5050a829f6b31c2029d2ad84b50eb48c5f53289e7f4195fb741eb36",
+      "decoded_rgb_sha256": "e0b03dfa596723dc9ef3461d3c5bcd0b900531f96e709524c17f0cc029859505",
+      "dhash64": "c79693cbc2d29b22"
+    },
+    {
+      "path": "BloodImage_00246.jpg",
+      "split": "train",
+      "source_group": "img:79460ba326329355",
+      "sha256": "79460ba326329355d1eaef26cee2fd0926c06617f3e34480be3d76e6fe00e684",
+      "decoded_rgb_sha256": "bb6b48c2fbb9d8b96613e5ea6d29bec14310121cab5bc54fec2337f8b3119c5d",
+      "dhash64": "696324a08b65614d"
+    },
+    {
+      "path": "BloodImage_00247.jpg",
+      "split": "train",
+      "source_group": "img:1b7d8b772c5d3f32",
+      "sha256": "1b7d8b772c5d3f32ff4b878d7778f877bad6a83d887d7cbbc662426932371de1",
+      "decoded_rgb_sha256": "1b188f1f5cbfc11b1d02b6822266533002095a96080dec9f289c4f0857d62b8c",
+      "dhash64": "652e66e66b8b294c"
+    },
+    {
+      "path": "BloodImage_00248.jpg",
+      "split": "train",
+      "source_group": "img:f9128fe266bcd5b0",
+      "sha256": "f9128fe266bcd5b0247136c8357dccbdbcc47f6f121f3ea19701566db7e17766",
+      "decoded_rgb_sha256": "99dd209902c9f8ef0ced6a1a85a5801f1f62a424a1c410fe0673185812490761",
+      "dhash64": "0c56521a2de5664b"
+    },
+    {
+      "path": "BloodImage_00249.jpg",
+      "split": "train",
+      "source_group": "img:b3fec86778afc900",
+      "sha256": "b3fec86778afc9000955a3701fd22892df883109cfc3ef3e5dea041cdcf90e93",
+      "decoded_rgb_sha256": "dce1e04be604869e3dc96f51b745791ce9dc66385d28fd54971cddcdfc3dcd1b",
+      "dhash64": "2aa4e6686a5bcace"
+    },
+    {
+      "path": "BloodImage_00250.jpg",
+      "split": "val",
+      "source_group": "img:1a7ba606a1c61789",
+      "sha256": "1a7ba606a1c6178995b9aefcc6ebc5d788159cf741f2c633a81d68ed261d986f",
+      "decoded_rgb_sha256": "a7b5eb840ad49b29f8f9a97518ae00aa0d92d5f4ada2e4028ffe73b25d0ab94a",
+      "dhash64": "6895856b6d0d4f17"
+    },
+    {
+      "path": "BloodImage_00251.jpg",
+      "split": "train",
+      "source_group": "img:9e6f797bc3b7dbfd",
+      "sha256": "9e6f797bc3b7dbfdd48c0d394557fd547dfd460c0b672a89c7c0ffd0fa78e5c4",
+      "decoded_rgb_sha256": "a51bf84b6c72a0773961b8b8f74db5f286554db617ee63be211a14055f841f3e",
+      "dhash64": "6252464c78781c93"
+    },
+    {
+      "path": "BloodImage_00252.jpg",
+      "split": "train",
+      "source_group": "img:776332cc020bf878",
+      "sha256": "776332cc020bf8785f994b5b894da2fa24238d3fc93437778b183b5f6df7d9ec",
+      "decoded_rgb_sha256": "37e4fba81d5f4b94f3a7bba77415eb32bb250bf49e73f551736d74bdf446ce9b",
+      "dhash64": "959a89d77326264b"
+    },
+    {
+      "path": "BloodImage_00253.jpg",
+      "split": "train",
+      "source_group": "img:5e6c48420ec37cb3",
+      "sha256": "5e6c48420ec37cb396872abbdeb37b2caae5047e4272e30219ec1ce441ce5e64",
+      "decoded_rgb_sha256": "bdfa7b95a61df7bf58c7255bc4ea84e17f16a7cf741c6eb064f223f2e4916623",
+      "dhash64": "36b6262c0d536a32"
+    },
+    {
+      "path": "BloodImage_00254.jpg",
+      "split": "train",
+      "source_group": "img:a70e2061dfb18415",
+      "sha256": "a70e2061dfb18415837a45c53b4ef5f1b1a7bfe30776252919ad5900f13a3751",
+      "decoded_rgb_sha256": "3bc6d82343f03ec6bf7ae5c7248f11fbb299747c2b692113d091e663016b6a7b",
+      "dhash64": "33d1916be3093072"
+    },
+    {
+      "path": "BloodImage_00255.jpg",
+      "split": "train",
+      "source_group": "img:e3a3e1d46b74bb02",
+      "sha256": "e3a3e1d46b74bb02601dcdf06da27ebc6f1cb483b1cc89427ca6f88877da09e8",
+      "decoded_rgb_sha256": "025006b0bee7e1606fc8f573c8284bdea24a86295a6f3ac094d7ebff6a88b6b9",
+      "dhash64": "233a18bc60461e5e"
+    },
+    {
+      "path": "BloodImage_00256.jpg",
+      "split": "train",
+      "source_group": "img:014a19c9450aac65",
+      "sha256": "014a19c9450aac65ac89d905dff07950b09a869c646d933745c84bb5ce841e61",
+      "decoded_rgb_sha256": "331372557e7d3d77390c5cdf9ff243d58dc9b624998be28be5c605d5a67fb13f",
+      "dhash64": "67662e865291b995"
+    },
+    {
+      "path": "BloodImage_00257.jpg",
+      "split": "train",
+      "source_group": "img:d090f948b72d99e1",
+      "sha256": "d090f948b72d99e1564f480a8ab4f6ab4beb44ba56826073708448c738bdc304",
+      "decoded_rgb_sha256": "50aba87881f6cea7009c83654097193df14347a24c078c62da862df433b1e968",
+      "dhash64": "633b2476245d5597"
+    },
+    {
+      "path": "BloodImage_00258.jpg",
+      "split": "train",
+      "source_group": "img:7fbe4c500bf77f7b",
+      "sha256": "7fbe4c500bf77f7ba46f53c43b15c63b108bbe457b2c8d5abdcfd92dfb064b3e",
+      "decoded_rgb_sha256": "6046ec91a7d578b6515faa0d3220fbfa2374312f5cba942169e44e70538a70b2",
+      "dhash64": "8ccacc94b3f51c13"
+    },
+    {
+      "path": "BloodImage_00259.jpg",
+      "split": "train",
+      "source_group": "img:e864413086858e63",
+      "sha256": "e864413086858e63c08add36da3b948cfd3d577c116c08962fb08425a6fbc57a",
+      "decoded_rgb_sha256": "8c228a0b832bf5eefe7d8d47944791a0b8f3b69042a5a141930b23ec6cadb188",
+      "dhash64": "17134b8693935811"
+    },
+    {
+      "path": "BloodImage_00260.jpg",
+      "split": "train",
+      "source_group": "img:4ccbef0a63508b6c",
+      "sha256": "4ccbef0a63508b6cbe374ea036947d0418bc9d7832392a30c2d75830ea43ef57",
+      "decoded_rgb_sha256": "2c1a21bc2d26580878e98d6e92b418e4fe80abbc8711baa01e19dc7d5d481651",
+      "dhash64": "4f46a96a66333393"
+    },
+    {
+      "path": "BloodImage_00261.jpg",
+      "split": "train",
+      "source_group": "img:b28f985b3659f91b",
+      "sha256": "b28f985b3659f91bd3a6fc3dc9f70669b1a3f12cdfb79d2e859d45618fa45fc2",
+      "decoded_rgb_sha256": "3f86446d6624346a23243745a450a6f3cfe52c47f429aa9e196f3940eb84d0dc",
+      "dhash64": "c997243b199bd457"
+    },
+    {
+      "path": "BloodImage_00262.jpg",
+      "split": "train",
+      "source_group": "img:ac16701714a8639e",
+      "sha256": "ac16701714a8639ea8463a6fb50f02886ec66a30c1217d0c95bdc2b09bdc37ab",
+      "decoded_rgb_sha256": "fbca23503f16fc69999087efe0b348ddb7a1cdef8cb89378d4eac88bbd10e2bb",
+      "dhash64": "498d2d6644b172b2"
+    },
+    {
+      "path": "BloodImage_00263.jpg",
+      "split": "train",
+      "source_group": "img:ab77c949f1a96b64",
+      "sha256": "ab77c949f1a96b64c55263a4ec0603490b90d186a70a67f4708a45a39c2b9a34",
+      "decoded_rgb_sha256": "f69fe25705d1f5df348f2f8019cd0abdfa755a6045bd7b33e274cc79bab7e58b",
+      "dhash64": "cdccaca2860d1f15"
+    },
+    {
+      "path": "BloodImage_00264.jpg",
+      "split": "train",
+      "source_group": "img:2baf97b30b941a80",
+      "sha256": "2baf97b30b941a809421084603e5fefa0c7fe4075f6525e880c0cd7131557828",
+      "decoded_rgb_sha256": "16c4eae91bc5f03b70eb75b556298bd6d516e3b6fe7b9ed5fb794a768838c40f",
+      "dhash64": "56d29c6c2ca7b5b6"
+    },
+    {
+      "path": "BloodImage_00265.jpg",
+      "split": "train",
+      "source_group": "img:de8f9be326e27e45",
+      "sha256": "de8f9be326e27e45b0ddfdccd7a04e5103be1e3d15909acd5b17c0f620b55aef",
+      "decoded_rgb_sha256": "10bc1035db30411f5a86a4afec6694d12a5dd2953eb9879032387d3731d6db8c",
+      "dhash64": "e68cca4633b1dc24"
+    },
+    {
+      "path": "BloodImage_00266.jpg",
+      "split": "train",
+      "source_group": "img:d1c60b3ed45cd7f2",
+      "sha256": "d1c60b3ed45cd7f208574525359144e63e7bfbc7a826e7c4bf581c8a1bc51b20",
+      "decoded_rgb_sha256": "fe7ded0aa420c50a2ea807bdc21ab889271d76f600448410daf4c90fe441d0b4",
+      "dhash64": "e9b193ce89999386"
+    },
+    {
+      "path": "BloodImage_00267.jpg",
+      "split": "test",
+      "source_group": "img:63edb4548d4630e6",
+      "sha256": "63edb4548d4630e6e31696e3a18e3b859f628c896e968c1ee6b3313fd2589da1",
+      "decoded_rgb_sha256": "6c218a3e3493bfd160ca51b8f4976c2a3273e62424cc20256ab05cc162169475",
+      "dhash64": "698a4fcfcccc6991"
+    },
+    {
+      "path": "BloodImage_00268.jpg",
+      "split": "train",
+      "source_group": "img:e503fc94594f65b0",
+      "sha256": "e503fc94594f65b00c63dfaa101c40cc2f2b4c8984ed10d0d2b632f0a27d6d56",
+      "decoded_rgb_sha256": "cb01e1fbb0e7d92f222c48fae5f06bc4885dd33b0e987c1e8dc8696826494534",
+      "dhash64": "c3626650478b3b13"
+    },
+    {
+      "path": "BloodImage_00269.jpg",
+      "split": "train",
+      "source_group": "img:b340beb846c2fea6",
+      "sha256": "b340beb846c2fea614d46be73c911e7bb634a4ee0575580df5ab81d06c08b55b",
+      "decoded_rgb_sha256": "7778e49bd4ce3ec74d900925b1d926e1926bd3df1098651aef89d1a85c153cdc",
+      "dhash64": "63c34a4816124915"
+    },
+    {
+      "path": "BloodImage_00270.jpg",
+      "split": "train",
+      "source_group": "img:54b6bddbd3f5259b",
+      "sha256": "54b6bddbd3f5259b049c3783bc902b96e49d080e3ed00bd8076ecabc319b6274",
+      "decoded_rgb_sha256": "47917feb1a70c07f30bc93d9a19d27e75e5743d44080fd8e6016d4059293289a",
+      "dhash64": "339392c4272b33b2"
+    },
+    {
+      "path": "BloodImage_00271.jpg",
+      "split": "train",
+      "source_group": "img:2a4f5cd1569d4490",
+      "sha256": "2a4f5cd1569d44902094f89ddedd03819f7168d0a9d9c1e701b1dfa42dc89f8a",
+      "decoded_rgb_sha256": "5eba433bf2fd593ec57e69453b8621bc512e98b16c60c54533d48fcc052ccf47",
+      "dhash64": "6aa673a41c9bca8a"
+    },
+    {
+      "path": "BloodImage_00272.jpg",
+      "split": "train",
+      "source_group": "img:f55787ec267cb4ae",
+      "sha256": "f55787ec267cb4ae68377f0fcccc4105bae1e84d505c901ea8b731a74cdd6ec6",
+      "decoded_rgb_sha256": "34af8eb24283f02df1df285ce999696b6b5b62d5925198fa0db864a50d7bdbbe",
+      "dhash64": "d3a2c2d7252d34b6"
+    },
+    {
+      "path": "BloodImage_00273.jpg",
+      "split": "train",
+      "source_group": "img:cf383489aa29f8ac",
+      "sha256": "cf383489aa29f8ac7ff4fabf4b7cbae21667adefd38afafff224ce0f74ada789",
+      "decoded_rgb_sha256": "59db139c9912a2448a2f49f61e184b35e62b335342db602118ff714e058a5539",
+      "dhash64": "b3b50c4e472e4683"
+    },
+    {
+      "path": "BloodImage_00274.jpg",
+      "split": "train",
+      "source_group": "img:83dd26dac28f1bc1",
+      "sha256": "83dd26dac28f1bc1bbe51ac661999a211c20de37a2b59f3e900bdd5df4f5bfc5",
+      "decoded_rgb_sha256": "7647bed78a0274cbec6d17fc89177801ab52ac014840da43dd870dbb53b2a59b",
+      "dhash64": "01393333b2e6ce4c"
+    },
+    {
+      "path": "BloodImage_00275.jpg",
+      "split": "train",
+      "source_group": "img:d9fbe584925ac17c",
+      "sha256": "d9fbe584925ac17c49de81aa278041baeab4fec170aa0865d79122e8ce609496",
+      "decoded_rgb_sha256": "2a799d439fa58f584473282793068423ae58bc6aa23cd2819015bac892d06d7f",
+      "dhash64": "b62f69245345255b"
+    },
+    {
+      "path": "BloodImage_00276.jpg",
+      "split": "val",
+      "source_group": "img:7d8235a4789333d8",
+      "sha256": "7d8235a4789333d8537a9d9f32298bf977abb935e2b215bb40265e555efa64f8",
+      "decoded_rgb_sha256": "57d725ec35e53af72fe15f5e7ecdb9015eeb4376639bbb22de78c998bad678f0",
+      "dhash64": "343272468d4d8a9b"
+    },
+    {
+      "path": "BloodImage_00277.jpg",
+      "split": "val",
+      "source_group": "img:bf7631d50c9d354c",
+      "sha256": "bf7631d50c9d354c2b09557eb1adb71e1b130973e5143514dbd72a043e093cf6",
+      "decoded_rgb_sha256": "ee307878ed2b12c2e7e155d8f36c3ee67f1bddc2f35ee3004a902c56dc857ca1",
+      "dhash64": "4e8a938c9949a933"
+    },
+    {
+      "path": "BloodImage_00278.jpg",
+      "split": "test",
+      "source_group": "img:f13a6329aacf2c1d",
+      "sha256": "f13a6329aacf2c1db023421eaf053e5d589f032f9156de2f65d392993846b5d9",
+      "decoded_rgb_sha256": "bd6768b56a01ff6d8867547c3fd16569afe67ae7a68dce45ff7798300cea7f14",
+      "dhash64": "2a4a31ac0c581959"
+    },
+    {
+      "path": "BloodImage_00279.jpg",
+      "split": "train",
+      "source_group": "img:04825986b4378d5f",
+      "sha256": "04825986b4378d5fede0b9df78c4aa6bdbfb1db7f62f2e42881ee4a0c9219101",
+      "decoded_rgb_sha256": "af2c65e0798dd8dae83134443ce4e5d129b811b07ab77ef076a9d1ee5c59ab74",
+      "dhash64": "72d919044616cec6"
+    },
+    {
+      "path": "BloodImage_00281.jpg",
+      "split": "train",
+      "source_group": "img:cc0d3eb9306aec82",
+      "sha256": "cc0d3eb9306aec82f4bf87d55fbb63a12ceb168a43b45ed724862090d090f25d",
+      "decoded_rgb_sha256": "949c2c4b55ef8d85b43032d964cb08d2e1a0ed568483fcd5203fbbc9b248b97e",
+      "dhash64": "92b294d1315b4f1d"
+    },
+    {
+      "path": "BloodImage_00282.jpg",
+      "split": "val",
+      "source_group": "img:21db2784d62d3096",
+      "sha256": "21db2784d62d3096ab16b795e64f7c2323b9f547c67cf326f5147e73c04e867f",
+      "decoded_rgb_sha256": "7a8065b393f3cf8598cab892e6a1b8e3a264beb096d8536c1ba13e96239f2553",
+      "dhash64": "626343170b2d951e"
+    },
+    {
+      "path": "BloodImage_00283.jpg",
+      "split": "train",
+      "source_group": "img:799aad306836f4fe",
+      "sha256": "799aad306836f4fe2443a559c99777d535983e47ad968889f4ede2ee0e3b73d2",
+      "decoded_rgb_sha256": "749212dd7de22fc44751b66db3b95530d3c8ca54121cbe592f61bc2362ec99d0",
+      "dhash64": "1dab49948c8d9b2b"
+    },
+    {
+      "path": "BloodImage_00284.jpg",
+      "split": "train",
+      "source_group": "img:26a7dbe93c485291",
+      "sha256": "26a7dbe93c485291d0f9affdbd17316c710b5d42edae18e92efd0a49c1891bee",
+      "decoded_rgb_sha256": "06eb1dc7ee93b99bd578287e9964c9dd08395e096d3846db7fd70e1b864d2d65",
+      "dhash64": "6b2d246c79303151"
+    },
+    {
+      "path": "BloodImage_00285.jpg",
+      "split": "train",
+      "source_group": "img:b685b1aab2e9be0b",
+      "sha256": "b685b1aab2e9be0b3352eb1a0f3764c3206feb656e50752f4fb6f2e459f9f090",
+      "decoded_rgb_sha256": "fa7e47e580d75d53a1ecb0198c3fe6e084982b5a53a600a894d70f86a524c0a2",
+      "dhash64": "564a060e24242425"
+    },
+    {
+      "path": "BloodImage_00287.jpg",
+      "split": "train",
+      "source_group": "img:ff7053934770c918",
+      "sha256": "ff7053934770c918e68fef4199f2a1e775925c464bd63537b1b95cae73d4692a",
+      "decoded_rgb_sha256": "c00226b85fbb93abc562d65d43917304dcc1687f5230bc71b21fe69407d6d89a",
+      "dhash64": "e29b4d8d8dad2e92"
+    },
+    {
+      "path": "BloodImage_00288.jpg",
+      "split": "train",
+      "source_group": "img:dd9c6aca0ab34ee3",
+      "sha256": "dd9c6aca0ab34ee30c459f648b92ec3508b64421b7f3e24bcbae1d46eaf7d2cd",
+      "decoded_rgb_sha256": "e19f75c615cd26f3573a19dfc49ace649624226befa73ced6d2579de0fdfa656",
+      "dhash64": "a322d4858a6564a3"
+    },
+    {
+      "path": "BloodImage_00289.jpg",
+      "split": "train",
+      "source_group": "img:50b12f1071e5adba",
+      "sha256": "50b12f1071e5adba3002baf75f733dc460900a282c7eb08becccbce4d861f782",
+      "decoded_rgb_sha256": "efc591d384856f07fe12409d7b22677b80f6cc886308737144c3e200cb05a487",
+      "dhash64": "6c88b999492c561e"
+    },
+    {
+      "path": "BloodImage_00290.jpg",
+      "split": "test",
+      "source_group": "img:9c95d52c24d40695",
+      "sha256": "9c95d52c24d4069545c450c9916bf84d810686058b7db40cffbafba93949d140",
+      "decoded_rgb_sha256": "3a4fae4a8af30cd2f281a8300931882d8a5da1f86f3d33bf4b9f98d2a15015cf",
+      "dhash64": "da646264a48b3a99"
+    },
+    {
+      "path": "BloodImage_00291.jpg",
+      "split": "train",
+      "source_group": "img:97ef368d94aef38f",
+      "sha256": "97ef368d94aef38fa2613b1143a64ab295a1ab0f249a96b226eef7835016c7f5",
+      "decoded_rgb_sha256": "2f3cdc5b9e12f8b9108002234bf75058289a3214a78e0755c64e6a4e23df1fd5",
+      "dhash64": "a52e2b22a263b296"
+    },
+    {
+      "path": "BloodImage_00292.jpg",
+      "split": "train",
+      "source_group": "img:7a8ef987ca0e5f8c",
+      "sha256": "7a8ef987ca0e5f8c737d5b24e17cbeed9d78289d9e33406339ad9b29663f3832",
+      "decoded_rgb_sha256": "686008502bd0ff25f5696ef3a75dd4b72438888207577dee6e52f34a4f1b3bd6",
+      "dhash64": "3c288a8913555a83"
+    },
+    {
+      "path": "BloodImage_00293.jpg",
+      "split": "train",
+      "source_group": "img:69957a38315aa8d2",
+      "sha256": "69957a38315aa8d256fb5cb619c21ba8ed66961af933b44e1df85b10d068aa3a",
+      "decoded_rgb_sha256": "abd45319160005650d33ca65fc434278dc23473d9048e690f5ed9e4d5cbdf87f",
+      "dhash64": "aa9a97e644cd8e0c"
+    },
+    {
+      "path": "BloodImage_00294.jpg",
+      "split": "test",
+      "source_group": "img:438cebbc1d1a48ab",
+      "sha256": "438cebbc1d1a48ab6149f1ec110123c308ebf9338432914d13ac9605b5049e7c",
+      "decoded_rgb_sha256": "393590bbb6acdf40cba57afd29f5715d362f79ee58f99e77189a6f68831eddc4",
+      "dhash64": "47c79225ad2c4c2d"
+    },
+    {
+      "path": "BloodImage_00295.jpg",
+      "split": "train",
+      "source_group": "img:4bba14c9e7f591d0",
+      "sha256": "4bba14c9e7f591d09040367ee2a2c8ad3573ad77d8b6ba1f766dd6819eed103c",
+      "decoded_rgb_sha256": "8818dae3658dc4ec3b398360788ac64abae2fc3d362dffa88f630273cf08b4c2",
+      "dhash64": "d6544567e22a0c4d"
+    },
+    {
+      "path": "BloodImage_00296.jpg",
+      "split": "val",
+      "source_group": "img:99b94818578fdd56",
+      "sha256": "99b94818578fdd561fa2c48ed50201af58586bb1d001c6bdced2ade180eda2ca",
+      "decoded_rgb_sha256": "1b6ce06a6d53eefcb6957c600db75d23c1aab8fff1c1aad5c6bf3fc65dce2cd9",
+      "dhash64": "51737253cfac4d25"
+    },
+    {
+      "path": "BloodImage_00297.jpg",
+      "split": "train",
+      "source_group": "img:e21fadb3b7d35403",
+      "sha256": "e21fadb3b7d35403be46fbbf1587648808982fee109211813efcda1e1e9b0644",
+      "decoded_rgb_sha256": "89d5dda3fcb92bbf1d9eda46f37b0b3b86bfdce978f736b7214ffbb60e2016d3",
+      "dhash64": "de4a6a9aaa6531b7"
+    },
+    {
+      "path": "BloodImage_00298.jpg",
+      "split": "val",
+      "source_group": "img:449a8e0bfd968bc4",
+      "sha256": "449a8e0bfd968bc4bdd4499aa78297b74eb53cb51d772de20723fd6d3911b277",
+      "decoded_rgb_sha256": "b16ce6cd631793b0926b4cdff01dba4026cfb8acc3d91d8c57b1db686803a0c9",
+      "dhash64": "6933348eeec66c8e"
+    },
+    {
+      "path": "BloodImage_00299.jpg",
+      "split": "test",
+      "source_group": "img:c9f4042a8b18107a",
+      "sha256": "c9f4042a8b18107a53ed955d642ed416b676d1555e542407e150d066b61cbc85",
+      "decoded_rgb_sha256": "a0a7cf86fce71d1e9fcef176a69c456f6fd216efdf862c314dcda7dbef7d05ed",
+      "dhash64": "d9cd25ade5733237"
+    },
+    {
+      "path": "BloodImage_00300.jpg",
+      "split": "val",
+      "source_group": "img:2cf07a4f3341e185",
+      "sha256": "2cf07a4f3341e185e1424b03eba68db84eba7cbe2b689e930af87c3b891407e8",
+      "decoded_rgb_sha256": "0eb4a460902a1667cabe2bb3c0d918ec44cd3385c1973f55b00de44854a35daf",
+      "dhash64": "6a6a25e4e69e3624"
+    },
+    {
+      "path": "BloodImage_00301.jpg",
+      "split": "train",
+      "source_group": "img:76b41e80c588aa4f",
+      "sha256": "76b41e80c588aa4fc81e7ca586130a44e64ae3e27ea5cb90d18895a81efa3254",
+      "decoded_rgb_sha256": "ffcee5d1ceb94f30692b2ce0393a20a6477b6fe2462fe2764e6bb4d712b2b972",
+      "dhash64": "2948688fc94b0b4c"
+    },
+    {
+      "path": "BloodImage_00302.jpg",
+      "split": "train",
+      "source_group": "img:e4d31b0b3e3abeeb",
+      "sha256": "e4d31b0b3e3abeebbcaffe6f6d27982400063f9082879b6286c869f533bff475",
+      "decoded_rgb_sha256": "18982888dafc4b563b1c15f1e2f21297c7e21b7e5b2280a54a0f7a295a279685",
+      "dhash64": "49db494796425e1f"
+    },
+    {
+      "path": "BloodImage_00303.jpg",
+      "split": "train",
+      "source_group": "img:c330858443e0d48b",
+      "sha256": "c330858443e0d48b7d187ffb2db86dedbebe871bd65f39e38461ea09a06a7c5b",
+      "decoded_rgb_sha256": "74d740769eb2ef56c2f41f2912e02be5cfdc04227a7ec5f7f22968a007dd8186",
+      "dhash64": "0fcfcdcd1526321b"
+    },
+    {
+      "path": "BloodImage_00304.jpg",
+      "split": "train",
+      "source_group": "img:14931a7aa048da0c",
+      "sha256": "14931a7aa048da0c5f71942fb0afdb98f60e98ed95791eadbd64b4abce709299",
+      "decoded_rgb_sha256": "7a1bd98f6ec811285359f1f8729764e32b5044c1fabd57bd5672c34a35a3a65e",
+      "dhash64": "1898b4a4703ad645"
+    },
+    {
+      "path": "BloodImage_00305.jpg",
+      "split": "train",
+      "source_group": "img:409dd13d76125dd6",
+      "sha256": "409dd13d76125dd6d548f14b5fd7ed9a9be69a3460cb1c38b8ddaea7eba4f216",
+      "decoded_rgb_sha256": "30412b14f6158c2d4c1d211ed529827a6414ae617b3b1f4a289a9984df09dc9c",
+      "dhash64": "195d495d66a48c0d"
+    },
+    {
+      "path": "BloodImage_00307.jpg",
+      "split": "test",
+      "source_group": "img:fb950fc62c3495ed",
+      "sha256": "fb950fc62c3495ed905855b02576916a345a12245f67f3f030b392d20257097a",
+      "decoded_rgb_sha256": "42b46310ed11e645476852e0cf9aaee50ddda5b22f5f44072b97b5b4f5be2636",
+      "dhash64": "251819992d35919d"
+    },
+    {
+      "path": "BloodImage_00308.jpg",
+      "split": "train",
+      "source_group": "img:94a02185239860a8",
+      "sha256": "94a02185239860a84f2e4d53517f68dbc494331897986843f8a25553dc79f3b0",
+      "decoded_rgb_sha256": "875b9b91c391eff889501ca5ca22958d2861e9829a3db801da929ecb37003a86",
+      "dhash64": "561b8d06138ae6e9"
+    },
+    {
+      "path": "BloodImage_00309.jpg",
+      "split": "train",
+      "source_group": "img:0dad533186094d10",
+      "sha256": "0dad533186094d10430a5cd4d13440b85401728804db8503086f2c820372d356",
+      "decoded_rgb_sha256": "33a58f6bf16e9d3d7e2bb079c847db736dd7fcc74a1afb8fc304cd00e4d71dca",
+      "dhash64": "6474646826244c19"
+    },
+    {
+      "path": "BloodImage_00310.jpg",
+      "split": "test",
+      "source_group": "img:13bb10ab6d8f1eef",
+      "sha256": "13bb10ab6d8f1eef2d958eac2a08015ea7a1aa523c7e02361e1bd79fa1f73c99",
+      "decoded_rgb_sha256": "0d0825b5ba79a91e6e9f5e97351a2df4e61d02545f147437f1cf8e34b62e164d",
+      "dhash64": "63dbcbcccdcc8d4b"
+    },
+    {
+      "path": "BloodImage_00311.jpg",
+      "split": "val",
+      "source_group": "img:238e01e8bd999682",
+      "sha256": "238e01e8bd99968272a21ba4d87b8c6090b91682ceb9c68627461e96c53ae146",
+      "decoded_rgb_sha256": "f7130b1ef38daa6de29ae67a5c003a5c2a845d5eb46a03fd2d70b2b4793d3013",
+      "dhash64": "d6b4b434e585a7ad"
+    },
+    {
+      "path": "BloodImage_00312.jpg",
+      "split": "train",
+      "source_group": "img:034ab29bb2603eb0",
+      "sha256": "034ab29bb2603eb007f801d9cf0402b2edef0bcadec310785254a60142cbbae2",
+      "decoded_rgb_sha256": "4d7c8378b680cdd7614668146eef7b214589c724a179613652dbe8e786d32b0c",
+      "dhash64": "8692aa1c4c46c6a6"
+    },
+    {
+      "path": "BloodImage_00313.jpg",
+      "split": "train",
+      "source_group": "img:bd14c94a048b6722",
+      "sha256": "bd14c94a048b672242eb16602709f12cbc9fcd337aa06fcf839a48c35ca339ec",
+      "decoded_rgb_sha256": "f04b72ab8c605742de41f129f5ea6c503f534b060717c7364ed4660104d90de6",
+      "dhash64": "cb621469f43164c4"
+    },
+    {
+      "path": "BloodImage_00314.jpg",
+      "split": "train",
+      "source_group": "img:2b08b4b3b9abc429",
+      "sha256": "2b08b4b3b9abc4295f7abe97aaa9c57bec035171de5efa3fccd84022e69c0166",
+      "decoded_rgb_sha256": "14e08102dfac14cce899dc4f2cf72507abbfc3601650dc604d3f182028f3aea6",
+      "dhash64": "264ec94c3696de2e"
+    },
+    {
+      "path": "BloodImage_00315.jpg",
+      "split": "train",
+      "source_group": "img:37a7d3611cf1e27e",
+      "sha256": "37a7d3611cf1e27e6634082367ba00beac343256ba71edee03e7a68037da2751",
+      "decoded_rgb_sha256": "8011bb5aa10223f22fca1d5ce9a3f194e30499930282b29ef982f6b3f76887e6",
+      "dhash64": "d43ca949392d1932"
+    },
+    {
+      "path": "BloodImage_00317.jpg",
+      "split": "train",
+      "source_group": "img:ce43ef79cae0617d",
+      "sha256": "ce43ef79cae0617db17df294a604d0bcd2007d767765c2783a6c5e32afc46978",
+      "decoded_rgb_sha256": "345f388d3893984081bc4cc3f63647540bbd0d9713ec01be0dcd28059b62f4b4",
+      "dhash64": "b870f0f20dc90e65"
+    },
+    {
+      "path": "BloodImage_00318.jpg",
+      "split": "train",
+      "source_group": "img:9680609b2ab5c168",
+      "sha256": "9680609b2ab5c1683b7d05613f106a270d8f5054baf3235e9b45787713e787ea",
+      "decoded_rgb_sha256": "4a2386099bd6e17f73fd746cb2fe6b15cec2d31e67dcc62be1e2a49d945b594f",
+      "dhash64": "c4dd9f3263632725"
+    },
+    {
+      "path": "BloodImage_00319.jpg",
+      "split": "train",
+      "source_group": "img:fffad4aa6c5b912e",
+      "sha256": "fffad4aa6c5b912ea4b711df6a5814e85084d4391c92bc06bec39623a6a5f8e7",
+      "decoded_rgb_sha256": "8ac215fd44e129e9282b6463a42266d4ec55b3a385dc92138cd59f03cb3e63af",
+      "dhash64": "cee3ca9bb02d650d"
+    },
+    {
+      "path": "BloodImage_00320.jpg",
+      "split": "train",
+      "source_group": "img:ff3102083d9ea8f4",
+      "sha256": "ff3102083d9ea8f49273d556b4a87833c7de93c45c595aa528a7fe65e748ed87",
+      "decoded_rgb_sha256": "7e4a5bd54d7e25884cc18af7c0dc77cb8826b438ff7888c02c09375299f303f0",
+      "dhash64": "53554d676b094e36"
+    },
+    {
+      "path": "BloodImage_00322.jpg",
+      "split": "train",
+      "source_group": "img:12cc787ba254d423",
+      "sha256": "12cc787ba254d4234c0d3e5a1aec64f3087cf0c96a08bd7925d36072a7f1ef14",
+      "decoded_rgb_sha256": "313927e7fd4cf6fc961d73e722acc95eef2d66cc5d3d6add5c560f5039833f77",
+      "dhash64": "2135354959496969"
+    },
+    {
+      "path": "BloodImage_00323.jpg",
+      "split": "test",
+      "source_group": "img:388220052bc5455a",
+      "sha256": "388220052bc5455a43d1a09df7b2cdf81d9a5da7c155ae74ab342e9e99dfe27f",
+      "decoded_rgb_sha256": "ef85586f6178a95ce9ebc9a935640b6be85c235c2862fe4c93c7660a8af6039f",
+      "dhash64": "a026c589ccce4b2b"
+    },
+    {
+      "path": "BloodImage_00324.jpg",
+      "split": "train",
+      "source_group": "img:6530af68febd9156",
+      "sha256": "6530af68febd9156e4a58f6899d84b699de12f622d6ee2835c02452437722c50",
+      "decoded_rgb_sha256": "d91179803445ca4b0c52ce079eba1098befac36071c2ec574f38563f3da9b6f0",
+      "dhash64": "db5939296e4b39bc"
+    },
+    {
+      "path": "BloodImage_00325.jpg",
+      "split": "train",
+      "source_group": "img:5393b87ccbab7ffe",
+      "sha256": "5393b87ccbab7ffe33df5ced36b0dad29e64796b6ba960d15e6a33dee960ee39",
+      "decoded_rgb_sha256": "9416883c24e1cd953b5c0c27710d95f7ac8e5b68850b372959df8bf349dfbb8e",
+      "dhash64": "89e666646d49d6b6"
+    },
+    {
+      "path": "BloodImage_00326.jpg",
+      "split": "train",
+      "source_group": "img:f000214b4e02292a",
+      "sha256": "f000214b4e02292a0315ac546e56cfbe3ba56c13916552fbd2af3a99d284865a",
+      "decoded_rgb_sha256": "00e9a910bd8b448f876e5e2ab7f0da0b02f2bd93b3efab6ac3f979335a10ff91",
+      "dhash64": "4b4dcc1b99697153"
+    },
+    {
+      "path": "BloodImage_00327.jpg",
+      "split": "train",
+      "source_group": "img:fc73c5d267c3f24a",
+      "sha256": "fc73c5d267c3f24a93218b7b320b373d3aac7038af9aac110d6c0fb5fc8cbbfc",
+      "decoded_rgb_sha256": "30102885923a7992322ea77f86097fdf1748942ea0c5341520c537509a2efdfa",
+      "dhash64": "62264b32230d4d4a"
+    },
+    {
+      "path": "BloodImage_00330.jpg",
+      "split": "train",
+      "source_group": "img:efe962b99c56f04d",
+      "sha256": "efe962b99c56f04de41783d8f3dd2d800becfea304cbd92baa864d2edd9c6681",
+      "decoded_rgb_sha256": "74991d7688b7857d8cd25263acd871e2c393f1f3441d084a222097b3daa00269",
+      "dhash64": "969e59450a1b3b9a"
+    },
+    {
+      "path": "BloodImage_00331.jpg",
+      "split": "train",
+      "source_group": "img:6a2f37e315bf1603",
+      "sha256": "6a2f37e315bf160338906c7a4f408a1a8fa65213c342d5a329d84ad5f28a76fc",
+      "decoded_rgb_sha256": "6c84058fd529aeb025eb1ab59996d8f0b518266c15271112ea70b1bbc2414057",
+      "dhash64": "5373384e8eac1b4a"
+    },
+    {
+      "path": "BloodImage_00332.jpg",
+      "split": "train",
+      "source_group": "img:cdc07b91b0d7ab88",
+      "sha256": "cdc07b91b0d7ab88bd9042aac619e87f1bec7d154d71c89e4682e6e235c0307f",
+      "decoded_rgb_sha256": "27fc0522515f37c9bc50d5bf1562dd0a3515151e8e06935095a8f4f42f8b8671",
+      "dhash64": "95194b13b3b1d495"
+    },
+    {
+      "path": "BloodImage_00333.jpg",
+      "split": "train",
+      "source_group": "img:8a25dcb592b719e2",
+      "sha256": "8a25dcb592b719e2362c50c8b52d37b8140e144dd6d87ac4ef23274e91400b7c",
+      "decoded_rgb_sha256": "7ef7e7e426c722811a62d1df2cf0858ff16bc70c0dc57e7d10e0c8bf9c8104b2",
+      "dhash64": "29590e8ca3bcbc19"
+    },
+    {
+      "path": "BloodImage_00334.jpg",
+      "split": "train",
+      "source_group": "img:7ef77f29a3537430",
+      "sha256": "7ef77f29a3537430e1e328e61220dab07cbaf2791877945bda7cec1e7e9e1118",
+      "decoded_rgb_sha256": "ac206da16a0e2805c3d2fb36f63e079222e597da838640a254420d05fe86be50",
+      "dhash64": "b59ec2b233b0dd9a"
+    },
+    {
+      "path": "BloodImage_00335.jpg",
+      "split": "train",
+      "source_group": "img:af2fdc32984e8946",
+      "sha256": "af2fdc32984e8946f0a487e24b33048b80724ff22b3efb277fac886f2e6cef55",
+      "decoded_rgb_sha256": "908fb4deb6ce4233c2cf32014031f68520e9011bbb9355a8b7b1f5e9e0ae2e86",
+      "dhash64": "199bc746ab8d28b8"
+    },
+    {
+      "path": "BloodImage_00336.jpg",
+      "split": "train",
+      "source_group": "img:19c34a51dde7d67a",
+      "sha256": "19c34a51dde7d67ac2c33cee56b36870a2223f06a3edeec4b68d27734c680c45",
+      "decoded_rgb_sha256": "558b3da6072002f5e6e99938097010613e93b4bdcb0eb0d9edde56489bd15ac2",
+      "dhash64": "4d2c9818a6e98d8e"
+    },
+    {
+      "path": "BloodImage_00337.jpg",
+      "split": "train",
+      "source_group": "img:b134c1d31c878a32",
+      "sha256": "b134c1d31c878a320a802e5812ff63ad19a65db3286d9dba5681971b4344778c",
+      "decoded_rgb_sha256": "76b0badcd8f5d3018db419cdd2f57f59a4e390f98a2be74c14663277bc376651",
+      "dhash64": "826a5295cd656d35"
+    },
+    {
+      "path": "BloodImage_00338.jpg",
+      "split": "train",
+      "source_group": "img:d4cbf682a22075e1",
+      "sha256": "d4cbf682a22075e1298f125a5f11b41aa13fe99911a586a1ceb6fd75d4925a47",
+      "decoded_rgb_sha256": "dfea2b1906cab439ce0eb9c217fd4ae0a5b3fc6fd3c1656f976fa5c373d22f63",
+      "dhash64": "63229acada831b78"
+    },
+    {
+      "path": "BloodImage_00339.jpg",
+      "split": "train",
+      "source_group": "img:0240ec609c9aa05a",
+      "sha256": "0240ec609c9aa05ab8aa7a7b9f1b887d1f1fd0b2bae0a7d45ae441c9cbfbb4a4",
+      "decoded_rgb_sha256": "85160a9bf223451856a6312ad3120b04d0a951fe5971622b9923a2493b1454d1",
+      "dhash64": "a48a32b8b06389ac"
+    },
+    {
+      "path": "BloodImage_00340.jpg",
+      "split": "train",
+      "source_group": "img:cb57d049a2e3cef3",
+      "sha256": "cb57d049a2e3cef34028a0761a26583262da922fc809aeaaaeb1c6680f77276f",
+      "decoded_rgb_sha256": "1211645cb1c5c01a07cfadd3319ba8f388e8b988238580313254c25ebe799448",
+      "dhash64": "1b4d84b6eecb5919"
+    },
+    {
+      "path": "BloodImage_00341.jpg",
+      "split": "train",
+      "source_group": "img:62812e89d76e89a5",
+      "sha256": "62812e89d76e89a51cd54ff508d8cd339bca8e9ec22b043da0832e626c40c420",
+      "decoded_rgb_sha256": "d3fe72c0038a79bcc4b3852e6083afe1b3672c61492c36ce89b48353108e3835",
+      "dhash64": "2b9d8c0c4c968a8b"
+    },
+    {
+      "path": "BloodImage_00342.jpg",
+      "split": "train",
+      "source_group": "img:d63490ccba79e0bf",
+      "sha256": "d63490ccba79e0bf2ebd5bba78f440b2c70026202180b9823eeb288e0e49dcb5",
+      "decoded_rgb_sha256": "fc9e6f495caf79b24470c2e933cb52fb9294d77d660b162f733f248d7997453a",
+      "dhash64": "4b9bc66464e80f2c"
+    },
+    {
+      "path": "BloodImage_00343.jpg",
+      "split": "train",
+      "source_group": "img:045c5ddb12c3bbbf",
+      "sha256": "045c5ddb12c3bbbf7862fca30839e03a948f4c92c795e954ee1351a75186ae6c",
+      "decoded_rgb_sha256": "507c793542079953beb00f3547213b5f03e21c9325938006604462a92082e0af",
+      "dhash64": "b0b155da96371b16"
+    },
+    {
+      "path": "BloodImage_00344.jpg",
+      "split": "train",
+      "source_group": "img:97c5665669b26214",
+      "sha256": "97c5665669b262145b6197329d18c9b6044f398c82bb07dc4b5c924c18d8f7a0",
+      "decoded_rgb_sha256": "994a5ab339418681f86743f0d6051ef1c20cec83d768dfce31b43829b38db2d9",
+      "dhash64": "0809e5e3e6c01317"
+    },
+    {
+      "path": "BloodImage_00345.jpg",
+      "split": "train",
+      "source_group": "img:bf8d33efe4a82ab3",
+      "sha256": "bf8d33efe4a82ab3ffd9cfcd97e733f7e311131126e83228e1371739933c78ad",
+      "decoded_rgb_sha256": "0e89ee967601da2a0fb57fdadc088e6b0c63eb7cf3095822e4588960a253115a",
+      "dhash64": "929a6eb0278e5e1e"
+    },
+    {
+      "path": "BloodImage_00346.jpg",
+      "split": "train",
+      "source_group": "img:eaaf105810a359d2",
+      "sha256": "eaaf105810a359d2c8463cec66ac812724c7d0688c73ba768721e7a9c42074ac",
+      "decoded_rgb_sha256": "f002d162bf839b495b3e0a35eba3f07472be51e65b7d9c4c82e7c2779c1362a7",
+      "dhash64": "0b648e9b4c6463e1"
+    },
+    {
+      "path": "BloodImage_00347.jpg",
+      "split": "train",
+      "source_group": "img:4a0b1735c53728ed",
+      "sha256": "4a0b1735c53728ed7fedbcce9afe39410a87839f3322e9ca8f01bf7ccb667ea9",
+      "decoded_rgb_sha256": "61fbb9facaa9ca5dcce22c63401dd52fa0edb0d1157399f49171454065e35103",
+      "dhash64": "6a99255616195919"
+    },
+    {
+      "path": "BloodImage_00348.jpg",
+      "split": "train",
+      "source_group": "img:3314dafdcbef4fff",
+      "sha256": "3314dafdcbef4fff9d5cd764ed1d9e21166a178d868c2c3b84272483f58fb16d",
+      "decoded_rgb_sha256": "59f6d14f04bce53ee4f9c4ac7ac0699b161247abf5e0074c848341d01093cad0",
+      "dhash64": "48c58d1c1a1b271e"
+    },
+    {
+      "path": "BloodImage_00349.jpg",
+      "split": "train",
+      "source_group": "img:565cac403aea3c83",
+      "sha256": "565cac403aea3c83715f35df4809c5859d723ab91ed9c410ecfdac5b37c9e9fd",
+      "decoded_rgb_sha256": "ebc9e7e50f932f5f36d6db18b5904041fd6f101ef413e310948447808740d2b0",
+      "dhash64": "922233736333448e"
+    },
+    {
+      "path": "BloodImage_00350.jpg",
+      "split": "train",
+      "source_group": "img:8d0ccb349e1f196d",
+      "sha256": "8d0ccb349e1f196d8e11da01c0e129f8be8484d88c7e5b9124c999286f447042",
+      "decoded_rgb_sha256": "06407b5a6640f6dceb9bc68546bdeadcb976143f77c8d7517e1fb16a9821d0aa",
+      "dhash64": "8b9b9199c3633432"
+    },
+    {
+      "path": "BloodImage_00351.jpg",
+      "split": "test",
+      "source_group": "img:6b114582f2efb88c",
+      "sha256": "6b114582f2efb88c79464b210a5b74d41ec5cae9b172e70b5e1323a33559a097",
+      "decoded_rgb_sha256": "774f79b50d860b72c00184a83c49df9521d8d8e9cd4d45bd3282ca6cff76baa2",
+      "dhash64": "3a2acc5e2ca68d0d"
+    },
+    {
+      "path": "BloodImage_00352.jpg",
+      "split": "train",
+      "source_group": "img:0d7abd83e5fde39b",
+      "sha256": "0d7abd83e5fde39b51bf550d7d233e5fed7b5e11eb0beb6172175ac2da33f38c",
+      "decoded_rgb_sha256": "57e8c72be156add7fe71d140fc367b4e4c72c9bb35d522dbb9093f2082e9b89c",
+      "dhash64": "59db9b8cae6e4c2c"
+    },
+    {
+      "path": "BloodImage_00353.jpg",
+      "split": "test",
+      "source_group": "img:5cb537b01ea9b41b",
+      "sha256": "5cb537b01ea9b41b3ade65973faef185b0f995d4bfbd1fc248065b6418a22cf9",
+      "decoded_rgb_sha256": "5452e63407c8d77be9372f92dea1153b7dcf5c3fa754b5d4c25928596e0ebdf1",
+      "dhash64": "4b9a269d19399d2e"
+    },
+    {
+      "path": "BloodImage_00354.jpg",
+      "split": "train",
+      "source_group": "img:c9fcf66edbfa34b8",
+      "sha256": "c9fcf66edbfa34b844f8a55f03a3a2db1584863078ab51ba462353e69713aba2",
+      "decoded_rgb_sha256": "76f1e15e8a9f57b45a85bf84994a1040f69067ec17467aa6bafe7d7c508d073f",
+      "dhash64": "0ecc49ee6666a715"
+    },
+    {
+      "path": "BloodImage_00355.jpg",
+      "split": "train",
+      "source_group": "img:571576d6e129764f",
+      "sha256": "571576d6e129764fb2774d4982600cdc9d9282378231d3bd155254fe507b93bc",
+      "decoded_rgb_sha256": "59ea4764f5da7f2fa5674dfa80334db113fc02173987e6c12f8c3aeb23bc4543",
+      "dhash64": "9b151695adac9caa"
+    },
+    {
+      "path": "BloodImage_00356.jpg",
+      "split": "test",
+      "source_group": "img:36228c073e29a6dc",
+      "sha256": "36228c073e29a6dc494e02af9f1bdcf7d09f4fd33de65f0ff08c6887c4138cc1",
+      "decoded_rgb_sha256": "446432e652b4b4da8cb44be201e53ba60d0031f5e169b1f1a52998de05cf444c",
+      "dhash64": "5a928c0e4dca469c"
+    },
+    {
+      "path": "BloodImage_00357.jpg",
+      "split": "test",
+      "source_group": "img:9c421b9a6baca2c0",
+      "sha256": "9c421b9a6baca2c02fe7d4ece7306fb503f6e04e8142dd24308bc69c7e806c6e",
+      "decoded_rgb_sha256": "a9c88647cb3878bdc7488298551d253af4466523d73fce9b6f730b3eab2ac50b",
+      "dhash64": "65650cc406565ea5"
+    },
+    {
+      "path": "BloodImage_00359.jpg",
+      "split": "test",
+      "source_group": "img:e57dd228ee5cf417",
+      "sha256": "e57dd228ee5cf41780b7121f048d3a5344676c3750faa221d866d64a84aba233",
+      "decoded_rgb_sha256": "aa0504ffed0e4d793947c259cd63fc46f285c733486fa1dd84b0733ef702ae44",
+      "dhash64": "53193b200e8d9b1b"
+    },
+    {
+      "path": "BloodImage_00360.jpg",
+      "split": "train",
+      "source_group": "img:c074683ea6d45555",
+      "sha256": "c074683ea6d45555fd7fc06f39baec8ef72dd8887ccabbba20fa0d1f855ab60a",
+      "decoded_rgb_sha256": "3b56f688c4c0d92ca28e7d054f93310e20b8a5dd5072ecdc9b163747d5cf6daa",
+      "dhash64": "3524a46e39105667"
+    },
+    {
+      "path": "BloodImage_00361.jpg",
+      "split": "train",
+      "source_group": "img:68851471904cb0b4",
+      "sha256": "68851471904cb0b4412a5ca1a12823a42ee5ae16052b39a3fe574c399c28df2a",
+      "decoded_rgb_sha256": "25538f19f3091ebf30dedc62a6838cc718dfa58f4e3c7ef19c7739e0b2ad3ea5",
+      "dhash64": "46d27272674f8e26"
+    },
+    {
+      "path": "BloodImage_00362.jpg",
+      "split": "val",
+      "source_group": "img:10845eada6021c75",
+      "sha256": "10845eada6021c7530b6bc4c3f3d96878954000441a7c319674f86bc20fce122",
+      "decoded_rgb_sha256": "72eff49f9a5d9a1d25e3d6a4ab3c7b02b41391fe1dd2e116ec449d62f8f019a2",
+      "dhash64": "438f1c194d6f979e"
+    },
+    {
+      "path": "BloodImage_00364.jpg",
+      "split": "train",
+      "source_group": "img:e03f941e0ad31e5c",
+      "sha256": "e03f941e0ad31e5c491a71ad151c252216bc90c8c6ef012f7384b069465a42eb",
+      "decoded_rgb_sha256": "29badc5b22b316c992a2d8e5da12973e0b1e07c005985b89f58e2db02ecb2bcf",
+      "dhash64": "989898934625031a"
+    },
+    {
+      "path": "BloodImage_00365.jpg",
+      "split": "val",
+      "source_group": "img:7c16953c5a6e624f",
+      "sha256": "7c16953c5a6e624f1c316fa9076cbaeb7640e30e9b0c30fde40f7d9235934ef7",
+      "decoded_rgb_sha256": "662ccf7e26d7e7dc20240f1fc2db490937cd48b92dcaf40ca28fce0f6d2b1f29",
+      "dhash64": "c9830b0d0dcc271a"
+    },
+    {
+      "path": "BloodImage_00366.jpg",
+      "split": "train",
+      "source_group": "img:b07d6ee90f2d5ccf",
+      "sha256": "b07d6ee90f2d5ccf530f4d536a01ff92ccdf73e1c621f200a9cae2c3dda7a254",
+      "decoded_rgb_sha256": "75d27b8728caca7a1e1e557ee4d11e287e2b12fe1767fef7302fbbdd413d9c8a",
+      "dhash64": "29880e0b0e8e498b"
+    },
+    {
+      "path": "BloodImage_00367.jpg",
+      "split": "train",
+      "source_group": "img:95dc387233b9640a",
+      "sha256": "95dc387233b9640adfee730c59e2b6bb1bfd74bee981a91cd957bbf57aec6d71",
+      "decoded_rgb_sha256": "be7a7016700804475603cda0ef8a3aca56c6f081335c014cbdd22fd5f60459eb",
+      "dhash64": "c5d91f1c9b969f1b"
+    },
+    {
+      "path": "BloodImage_00368.jpg",
+      "split": "train",
+      "source_group": "img:2a6dd28f4a511097",
+      "sha256": "2a6dd28f4a511097adba6fbca159e9a1d8fa09df82a2320687c25f85a722f980",
+      "decoded_rgb_sha256": "eb331e77d8c076c295917acf17e5f9a2b2e6197f4e6ffff96b8212d088f9e0a7",
+      "dhash64": "864a49571d19168d"
+    },
+    {
+      "path": "BloodImage_00369.jpg",
+      "split": "train",
+      "source_group": "img:396d91b7ffa32769",
+      "sha256": "396d91b7ffa32769662a73bd7cded87cbcde720802064da852f7d05d5ef96a27",
+      "decoded_rgb_sha256": "30e72371b9747635082ffadd00dcc76a0021a2229e732dacacbac5470ee583ba",
+      "dhash64": "d2981d5819474c35"
+    },
+    {
+      "path": "BloodImage_00370.jpg",
+      "split": "train",
+      "source_group": "img:82228a6255136a75",
+      "sha256": "82228a6255136a7502c7d4a177fa46d0d7c033773b4f12747a5a9da0b6a84c80",
+      "decoded_rgb_sha256": "bbd0584145803f818006d90c18f556f301519edee9ba30e00737bd08d53cbabd",
+      "dhash64": "9a3b0bf29097bd9e"
+    },
+    {
+      "path": "BloodImage_00371.jpg",
+      "split": "train",
+      "source_group": "img:94b5b13d0a92eab1",
+      "sha256": "94b5b13d0a92eab14005bce49e6c7a5083963a811eef7e2ac471b5837eaf52e2",
+      "decoded_rgb_sha256": "ebfe90a040ad97536fb89ecdb94abed33fb6b089ce31d5430d1ddfa584f41329",
+      "dhash64": "8bcc64f3e52db3bb"
+    },
+    {
+      "path": "BloodImage_00372.jpg",
+      "split": "train",
+      "source_group": "img:8d967b41969a0580",
+      "sha256": "8d967b41969a0580aec812f317471fcdabac84038b18e761d004c358e71cfdfc",
+      "decoded_rgb_sha256": "472024979804bb41f845d90c0ce48de898c8b08371b04b3dbf1e2477e4efa565",
+      "dhash64": "60616153424d9797"
+    },
+    {
+      "path": "BloodImage_00374.jpg",
+      "split": "train",
+      "source_group": "img:39d082c4ca4e35dd",
+      "sha256": "39d082c4ca4e35ddd0c02311071ee3536d5d1fded16cd5ab67c684591a03ca51",
+      "decoded_rgb_sha256": "aef4d909498b29e0616d173b953fe3c19152fe87f8a9259c46f81e4af3a8d970",
+      "dhash64": "4404359c96a5a6e6"
+    },
+    {
+      "path": "BloodImage_00375.jpg",
+      "split": "train",
+      "source_group": "img:47f88a2c880aea82",
+      "sha256": "47f88a2c880aea82ef279aff1f2af1cd3fd9a2c36ac51d7f8e22caf22e318d08",
+      "decoded_rgb_sha256": "60d6cf28624486a3d39ae1bda80bf8a6d31a3a1a39bf18ad3b972b320c079f94",
+      "dhash64": "b3b3136c9ac6268e"
+    },
+    {
+      "path": "BloodImage_00376.jpg",
+      "split": "train",
+      "source_group": "img:1677697d4d98fc31",
+      "sha256": "1677697d4d98fc31d991a55334ed30af447367cb82ba5e00784a1084abb09f12",
+      "decoded_rgb_sha256": "226cc8b59945a143a049144876e369733c837b5fb294cd9ac1087b6833d85b00",
+      "dhash64": "9397c6cb9a1c8c8c"
+    },
+    {
+      "path": "BloodImage_00377.jpg",
+      "split": "train",
+      "source_group": "img:1ff45b6d8fc20742",
+      "sha256": "1ff45b6d8fc20742236403e8491f2fc18d1bbbbf0f3cb0262ec8904d3567f517",
+      "decoded_rgb_sha256": "d6d1ea557d229e3236991deae79fa1a2b829f30783f9cd848dfacd33c3b90b40",
+      "dhash64": "4cd698c8b2c8c9cc"
+    },
+    {
+      "path": "BloodImage_00378.jpg",
+      "split": "train",
+      "source_group": "img:41d2f4f33b47acb1",
+      "sha256": "41d2f4f33b47acb10ba6b94159e348deee9005c28e51449a1138448dc97ea123",
+      "decoded_rgb_sha256": "11159c2daa5be56b034e70a601ba2a4f03123f8625df53e163a9e3273a16dd53",
+      "dhash64": "8976368699e86237"
+    },
+    {
+      "path": "BloodImage_00379.jpg",
+      "split": "train",
+      "source_group": "img:2da8d8da218a01ae",
+      "sha256": "2da8d8da218a01ae2877133ee98bdb68c73c957707d5e15c0fdc3b09242e9e63",
+      "decoded_rgb_sha256": "83adf9872985e9234287dba80dc5c67c4d58d818652cd8490a41092605d8ea2d",
+      "dhash64": "21641352585d8599"
+    },
+    {
+      "path": "BloodImage_00381.jpg",
+      "split": "train",
+      "source_group": "img:e0f0ac9b43a51925",
+      "sha256": "e0f0ac9b43a519251953c860f43a9985427a60cb80860361c7a883ae9b23ab0e",
+      "decoded_rgb_sha256": "41515c432d154f6f565e87e28e4e495ab14d0f27ef51b789c0bc59be6c13ae85",
+      "dhash64": "96124d2d258d9a95"
+    },
+    {
+      "path": "BloodImage_00382.jpg",
+      "split": "train",
+      "source_group": "img:28feb6578adfeeb8",
+      "sha256": "28feb6578adfeeb899acfd310199b493366c7bdabd3430bf4a2a182ea1361493",
+      "decoded_rgb_sha256": "bd964fc15e1cdbc5cfda5e1d349d00889e7145b59935cb6c41b3669b18a4350d",
+      "dhash64": "a2b47266c4a84954"
+    },
+    {
+      "path": "BloodImage_00383.jpg",
+      "split": "train",
+      "source_group": "img:00169290391b7111",
+      "sha256": "00169290391b7111eaa2b5d3dca3205f0e1321ae3903a82da25561a94ffba702",
+      "decoded_rgb_sha256": "010c557418870e193ff9ee63c219755f2b8edc199ede9ab42d669027790e4a07",
+      "dhash64": "1b188d8d9b993830"
+    },
+    {
+      "path": "BloodImage_00384.jpg",
+      "split": "test",
+      "source_group": "img:0a33ad05b4513325",
+      "sha256": "0a33ad05b4513325a54ec03d86cdbeb802807ea17154acc37412840e9a3a0c71",
+      "decoded_rgb_sha256": "30a37be399c8f6dfda8cc9eb0ca6f0f47b83c45b61600cb810c9903feffdd37d",
+      "dhash64": "99d8df163c6edacb"
+    },
+    {
+      "path": "BloodImage_00385.jpg",
+      "split": "train",
+      "source_group": "img:c4109583f94798ea",
+      "sha256": "c4109583f94798ea943a79503719c677ce9e4348a346ba86f8c5d4fc6505d769",
+      "decoded_rgb_sha256": "eca5840d0589e50b13e5af68c482d2082b7b5e0064c28af12f98057714891c11",
+      "dhash64": "0e5291944c137232"
+    },
+    {
+      "path": "BloodImage_00386.jpg",
+      "split": "train",
+      "source_group": "img:8db5f446c1f89b75",
+      "sha256": "8db5f446c1f89b7544abf6f3c6328933f6a25241e5425eb2747efe0432fc080c",
+      "decoded_rgb_sha256": "f0d9662ad6f692ceef1966b41af1baaa9e97ae5fef087dfddab62917388635ac",
+      "dhash64": "992b28306266408c"
+    },
+    {
+      "path": "BloodImage_00387.jpg",
+      "split": "train",
+      "source_group": "img:3c6ad99bdb9ec4d2",
+      "sha256": "3c6ad99bdb9ec4d22385814d659988051c5bb8e607606c9c7639d43d6ff8539f",
+      "decoded_rgb_sha256": "11b22f54eecad700a70f98288b483141549077945cb8eb03e9cc11f1146f234b",
+      "dhash64": "9816174ea6b37332"
+    },
+    {
+      "path": "BloodImage_00388.jpg",
+      "split": "train",
+      "source_group": "img:05aacb38d017d5ef",
+      "sha256": "05aacb38d017d5efa18e85fa8333e568d08067a73198fdda1cc6d83b00da7c87",
+      "decoded_rgb_sha256": "dd704f8e6ffa4c8a5dddc218c87b1e996c0472a48cf95817bd275b4ba56a9178",
+      "dhash64": "cecdcdcc4c890916"
+    },
+    {
+      "path": "BloodImage_00389.jpg",
+      "split": "train",
+      "source_group": "img:d670359e52378edb",
+      "sha256": "d670359e52378edbb7449600941c0141aa97d64132b3b852a8d32cf6cd285eaf",
+      "decoded_rgb_sha256": "af24be7fb2020aefa849573c83d969c2da7a97c3751d595b1cb107ae93947a4b",
+      "dhash64": "8182980f0f0f2d2d"
+    },
+    {
+      "path": "BloodImage_00390.jpg",
+      "split": "train",
+      "source_group": "img:10b8c1de3e7924a8",
+      "sha256": "10b8c1de3e7924a8dc75013ab614f3d8b574e3fec829b98f9cb365720ca7c7cf",
+      "decoded_rgb_sha256": "f4a12bdf11ad3d4cdda8e13d69cd4c6345324f74ab1547dc606b94b95db67200",
+      "dhash64": "430a2b27c3a3a363"
+    },
+    {
+      "path": "BloodImage_00391.jpg",
+      "split": "val",
+      "source_group": "img:9d15e7bbb556ef6f",
+      "sha256": "9d15e7bbb556ef6f5c24bdd6f50f0a4b788c521e15f8f7508c2b7b936cd0e9e3",
+      "decoded_rgb_sha256": "28f48a074d00a77d13de7ace77228049c741a97a723366a0db00320b0208c896",
+      "dhash64": "992f20323222228a"
+    },
+    {
+      "path": "BloodImage_00392.jpg",
+      "split": "train",
+      "source_group": "img:dfe044ff7baaf17c",
+      "sha256": "dfe044ff7baaf17c8a3517ebcb809efde1e6d4365bf592c703fe1ae2d17f6b72",
+      "decoded_rgb_sha256": "b4b10c04ec8117810f3330ab977efb99f123ecefbf7921e323888292d57dbd64",
+      "dhash64": "a422666163534e5c"
+    },
+    {
+      "path": "BloodImage_00393.jpg",
+      "split": "val",
+      "source_group": "img:e27d0090906fef79",
+      "sha256": "e27d0090906fef79e627cf5d2ed52500bb4b778eb8de83a0ad86585b459d9f2a",
+      "decoded_rgb_sha256": "6cc9b7ae2eeb509fe62371cce5515b1dc46a1c10e74fabbb01ce6384202e0c7f",
+      "dhash64": "5151f1e2734c1d11"
+    },
+    {
+      "path": "BloodImage_00395.jpg",
+      "split": "train",
+      "source_group": "img:b854299463601629",
+      "sha256": "b85429946360162924949abac25b0e7271b9da7fa0d8a05e2021d71dff8feebe",
+      "decoded_rgb_sha256": "04208c258bfc1899490e64f74407eb3d40f0e3cc66f3dd80a49b97fdba5b9441",
+      "dhash64": "5461e164ef8d7b9b"
+    },
+    {
+      "path": "BloodImage_00396.jpg",
+      "split": "train",
+      "source_group": "img:2b21ebd2a1650976",
+      "sha256": "2b21ebd2a165097610e14fcbfefe12b71826d9e312483f6d520482e817ed7dbd",
+      "decoded_rgb_sha256": "443c83d70c64458b45f2c6a3b67a259bb25c6768afa51499b25745b7660aee2a",
+      "dhash64": "46369a3b31784909"
+    },
+    {
+      "path": "BloodImage_00397.jpg",
+      "split": "train",
+      "source_group": "img:33099ae341aa9f5d",
+      "sha256": "33099ae341aa9f5db9dfa607149565bb7acd33c0abf3d1a94eafe2f5916b2c68",
+      "decoded_rgb_sha256": "14c46617bab64019bd200e93a9a72e32b8d64f6ee11dc3c5c5e8757e60065cc5",
+      "dhash64": "4d922aada4b493b9"
+    },
+    {
+      "path": "BloodImage_00398.jpg",
+      "split": "train",
+      "source_group": "img:39a5c8b1e05fd74b",
+      "sha256": "39a5c8b1e05fd74b98eee22b164f5ad09bdd28e804eeea4f1073bb5da78ef9dc",
+      "decoded_rgb_sha256": "295917ac71bd73d0cc5b56abd465751752388568020a331b7e2cfeeba2d1a042",
+      "dhash64": "4a60e4b22a36078e"
+    },
+    {
+      "path": "BloodImage_00400.jpg",
+      "split": "test",
+      "source_group": "img:e49f07c06a31348d",
+      "sha256": "e49f07c06a31348de479e017cc72b8d1d31353c030afdea80207135f3a80ea39",
+      "decoded_rgb_sha256": "437ee9b0169cc272466771eba8b008be21b622d72db627a3af895a74f46be1b8",
+      "dhash64": "a8e444c68e591296"
+    },
+    {
+      "path": "BloodImage_00402.jpg",
+      "split": "train",
+      "source_group": "img:08acbc853d215b95",
+      "sha256": "08acbc853d215b956497df427dcda260621164307fb2a6af37bbbbe3cdc39025",
+      "decoded_rgb_sha256": "6796bd87dee7ce766984db3261414f8ccd7629bd3f4721a4ed8ae1f1856a30fd",
+      "dhash64": "2a272b494c671e0e"
+    },
+    {
+      "path": "BloodImage_00403.jpg",
+      "split": "train",
+      "source_group": "img:17ebeef058185aa9",
+      "sha256": "17ebeef058185aa96e50c95425024482f1d71ebd1c935662882f0a2f54baafda",
+      "decoded_rgb_sha256": "ebfe8685d07b4b7d3c954c940c32e7d47260384e081f0006eb5c62d71f8ea5d8",
+      "dhash64": "6422334aca4b868e"
+    },
+    {
+      "path": "BloodImage_00404.jpg",
+      "split": "val",
+      "source_group": "img:8be4b13aef4067e7",
+      "sha256": "8be4b13aef4067e77f2ce52b7a6bd4bc4d2f8d60b8f80f4f25f5d6654b8805b5",
+      "decoded_rgb_sha256": "243db5436ea089c7c5f1b08111989d1a8f170338e3e17ab66cb8476a187be8b7",
+      "dhash64": "627745c5c46c2c36"
+    },
+    {
+      "path": "BloodImage_00405.jpg",
+      "split": "train",
+      "source_group": "img:57ad0ad2dc2397f5",
+      "sha256": "57ad0ad2dc2397f51c892b016cc9dcb53fc94e90e982378b5ce29e76ccac4810",
+      "decoded_rgb_sha256": "c0075d561288b6b1ade07ff4ebbe450f53773e7aa246a7a59c4aca066371d03a",
+      "dhash64": "d35aca4d6cacd82c"
+    },
+    {
+      "path": "BloodImage_00407.jpg",
+      "split": "val",
+      "source_group": "img:4ae9fc48463436be",
+      "sha256": "4ae9fc48463436be9a659236ec452a650246343293a6e89e28cd16ebc3e596ff",
+      "decoded_rgb_sha256": "615792f19e65598ff00d26f7d31f991e776f8d0965655cb938595d909c92173f",
+      "dhash64": "cd2b6ead4d4b973e"
+    },
+    {
+      "path": "BloodImage_00408.jpg",
+      "split": "train",
+      "source_group": "img:2720302caaebf3e0",
+      "sha256": "2720302caaebf3e05783145db95ac4f7f587b04a8323acec56ed9e6288c4ff2d",
+      "decoded_rgb_sha256": "a9f08581c310990aa290f6f23847e176238c768dd7d2cfb2ec85d9777f63e2c5",
+      "dhash64": "c21cdc591badac9c"
+    },
+    {
+      "path": "BloodImage_00409.jpg",
+      "split": "train",
+      "source_group": "img:27524f47535afb16",
+      "sha256": "27524f47535afb16f33ab9ae84c80cebfe3bec70525ff453ec6e9e11a888353a",
+      "decoded_rgb_sha256": "3fcc8b772a399cfdb04035a422d38859f17ac155f3531389dc322fe58b5e27f4",
+      "dhash64": "37676c0a31c5cfcb"
+    },
+    {
+      "path": "BloodImage_00410.jpg",
+      "split": "test",
+      "source_group": "img:325e157a61356a3b",
+      "sha256": "325e157a61356a3b274ef5d2919456ea235cabc80a451567e9b95a2cc468c2d0",
+      "decoded_rgb_sha256": "490befb4f871a35dbd781a31e6f8756f18528b910b85ef6adce2b64f022706f6",
+      "dhash64": "93123b1c1c1e5e3a"
+    }
+  ]
+}

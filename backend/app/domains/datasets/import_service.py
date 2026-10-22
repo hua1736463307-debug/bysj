@@ -263,9 +263,22 @@ def import_dataset(
     class_map = _load_class_map(staging, payload)
     annotation_map = _load_annotation_json(staging)
     group_level = str(payload.get("group_level") or "original_image")
-    if group_level != "original_image":
-        report.add_error("group_level_unsupported", "当前导入器只支持 original_image 级来源组")
+    groups = payload.get('source_groups')
+    if group_level not in {'original_image', 'image_cluster'}:
+        report.add_error("group_level_unsupported", "来源组只支持 original_image 或 image_cluster")
         db_raise(report)
+    if group_level == 'original_image' and groups is not None:
+        report.add_error('source_groups_unexpected', '显式分组必须使用 image_cluster，不能静默忽略分组')
+        db_raise(report)
+    if group_level == 'image_cluster':
+        image_paths = {relative for relative,path in files if path.suffix.lower() in IMAGE_SUFFIXES}
+        if not isinstance(groups, dict) or set(groups) != image_paths:
+            report.add_error('source_groups_coverage', '分组映射必须完整且精确覆盖本次图像相对路径')
+            db_raise(report)
+        for relative,group in groups.items():
+            if normalize_relative(relative).as_posix() != relative or not isinstance(group,str) or not group.strip() or len(group)>128:
+                report.add_error('source_groups_invalid', '组名必须是非空且至多 128 字符，路径必须规范化', relative)
+        if report.errors:db_raise(report)
 
     label_index: dict[str, Path] = {}
     for relative, path in files:
@@ -294,6 +307,8 @@ def import_dataset(
             continue
         digest = sha256_file(path)
         if digest in seen_hashes:
+            if groups is not None and groups[relative] != groups[seen_hashes[digest]]:
+                report.add_error('source_groups_content_conflict', '完全相同内容被分配到不同来源组', relative)
             report.duplicates.append({"file": relative, "duplicate_of": seen_hashes[digest], "sha256": digest})
             continue
         seen_hashes[digest] = relative
@@ -319,7 +334,7 @@ def import_dataset(
                 "width": width,
                 "height": height,
                 "annotations": annotations,
-                "source_group": f"img:{digest[:16]}",
+                "source_group": groups[relative] if groups is not None else f"img:{digest[:16]}",
                 "label_relative": label_rel,
             }
         )

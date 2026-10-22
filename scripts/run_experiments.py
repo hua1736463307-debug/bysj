@@ -173,6 +173,8 @@ def summarize(runs, seeds):
 
 
 def execute(client, api, token, protocol, output, digest, timeout, retry_cancelled=False):
+    if (output / 'BLOCKED.json').exists():
+        raise ValueError('protocol blocked by recorded data-quality review; retain history and prepare a new disclosed protocol')
     config = protocol["config"]
     headers = {"Authorization": f"Bearer {token}"}
     runs = []

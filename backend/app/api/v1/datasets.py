@@ -84,6 +84,7 @@ def import_dataset(
     license_text: str | None = Form(default=None, alias="license"),
     modality: str | None = Form(default=None),
     group_level: str = Form(default="original_image"),
+    source_groups: str | None = Form(default=None),
     class_map: str | None = Form(default=None),
     allow_empty_labels: str = Form(default="true"),
     user: CurrentUser = Depends(get_current_user),
@@ -111,6 +112,18 @@ def import_dataset(
             remove_tree(staging, allowed_root=settings.data_root / "staging")
             raise ApiError(422, "invalid_class_map", "class_map 必须是 JSON 对象") from exc
 
+    parsed_groups = None
+    if source_groups is not None:
+        try:
+            if len(source_groups.encode('utf-8')) > 1024 * 1024:
+                raise ValueError('source_groups too large')
+            parsed_groups = json.loads(source_groups)
+            if not isinstance(parsed_groups, dict):
+                raise ValueError('source_groups must be an object')
+        except (ValueError, TypeError) as exc:
+            remove_tree(staging, allowed_root=settings.data_root / "staging")
+            raise ApiError(422, "invalid_source_groups", "source_groups 必须是至多 1 MiB 的 JSON 对象") from exc
+
     payload = {
         "staging_token": token,
         "name": name or "导入数据集",
@@ -119,6 +132,7 @@ def import_dataset(
         "license": license_text,
         "modality": modality,
         "group_level": group_level,
+        "source_groups": parsed_groups,
         "class_map": parsed_class_map,
         "allow_empty_labels": str(allow_empty_labels).strip().lower() not in {"false", "0", "no"},
     }

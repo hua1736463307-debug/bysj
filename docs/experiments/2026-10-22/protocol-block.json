@@ -1,0 +1,17 @@
+{
+  "status": "blocked_data_quality",
+  "identified_at": "2026-10-22T17:03:48.996795+00:00",
+  "reason": "Cross-split near-duplicate candidate; assistant visual inspection found highly similar cell layout consistent with the same field at different focus. Human adjudication pending.",
+  "pair": {
+    "a": "BloodImage_00037.jpg",
+    "a_split": "test",
+    "b": "BloodImage_00038.jpg",
+    "b_split": "train",
+    "cross_split": true,
+    "hamming_distance": 3,
+    "human_decision": null
+  },
+  "screening_sha256": "191f02bbf3a1150cbfed450428cc04458e5a031412650641ca2164a2fa7f8c8b",
+  "historical_metrics": "Retained without edits; not accepted as independent generalization evidence.",
+  "future_work": "Conservatively co-group candidate images in a new disclosed development protocol; never silently replace the already-used test set."
+}

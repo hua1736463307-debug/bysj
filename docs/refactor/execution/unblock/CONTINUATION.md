@@ -2,6 +2,8 @@
 
 本文件用于接手当前实施，最新是否停线、额度、正在执行的任务见 [STATUS](STATUS.md)。不能根据历史任务书里的旧路径重新覆盖本轮成果。
 
+> 10:00 数据质量门禁覆盖下文旧 E2 续跑步骤：原 E1/E2 目录已有 BLOCKED.json，禁止续跑旧协议，包括 --retry-cancelled。先阅读 docs/experiments/2026-10-22/DATA-QUALITY-REVIEW.md。新保守分组准备包为 artifacts/bccd-grouped-20261022，364 图/363 组；后续需使用 image_cluster/source_groups 导入新版本，按新的事后开发协议评估，不能冒充未见 test。
+
 ## 基线与运行位置
 
 - 当前工作区：`D:\毕业设计\bysj-unblock`，分支 `graduation/unblock-20261022`。

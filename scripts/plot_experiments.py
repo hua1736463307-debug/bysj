@@ -44,6 +44,7 @@ def main():
             values=[groups[name]['per_class'][cid][metric] for cid in labels]
             if any(v['n'] for v in values):ax.bar(cx+(i-.5)*width,[v['mean'] or 0 for v in values],width,label=name,color=colors[i],yerr=[v['std'] or 0 for v in values],capsize=3)
         ax.set(xticks=cx,xticklabels=list(labels.values()),ylim=(0,1.1),title=title,ylabel='Score');ax.legend()
+    if data['status']=='blocked_data_quality':fig.suptitle('Historical results: cross-split near-duplicate risk',y=1.03,color='#a22622')
     fig.tight_layout();save(fig,'per-class')
     fig,axes=plt.subplots(1,2,figsize=(11,4.5))
     matrices=[np.array(r['metrics']['confusion_matrix']) for g in groups.values() for r in g['completed'] if r['seed']==42]
@@ -56,6 +57,7 @@ def main():
         for (r,c),v in np.ndenumerate(matrix):ax.text(c,r,str(int(v)),ha='center',va='center',color='white' if v>common_max/2 else 'black',fontsize=8)
         ax.set(xticks=range(len(labels)),xticklabels=labels,yticks=range(len(labels)),yticklabels=labels,xlabel='True',ylabel='Predicted',title=name+' seed 42: test counts')
         ax.tick_params(axis='x',rotation=25)
+    if data['status']=='blocked_data_quality':fig.suptitle('Historical results: cross-split near-duplicate risk',y=1.03,color='#a22622')
     fig.tight_layout();save(fig,'confusion-seed42')
 
 

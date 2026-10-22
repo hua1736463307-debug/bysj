@@ -64,6 +64,12 @@ def test_empty_runs_are_failed():
     assert report["test_metrics"]["map50"]["mean"] is None
 
 
+def test_data_quality_block_prevents_even_cancelled_retry(tmp_path):
+    (tmp_path/'BLOCKED.json').write_text('{"reason":"cross-split similarity"}')
+    with pytest.raises(ValueError,match='protocol blocked'):
+        runner.execute(None,'http://unused','token',{},tmp_path,'digest',1,retry_cancelled=True)
+
+
 def test_replay_reuses_training_and_test_keys(tmp_path):
     keys = []; calls = []
     metrics = {**{k: .5 for k in runner.METRICS}, "per_class": {"0": {}}, "confusion_matrix": [[1, 0], [0, 0]]}

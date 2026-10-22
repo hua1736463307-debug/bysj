@@ -61,6 +61,8 @@ OpenAPI：`GET /api/openapi.json`，交互文档 `GET /api/docs`。
 | DELETE | `/datasets/{id}` / `/assets/{id}` | 软删除；被引用 409 |
 | POST | `/datasets/{id}/restore` / `/assets/{id}/restore` | 管理员恢复 |
 
+导入的 `group_level` 默认 original_image（按文件内容哈希分组）；若需要保守合并不同文件的相似图片，传 `group_level=image_cluster` 与 `source_groups` JSON 对象，键为本次图像规范相对路径，值为非空来源组名。映射必须精确覆盖全部图像，不能有遗漏/多余项；完全相同内容不得分到不同组。原始模式携带显式映射会拒绝，不静默忽略。image_cluster 不能宣称患者或载玻片级独立。已有冻结版本不会被此接口修改。
+
 ### 标注
 
 | 方法 | 路径 | 说明 |

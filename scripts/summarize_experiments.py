@@ -60,7 +60,8 @@ def read_group(root):
             values=[r['metrics']['per_class'].get(class_id,{}).get(metric) for r in completed]
             if any(type(v) not in (float,int) or not math.isfinite(v) for v in values):raise ValueError('per-class metric missing/nonfinite')
             per_class[class_id][metric]=stats(values)
-    return {'status':'completed' if len(completed)==len(config['seeds']) else 'partial',
+    validity=json.loads((root/'BLOCKED.json').read_text(encoding='utf-8')) if (root/'BLOCKED.json').exists() else None
+    return {'status':'completed' if len(completed)==len(config['seeds']) else 'partial','validity_warning':validity,
         'protocol_sha256':digest,'protocol':protocol,'seeds':records,'completed':completed,
         'aggregate':{m:stats([r['metrics'][m] for r in completed]) for m in METRICS},'per_class':per_class,
         'training_seconds':stats([r['training_seconds'] for r in completed])}
@@ -96,6 +97,7 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True)
     report={'status':'completed' if all(g['status']=='completed' for g in groups.values()) else 'partial',
         'groups':groups,'comparison':comparison}
+    if any(g['validity_warning'] for g in groups.values()):report['status']='blocked_data_quality'
     # Full curves stay in raw artifacts; publish only numerical evidence and
     # confusion matrices needed to reproduce tables and plots.
     for group in groups.values():
@@ -111,6 +113,8 @@ def main():
         'E1 为完整原图训练；E2 只对训练集做 320 像素、0.2 重叠切片，最小可见比例 0.5。共同 val/test 使用原图与相同标注、整图推理。两组模型、优化器、batch、epoch 上限和 seeds 一致；E2 训练样本为 6 倍，不是等计算量对比。','',
         '80 epoch 上限，batch=8，imgsz=640，seeds=42/43/44；AdamW，lr0=0.001，patience=20，仅按 val/mAP50–95 早停与选权重。test 不用于参数选择。','',
         '| 组 | 状态 | P | R | mAP50 | mAP50–95 |','|---|---|---|---|---|---|']
+    if report['status']=='blocked_data_quality':
+        lines[4:4]=['> 数据有效性门禁：事后筛查发现 train/test 跨集近重复风险。以下为真实历史数值，不能作为已通过独立性验收的泛化结果；旧协议停止续跑。见 DATA-QUALITY-REVIEW.md。','']
     for name,g in groups.items():lines.append('| '+name+' | '+g['status']+' | '+' | '.join(cell(g['aggregate'][m]) for m in METRICS)+' |')
     lines+=['','表内为训练种子均值 ± 样本标准差（n−1）。不是患者级置信区间。','',
         '## 分类别结果','', '| 组 | 类别 | P | R | mAP50 | mAP50–95 |','|---|---|---|---|---|---|']
