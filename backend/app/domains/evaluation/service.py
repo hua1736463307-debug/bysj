@@ -1,5 +1,9 @@
 """评估域：独立 val/test 运行记录。"""
 from __future__ import annotations
+import uuid
+from sqlalchemy.exc import IntegrityError
+from pydantic import ValidationError
+from app.schemas.inference import EvaluationParams
 
 from sqlalchemy.orm import Session
 
@@ -36,6 +40,10 @@ def create_evaluation(
     user: CurrentUser,
     payload: dict,
 ) -> tuple[EvaluationRun, JobTask, bool]:
+    try:
+        params = EvaluationParams.model_validate(payload.get("params") or {}).model_dump()
+    except ValidationError as exc:
+        raise ApiError(422, "invalid_params", str(exc)) from exc
     split = str(payload.get("split") or "val")
     if split not in {"val", "test"}:
         raise ApiError(422, "invalid_split", "split 只能是 val 或 test")
@@ -45,8 +53,8 @@ def create_evaluation(
     if version.state != "frozen":
         raise ApiError(422, "version_not_frozen", "评估只接受冻结版本")
 
-    model_classes = {str(key) for key in (model.class_map_json or {})}
-    version_classes = {str(key) for key in (version.class_map_json or {})}
+    model_classes = {str(key): str(value) for key, value in (model.class_map_json or {}).items()}
+    version_classes = {str(key): str(value) for key, value in (version.class_map_json or {}).items()}
     if model_classes and version_classes and model_classes != version_classes:
         raise ApiError(422, "class_map_mismatch", "模型类别与数据版本类别不一致")
 
@@ -61,19 +69,32 @@ def create_evaluation(
         purpose = payload.get("purpose")
         approved_by = None
 
-    run = EvaluationRun(
-        owner_id=user.id,
-        model_id=model.id,
-        dataset_version_id=version.id,
-        split=split,
-        params_json=payload.get("params") or {},
-        status="pending",
-        purpose=purpose,
-        approved_by=approved_by,
-    )
-    db.add(run)
-    db.commit()
-    db.refresh(run)
+    key = payload.get("idempotency_key")
+    existing_job = db.query(JobTask).filter(JobTask.owner_id == str(user.id), JobTask.type == "evaluation",
+        JobTask.idempotency_key == key).one_or_none() if key else None
+    run_id = (existing_job.input_json or {}).get("evaluation_id") if existing_job else str(uuid.uuid5(uuid.NAMESPACE_URL, f"bysj:evaluation:{user.id}:{key}")) if key else str(uuid.uuid4())
+    expected = {"model_id": model.id, "dataset_version_id": version.id, "split": split, "params": params, "purpose": purpose}
+    run = db.get(EvaluationRun, run_id)
+    if run is None:
+        run = EvaluationRun(
+            id=run_id, owner_id=user.id, model_id=model.id,
+            dataset_version_id=version.id, split=split, params_json=params,
+            status="pending", purpose=purpose, approved_by=approved_by,
+        )
+        db.add(run)
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            run = db.get(EvaluationRun, run_id)
+            if run is None:
+                raise
+    actual = {"model_id": run.model_id, "dataset_version_id": run.dataset_version_id, "split": run.split,
+              "params": EvaluationParams.model_validate(run.params_json or {}).model_dump(), "purpose": run.purpose}
+    if actual != expected:
+        raise ApiError(409, "idempotency_conflict", "相同幂等键对应了不同评估请求")
+    if existing_job:
+        return run, existing_job, False
 
     job, created = job_service.create_job(
         db,
@@ -84,9 +105,12 @@ def create_evaluation(
             "evaluation_id": run.id,
             "dataset_version_id": version.id,
             "model_id": model.id,
+            "evaluation_request": expected,
         },
         idempotency_key=payload.get("idempotency_key"),
     )
+    run.job_id = job.id
+    db.commit()
     return run, job, created
 
 

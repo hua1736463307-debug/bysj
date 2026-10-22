@@ -50,10 +50,12 @@ def export_feedback_version(
     review_ids = list(payload.get("review_ids") or [])
     if not review_ids:
         raise ApiError(422, "review_required", "必须选择已批准的复核记录")
-    key = payload.get("idempotency_key") or _review_hash(review_ids)
+    key = sha256_text(json.dumps({"parent": parent.id, "key": payload.get("idempotency_key") or _review_hash(review_ids)}, sort_keys=True))
 
     existing = db.query(FeedbackExport).filter(FeedbackExport.idempotency_key == key).one_or_none()
     if existing and existing.child_version_id:
+        if existing.review_ids_hash != _review_hash(review_ids):
+            raise ApiError(409, "idempotency_conflict", "相同幂等键对应了不同复核记录")
         return {
             "child_version_id": existing.child_version_id,
             "idempotent": True,
@@ -87,9 +89,9 @@ def export_feedback_version(
             raise ApiError(409, "test_leak_blocked", "只允许 train 资产回流，test/val 一律拒绝")
         if asset.original_asset_id or (asset.root_asset_id and asset.root_asset_id != asset.id):
             raise ApiError(409, "derived_asset_blocked", "派生资产不能作为回流来源")
-        if asset.content_hash in test_hashes and asset.relative_path in protected:
+        if asset.content_hash in test_hashes:
             raise ApiError(409, "test_leak_blocked", "该资产与测试集内容相同")
-        if asset.source_group in test_groups and asset.relative_path in protected:
+        if asset.source_group in test_groups:
             raise ApiError(409, "test_leak_blocked", "该资产与测试集同源")
         from app.db.models import ReviewItem
 
@@ -192,7 +194,7 @@ def export_feedback_version(
             db,
             settings,
             version=child,
-            seed=int((parent.split_config_json or {}).get("seed") or 42),
+            seed=int((parent.split_config_json or {}).get("seed", 42)),
             ratios=_parent_ratios(parent),
             fixed_splits=fixed_splits,
             progress=progress,

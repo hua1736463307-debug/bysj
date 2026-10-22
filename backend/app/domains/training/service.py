@@ -20,6 +20,8 @@ from app.domains import job_service
 from app.domains.datasets import service as dataset_service
 from app.domains.models import service as model_service
 from app.ml.yolo_adapter import compute_sha256, environment_snapshot, get_adapter, write_json
+from app.schemas.training import TrainingParams
+from pydantic import ValidationError
 
 DEFAULT_PARAMS = {
     "epochs": 80,
@@ -38,32 +40,13 @@ class TrainingPreflightError(ApiError):
 
 
 def _normalize_params(payload: dict, checks: list[dict]) -> dict:
-    params = dict(DEFAULT_PARAMS)
-    provided = payload.get("params") or {}
-    for key in ("epochs", "batch", "imgsz", "seed"):
-        if key in payload:
-            provided[key] = payload[key]
-    params.update({key: provided[key] for key in provided if key in {"epochs", "batch", "imgsz", "seed", "deterministic", "device"}})
-
-    def _check(condition: bool, name: str, message: str) -> None:
-        checks.append({"name": name, "status": "pass" if condition else "fail", "detail": message})
-
     try:
-        params["epochs"] = int(params["epochs"])
-        params["batch"] = int(params["batch"])
-        params["imgsz"] = int(params["imgsz"])
-        params["seed"] = int(params["seed"])
-    except (TypeError, ValueError):
-        _check(False, "params_numeric", "epochs/batch/imgsz/seed 必须是整数")
-        return params
-
-    _check(1 <= params["epochs"] <= 1000, "epochs", "epochs 必须在 1..1000")
-    _check(1 <= params["batch"] <= 128, "batch", "batch 必须在 1..128")
-    _check(32 <= params["imgsz"] <= 2048 and params["imgsz"] % 32 == 0, "imgsz", "imgsz 必须是 32 的倍数且在 32..2048")
-    _check(params["seed"] >= 0, "seed", "seed 必须非负")
-    params["deterministic"] = bool(params.get("deterministic", True))
-    params["device"] = str(params.get("device") or DEFAULT_PARAMS["device"])
-    return params
+        normalized = TrainingParams.model_validate(payload.get("params") or {}).model_dump()
+        checks.append({"name": "params", "status": "pass", "detail": "参数白名单与范围校验通过"})
+        return normalized
+    except ValidationError as exc:
+        checks.append({"name": "params", "status": "fail", "detail": str(exc)})
+        return {}
 
 
 def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict) -> dict:

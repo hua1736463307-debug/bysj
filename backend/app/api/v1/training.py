@@ -11,17 +11,9 @@ from app.core.errors import ApiError, accepted, ok
 from app.db.session import get_db
 from app.domains import job_service
 from app.domains.training import service as training_service
+from app.schemas.training import TrainingParams
 
 router = APIRouter(prefix="/training", tags=["training"])
-
-
-class TrainingParams(BaseModel):
-    epochs: int = Field(default=80, ge=1, le=1000)
-    batch: int = Field(default=8, ge=1, le=128)
-    imgsz: int = Field(default=640, ge=32, le=2048)
-    seed: int = Field(default=42, ge=0)
-    deterministic: bool = True
-    device: str = "0"
 
 
 class TrainingRequest(BaseModel):

@@ -68,7 +68,7 @@ def _approve(client, headers, review_id):
     return decision.json()["data"]
 
 
-def test_review_lifecycle_and_export(client, researcher_headers, admin_headers):
+def test_review_lifecycle_and_export(client, researcher_headers, admin_headers, db, settings):
     ctx = _trained_and_inferred(client, researcher_headers)
     created = _create_review(client, researcher_headers, ctx["item"], verdict="false_positive")
     assert created.status_code == 201, created.text
@@ -98,6 +98,16 @@ def test_review_lifecycle_and_export(client, researcher_headers, admin_headers):
     child = client.get(f"/api/v1/dataset-versions/{child_id}", headers=researcher_headers).json()["data"]
     assert child["state"] == "frozen"
     assert child["parent_version_id"] == ctx["version_id"]
+    from pathlib import Path
+    from app.db.models import DatasetVersion
+    stored = db.get(DatasetVersion, child_id)
+    expected_root = Path(settings.data_root) / "datasets" / ctx["dataset_id"] / child_id
+    assert Path(stored.root_path).resolve() == expected_root.resolve()
+    assert Path(stored.manifest_path).resolve() == (expected_root / "manifest.json").resolve()
+    assert (expected_root / "manifest.json").is_file()
+    # False-positive removal must also clear the actual YOLO sidecar.
+    label = expected_root / "labels" / Path(ctx["train_asset"]["relative_path"]).with_suffix(".txt")
+    assert label.read_text(encoding="utf-8") == ""
 
     # test/val 逐资产 hash 未变
     parent_assets = ctx["assets"]

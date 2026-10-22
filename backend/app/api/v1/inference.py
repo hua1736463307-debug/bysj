@@ -67,6 +67,8 @@ def create_inference(
         owner_username=user.username,
         payload={"run_id": run.id, "model_id": model_id},
     )
+    run.job_id = job.id
+    db.commit()
     if settings.inline_jobs and created:
         from app.workers.dispatcher import execute_job_inline
 

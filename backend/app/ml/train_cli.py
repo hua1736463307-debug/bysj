@@ -15,28 +15,35 @@ from pathlib import Path
 
 def run(request: dict) -> dict:
     from ultralytics import YOLO
+    import time
+    import torch
+    from app.schemas.training import ultralytics_arguments
+    from app.ml.yolo_adapter import environment_snapshot
 
     params = request["params"]
     base_path = request.get("base_model_path")
     if not base_path:
         raise RuntimeError("真实训练必须提供已登记的基础权重")
     model = YOLO(str(base_path), task="detect")
+    training_args = ultralytics_arguments(params)
+    cuda = training_args["device"] != "cpu" and torch.cuda.is_available()
+    if cuda:
+        torch.cuda.synchronize(0)
+        torch.cuda.reset_peak_memory_stats(0)
+    started = time.perf_counter()
     results = model.train(
         data=request["dataset_yaml"],
-        epochs=int(params["epochs"]),
-        batch=int(params["batch"]),
-        imgsz=int(params["imgsz"]),
-        seed=int(params["seed"]),
-        deterministic=bool(params.get("deterministic", True)),
-        device=params.get("device") or None,
+        **training_args,
         project=request["workdir"],
         name="train",
         exist_ok=True,
         pretrained=True,
-        amp=False,  # Avoid Ultralytics' implicit download/load of another model for AMP checks.
         verbose=True,
     )
     trainer = getattr(model, "trainer", None)
+    if cuda:
+        torch.cuda.synchronize(0)
+    elapsed = time.perf_counter() - started
     best = Path(getattr(trainer, "best", "") or "")
     if not best.exists():
         raise RuntimeError("训练完成但没有 best 权重")
@@ -45,7 +52,7 @@ def run(request: dict) -> dict:
 
     metrics = {}
     try:
-        val = model.val(data=request["dataset_yaml"], split="val", verbose=False)
+        val = model.val(data=request["dataset_yaml"], split="val", imgsz=params["imgsz"], device=training_args["device"], verbose=False)
         box = getattr(val, "box", None)
         if box is not None:
             metrics = {
@@ -64,6 +71,11 @@ def run(request: dict) -> dict:
         "backend": "ultralytics",
         "ultralytics_version": getattr(__import__("ultralytics"), "__version__", None),
         "results_dict": getattr(results, "results_dict", None),
+        "effective_args": json.loads(json.dumps(vars(trainer.args) if trainer is not None else training_args, default=str)),
+        "training_seconds": elapsed,
+        "peak_gpu_allocated_bytes": torch.cuda.max_memory_allocated(0) if cuda else None,
+        "peak_gpu_reserved_bytes": torch.cuda.max_memory_reserved(0) if cuda else None,
+        "environment": environment_snapshot(),
     }
 
 

@@ -136,9 +136,9 @@ def restore_dataset(db: Session, resource: DatasetResource) -> None:
     db.commit()
 
 
-def get_asset(db: Session, asset_id: int, user: CurrentUser) -> DatasetAsset:
+def get_asset(db: Session, asset_id: int, user: CurrentUser, *, include_deleted: bool = False) -> DatasetAsset:
     asset = db.get(DatasetAsset, asset_id)
-    if asset is None or asset.deleted_at is not None:
+    if asset is None or (asset.deleted_at is not None and not (include_deleted and user.is_admin)):
         raise ApiError(404, "not_found", "图像资产不存在")
     get_version(db, asset.dataset_version_id, user)
     return asset

@@ -100,6 +100,13 @@ class UltralyticsAdapter:
     def predict_image(self, handle: ModelHandle, image_path: Path, params: dict) -> list[dict]:
         if self._model is None:
             raise RuntimeError("模型未加载")
+        import torch
+        import time
+        cuda = str(params.get("device", "0")) != "cpu" and torch.cuda.is_available()
+        if cuda:
+            torch.cuda.synchronize(0)
+            torch.cuda.reset_peak_memory_stats(0)
+        started = time.perf_counter()
         results = self._model.predict(
             str(image_path),
             imgsz=int(params.get("imgsz", 640)),
@@ -124,6 +131,17 @@ class UltralyticsAdapter:
                         "bbox_xyxy": [round(value, 2) for value in xyxy],
                     }
                 )
+        if cuda:
+            torch.cuda.synchronize(0)
+        speeds = [result.speed for result in results if getattr(result, "speed", None)]
+        self.last_timing = {
+            "predict_wall_ms": (time.perf_counter() - started) * 1000,
+            **{f"{key}_ms": sum(float(speed[key]) for speed in speeds) if speeds else None
+               for key in ("preprocess", "inference", "postprocess")},
+            "peak_gpu_allocated_bytes": torch.cuda.max_memory_allocated(0) if cuda else None,
+            "peak_gpu_reserved_bytes": torch.cuda.max_memory_reserved(0) if cuda else None,
+            "timing_source": "Ultralytics result.speed plus synchronized predict wall time",
+        }
         return predictions
 
     def evaluate(self, handle: ModelHandle, dataset_yaml: Path, split: str, params: dict) -> dict:
@@ -133,8 +151,13 @@ class UltralyticsAdapter:
             data=str(dataset_yaml),
             split=split,
             imgsz=int(params.get("imgsz", 640)),
+            batch=int(params.get("batch", 8)),
             device=params.get("device") or None,
             verbose=False,
+            plots=True,
+            project=str(params["_output_dir"]),
+            name="evaluation",
+            exist_ok=True,
         )
         box = getattr(metrics, "box", None)
         per_class = {}
@@ -147,6 +170,19 @@ class UltralyticsAdapter:
                     "map50": float(box.ap50[position]) if box.ap50 is not None else None,
                     "map50_95": float(box.ap[position]) if box.ap is not None else None,
                 }
+        matrix = getattr(getattr(metrics, "confusion_matrix", None), "matrix", None)
+        curves = getattr(metrics, "curves_results", None)
+        def serializable(value):
+            import math
+            if hasattr(value, "tolist"):
+                return serializable(value.tolist())
+            if isinstance(value, (list, tuple)):
+                return [serializable(item) for item in value]
+            if isinstance(value, dict):
+                return {str(k): serializable(v) for k, v in value.items()}
+            if isinstance(value, float) and not math.isfinite(value):
+                return None
+            return value
         return {
             "metrics": {
                 "precision": float(box.mp) if box is not None else None,
@@ -154,13 +190,17 @@ class UltralyticsAdapter:
                 "map50": float(box.map50) if box is not None else None,
                 "map50_95": float(box.map) if box is not None else None,
                 "per_class": per_class,
-                "confusion_matrix": None,
-                "curves": None,
+                "confusion_matrix": serializable(matrix),
+                "confusion_matrix_labels": [str(names[k]) for k in sorted(names, key=lambda x:int(x))] + ["background"],
+                "confusion_matrix_axes": {"rows": "predicted", "columns": "true"},
+                "curves": serializable(curves),
+                "missing": {key: "backend did not provide this metric" for key, value in (("confusion_matrix", matrix), ("curves", curves)) if value is None},
             },
             "reason": None,
             "split": split,
             "backend": self.backend,
             "names": names,
+            "plots": [str(p) for p in Path(metrics.save_dir).glob("*.png")],
         }
 
     def release(self, handle: ModelHandle) -> None:
@@ -212,6 +252,14 @@ def environment_snapshot() -> dict:
     except Exception:
         pass
     snapshot["code_sha"] = os.environ.get("BYSJ_CODE_SHA", "unknown")
+    import importlib.metadata
+    for name in ("torchvision", "ultralytics", "numpy"):
+        try:
+            snapshot[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            snapshot[name] = None
+    from app.version import build_info
+    snapshot["locks"] = {key: value for key, value in build_info().items() if "lock_sha256" in key}
     return snapshot
 
 

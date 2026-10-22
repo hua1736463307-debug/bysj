@@ -58,18 +58,25 @@ def handle_training(ctx: JobContext) -> dict:
     holder = _acquire_gpu(ctx)
     try:
         ctx.progress(0.05, "preparing", "准备训练数据")
-        result = training_service.train(
-            ctx.settings,
-            ctx.db,
-            job_id=ctx.job.id,
-            version=version,
-            model=model,
-            class_map=version.class_map_json or {},
-            params=payload.get("params") or {},
-            workdir=workspace,
-            should_stop=ctx.should_stop,
-            progress=ctx.progress,
-        )
+        existing = ctx.db.query(ModelRegistry).filter(ModelRegistry.training_job_id == ctx.job.id).one_or_none()
+        if existing:
+            model_service.verify_model_file(existing, ctx.settings)
+            result = (existing.metadata_json or {}).get("training_result")
+            if not result:
+                raise ApiError(409, "recovery_metadata_missing", "已有模型缺少完整训练记录，拒绝覆盖；需人工核对")
+        else:
+            result = training_service.train(
+                ctx.settings,
+                ctx.db,
+                job_id=ctx.job.id,
+                version=version,
+                model=model,
+                class_map=version.class_map_json or {},
+                params=payload.get("params") or {},
+                workdir=workspace,
+                should_stop=ctx.should_stop,
+                progress=ctx.progress,
+            )
         ctx.check_cancelled()
         best_path = Path(result["best_path"])
         metrics = result.get("metrics") or {}
@@ -86,26 +93,33 @@ def handle_training(ctx: JobContext) -> dict:
             class_map=version.class_map_json or {},
             metrics=metrics,
             backend=result.get("backend", "unknown"),
+            training_result=result,
         )
-        experiment = ExperimentRun(
-            owner_id=int(ctx.job.owner_user_id or 0),
-            training_job_id=ctx.job.id,
-            model_id=registered.id,
-            dataset_version_id=version.id,
-            code_sha=environment_snapshot().get("code_sha"),
-            env_json=environment_snapshot(),
-            config_json={
-                "params": payload.get("params"),
-                "dataset_yaml": result.get("dataset_yaml"),
-                "dataset_manifest_sha256": result.get("dataset_manifest_sha256"),
-                "request_sha256": result.get("request_sha256"),
-            },
-            metrics_json=metrics,
-            artifact_refs={
-                "model_sha256": registered.sha256,
-                "best_path": str(best_path),
-            },
-        )
+        experiment = ctx.db.query(ExperimentRun).filter(ExperimentRun.training_job_id == ctx.job.id).one_or_none()
+        if experiment is None:
+            experiment = ExperimentRun(
+                owner_id=int(ctx.job.owner_user_id or 0),
+                training_job_id=ctx.job.id,
+                model_id=registered.id,
+                dataset_version_id=version.id,
+                code_sha=environment_snapshot().get("code_sha"),
+                env_json=environment_snapshot(),
+                config_json={
+                    "params": payload.get("params"),
+                    "dataset_yaml": result.get("dataset_yaml"),
+                    "dataset_manifest_sha256": result.get("dataset_manifest_sha256"),
+                    "request_sha256": result.get("request_sha256"),
+                    "effective_args": result.get("effective_args"),
+                    "training_seconds": result.get("training_seconds"),
+                    "peak_gpu_allocated_bytes": result.get("peak_gpu_allocated_bytes"),
+                    "peak_gpu_reserved_bytes": result.get("peak_gpu_reserved_bytes"),
+                },
+                metrics_json=metrics,
+                artifact_refs={
+                    "model_sha256": registered.sha256,
+                    "best_path": str(best_path),
+                },
+            )
         ctx.lock_for_write()
         ctx.db.add(experiment)
         ctx.db.commit()
@@ -117,6 +131,11 @@ def handle_training(ctx: JobContext) -> dict:
             "epochs_completed": result.get("epochs_completed"),
             "experiment_id": experiment.id,
             "dataset_manifest_sha256": version.manifest_sha256,
+            "effective_args": result.get("effective_args"),
+            "environment": result.get("environment") or environment_snapshot(),
+            "training_seconds": result.get("training_seconds"),
+            "peak_gpu_allocated_bytes": result.get("peak_gpu_allocated_bytes"),
+            "peak_gpu_reserved_bytes": result.get("peak_gpu_reserved_bytes"),
         }
     finally:
         from app.workers.gpu import release
@@ -141,13 +160,39 @@ def handle_evaluation(ctx: JobContext) -> dict:
         adapter = get_adapter(ctx.settings)
         handle = adapter.load(path, model.class_map_json or version.class_map_json or {})
         try:
-            output = adapter.evaluate(handle, dataset_yaml, run.split, run.params_json or {})
+            output = adapter.evaluate(handle, dataset_yaml, run.split, {**(run.params_json or {}), "_output_dir": str(workspace)})
         finally:
             adapter.release(handle)
+        from app.domains.inference.service import record_artifact
+        from app.core.storage import atomic_write_bytes
+        import json
+        import shutil
+        artifacts = []
+        metrics = output.get("metrics") or {}
+        destination = ensure_dir(ctx.settings.artifact_root / "evaluations" / run.id / str(ctx.attempt))
+        curves = metrics.pop("curves", None)
+        if curves is not None:
+            curve_path = destination / "curves.json"
+            atomic_write_bytes(curve_path, json.dumps(curves, allow_nan=False).encode("utf-8"))
+            ctx.lock_for_write()
+            record = record_artifact(ctx.db, ctx.settings, owner_id=run.owner_id, resource_type="evaluation", resource_id=run.id, path=curve_path, mime="application/json")
+            metrics["curves"] = {"artifact_id": record.id, "sha256": record.sha256}
+        else:
+            metrics["curves"] = None
+        for raw in output.get("plots", []):
+            source = Path(raw).resolve()
+            source.relative_to(workspace.resolve())
+            target = destination / source.name
+            shutil.copy2(source, target)
+            ctx.lock_for_write()
+            record = record_artifact(ctx.db, ctx.settings, owner_id=run.owner_id, resource_type="evaluation", resource_id=run.id, path=target, mime="image/png")
+            artifacts.append({"name": source.name, "artifact_id": record.id, "sha256": record.sha256})
         ctx.lock_for_write()
         run.status = "completed"
-        run.metrics_json = output.get("metrics") or {}
-        run.artifacts_json = {"backend": output.get("backend"), "reason": output.get("reason"), "dataset_yaml": str(dataset_yaml)}
+        run.metrics_json = metrics
+        run.artifacts_json = {"backend": output.get("backend"), "reason": output.get("reason"), "plots": artifacts,
+                              "environment": environment_snapshot(), "model_sha256": model.sha256,
+                              "manifest_sha256": version.manifest_sha256, "split": run.split}
         run.context_hash = compute_sha256(dataset_yaml)
         run.finished_at = utcnow()
         ctx.db.commit()

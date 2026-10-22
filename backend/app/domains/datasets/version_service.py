@@ -26,11 +26,24 @@ def freeze_version(
     fixed_splits: dict[str, str] | None = None,
     progress=None,
 ) -> dict:
+    # Feedback creates a child and sets its directory in this transaction.
+    # Refreshing with autoflush disabled would discard that pending directory.
+    db.flush()
     version = db.query(DatasetVersion).filter(DatasetVersion.id == version.id).populate_existing().with_for_update().one()
     if version.state == "frozen":
         raise ApiError(409, "version_frozen", "版本已冻结，内容不可修改")
     if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_invalid_state", f"当前版本状态不可冻结: {version.state}")
+    root = Path(version.root_path or "")
+    if not version.root_path or not root.is_absolute():
+        raise ApiError(422, "invalid_version_root", "版本目录必须是受控根下的绝对路径")
+    version_dir = root.resolve()
+    try:
+        relative_root = version_dir.relative_to(Path(settings.data_root).resolve())
+    except ValueError as exc:
+        raise ApiError(422, "invalid_version_root", "版本目录超出数据根目录") from exc
+    if not relative_root.parts:
+        raise ApiError(422, "invalid_version_root", "版本目录不能是数据根目录本身")
 
     version.state = "validating"
     db.commit()
@@ -71,23 +84,28 @@ def freeze_version(
         db.commit()
         raise ApiError(422, "split_invalid", str(exc), exc.details) from exc
 
-    version_dir = Path(version.root_path)
     # YOLO reads sidecar files, not database JSON. Materialize the exact frozen
     # labels, including empty files for deleted boxes, before publishing frozen.
-    label_names = set()
-    for item in manifest["assets"]:
-        relative = normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
-        if relative in label_names:
-            version.state = "failed"
-            db.commit()
-            raise ApiError(409, "label_name_collision", "不同图像对应相同 YOLO 标签路径")
-        label_names.add(relative)
-        label = resolve_under(version_dir / "labels", relative)
-        body = "".join(f"{a['class_id']} {a['cx']:.6f} {a['cy']:.6f} {a['w']:.6f} {a['h']:.6f}\n" for a in item["annotations"])
-        atomic_write_bytes(label, body.encode("utf-8"))
-    manifest_path = version_dir / "manifest.json"
-    payload = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
-    atomic_write_bytes(manifest_path, payload)
+    try:
+        label_names = set()
+        for item in manifest["assets"]:
+            relative = normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
+            if relative in label_names:
+                version.state = "failed"
+                db.commit()
+                raise ApiError(409, "label_name_collision", "不同图像对应相同 YOLO 标签路径")
+            label_names.add(relative)
+            label = resolve_under(version_dir / "labels", relative)
+            body = "".join(f"{a['class_id']} {a['cx']:.6f} {a['cy']:.6f} {a['w']:.6f} {a['h']:.6f}\n" for a in item["annotations"])
+            atomic_write_bytes(label, body.encode("utf-8"))
+        manifest_path = version_dir / "manifest.json"
+        payload = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
+        atomic_write_bytes(manifest_path, payload)
+    except Exception:
+        db.rollback()
+        version.state = "failed"
+        db.commit()
+        raise
 
     by_path = {asset.relative_path: asset for asset in assets}
     for item in manifest["assets"]:

@@ -25,7 +25,8 @@ def build_info() -> dict:
     payload: dict = {
         "code_sha": os.environ.get("BYSJ_CODE_SHA", "unknown"),
         "build_time": os.environ.get("BYSJ_BUILD_TIME", "unknown"),
-        "requirements_lock_sha256": _lock_hash(REPO_ROOT / "backend" / "requirements.lock.txt"),
+        "requirements_lock_sha256": _lock_hash(REPO_ROOT / "backend" / "requirements-core-linux-py312.lock.txt"),
+        "ml_lock_sha256": _lock_hash(REPO_ROOT / "backend" / "requirements-ml-linux-py312-cu124.lock.txt"),
     }
     candidate = REPO_ROOT / "version.json"
     if candidate.exists():
@@ -33,4 +34,10 @@ def build_info() -> dict:
             payload.update(json.loads(candidate.read_text(encoding="utf-8")))
         except (json.JSONDecodeError, OSError):
             payload["version_file"] = "invalid"
+    # Runtime source identity overrides metadata inherited from a stale image.
+    if os.environ.get("BYSJ_CODE_SHA"):
+        payload["code_sha"] = os.environ["BYSJ_CODE_SHA"]
+    # Dependency identity belongs to the mounted/built source, not stale JSON.
+    payload["requirements_lock_sha256"] = _lock_hash(REPO_ROOT / "backend" / "requirements-core-linux-py312.lock.txt")
+    payload["ml_lock_sha256"] = _lock_hash(REPO_ROOT / "backend" / "requirements-ml-linux-py312-cu124.lock.txt")
     return payload

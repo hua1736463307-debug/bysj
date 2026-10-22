@@ -4,6 +4,45 @@ from __future__ import annotations
 import support
 
 
+def test_admin_can_restore_deleted_draft_asset(client, researcher_headers, admin_headers):
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
+    asset = client.get(f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}", headers=researcher_headers).json()["data"]["items"][0]
+    route = f"/api/v1/assets/{asset['asset_id']}"
+    assert client.delete(route, headers=researcher_headers).status_code == 200
+    assert client.get(route + "/image", headers=researcher_headers).status_code == 404
+    assert client.post(route + "/restore", headers=researcher_headers).status_code == 403
+    assert client.post(route + "/restore", headers=admin_headers).status_code == 200
+    assert client.get(route + "/image", headers=researcher_headers).status_code == 200
+
+
+def test_freeze_rejects_missing_root_without_writing_cwd(client, researcher_headers, db):
+    from app.db.models import DatasetVersion
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
+    version = db.get(DatasetVersion, version_id)
+    version.root_path = ""
+    db.commit()
+    result = support.freeze(client, researcher_headers, dataset_id, version_id=version_id).json()["data"]
+    assert result["status"] == "failed"
+    assert result["error"]["code"] == "invalid_version_root"
+
+
+def test_freeze_io_failure_is_retryable(client, researcher_headers, db, monkeypatch):
+    from app.db.models import DatasetVersion
+    from app.domains.datasets import version_service
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=6)
+    original_write = version_service.atomic_write_bytes
+    def disk_failure(*args, **kwargs):
+        raise OSError("simulated disk full")
+    monkeypatch.setattr(version_service, "atomic_write_bytes", disk_failure)
+    result = support.freeze(client, researcher_headers, dataset_id, version_id=version_id).json()["data"]
+    assert result["status"] == "failed"
+    db.expire_all()
+    assert db.get(DatasetVersion, version_id).state == "failed"
+    monkeypatch.setattr(version_service, "atomic_write_bytes", original_write)
+    retried = support.freeze(client, researcher_headers, dataset_id, version_id=version_id).json()["data"]
+    assert retried["status"] == "completed", retried
+
+
 def test_import_creates_draft_version_with_annotations(client, researcher_headers):
     dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
     detail = client.get(f"/api/v1/datasets/{dataset_id}", headers=researcher_headers).json()["data"]

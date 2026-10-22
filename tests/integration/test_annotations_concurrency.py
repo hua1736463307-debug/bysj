@@ -51,7 +51,7 @@ def test_freeze_uses_saved_labels_and_rejects_late_save(sessions, tmp_path):
     with sessions() as db:
         save_annotations(db, asset_id, USER, expected_revision=0, boxes=[BOX])
         version = db.get(DatasetVersion, version_id)
-        freeze_version(db, get_settings(), version=version, seed=42, ratios=[.8, .1, .1])
+        freeze_version(db, get_settings().model_copy(update={"data_root": tmp_path.parent}), version=version, seed=42, ratios=[.8, .1, .1])
         manifest = json.loads((tmp_path / "manifest.json").read_text())
         assert manifest["assets"][0]["annotations"][0]["w"] == .4
         assert (tmp_path / "labels/0.txt").read_text().strip() == "0 0.500000 0.500000 0.400000 0.400000"
@@ -71,7 +71,7 @@ def test_simultaneous_freeze_only_one_winner(sessions, tmp_path):
             version = db.get(DatasetVersion, version_id)
             barrier.wait(10)
             try:
-                return freeze_version(db, get_settings(), version=version, seed=42, ratios=[.8,.1,.1])["state"]
+                return freeze_version(db, get_settings().model_copy(update={"data_root": tmp_path.parent}), version=version, seed=42, ratios=[.8,.1,.1])["state"]
             except ApiError as exc:
                 return exc.code
     with ThreadPoolExecutor(2) as pool:

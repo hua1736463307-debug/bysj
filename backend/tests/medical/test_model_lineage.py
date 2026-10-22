@@ -4,6 +4,27 @@ from __future__ import annotations
 import support
 
 
+def test_evaluation_idempotency_reuses_run_and_rejects_changed_params(client, researcher_headers):
+    version_id, model_id, _ = _train(client, researcher_headers)
+    body = {"model_id":model_id,"dataset_version_id":version_id,"split":"val","idempotency_key":"stable-eval"}
+    first = client.post("/api/v1/evaluations",headers=researcher_headers,json=body).json()["data"]
+    second = client.post("/api/v1/evaluations",headers=researcher_headers,json=body).json()["data"]
+    assert first["evaluation"]["evaluation_id"] == second["evaluation"]["evaluation_id"]
+    assert first["job"]["job_id"] == second["job"]["job_id"]
+    changed = client.post("/api/v1/evaluations",headers=researcher_headers,json={**body,"params":{"imgsz":320}})
+    assert changed.status_code == 409
+
+
+def test_pending_evaluation_cancellation_updates_domain_state(client, researcher_headers, settings, monkeypatch):
+    version_id, model_id, _ = _train(client, researcher_headers)
+    monkeypatch.setattr(settings,"inline_jobs",False)
+    result = client.post("/api/v1/evaluations",headers=researcher_headers,json={"model_id":model_id,"dataset_version_id":version_id}).json()["data"]
+    job_id=result["job"]["job_id"]
+    assert client.post(f"/api/v1/jobs/{job_id}/cancel",headers=researcher_headers).json()["data"]["status"] == "cancelled"
+    run_id=result["evaluation"]["evaluation_id"]
+    assert client.get(f"/api/v1/evaluations/{run_id}",headers=researcher_headers).json()["data"]["status"] == "cancelled"
+
+
 def _train(client, headers):
     dataset_id, version_id = support.make_dataset(client, headers, count=9)
     job = support.freeze(client, headers, dataset_id, version_id=version_id).json()["data"]

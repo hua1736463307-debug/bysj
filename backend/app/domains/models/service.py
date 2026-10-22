@@ -103,6 +103,7 @@ def register_trained_model(
     class_map: dict,
     metrics: dict,
     backend: str,
+    training_result: dict | None = None,
 ) -> ModelRegistry:
     # The dispatcher holds the current job row lock before this call. A retry
     # after registration but before terminal status must reuse that registration.
@@ -134,7 +135,7 @@ def register_trained_model(
         trusted_source="platform",
         available=True,
         class_map_json={str(k): str(v) for k, v in class_map.items()},
-        metadata_json={"metrics": metrics, "backend": backend},
+        metadata_json={"metrics": metrics, "backend": backend, "training_result": training_result},
     )
     db.add(model)
     db.commit()

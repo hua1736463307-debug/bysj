@@ -123,3 +123,40 @@ def test_cross_user_cannot_read_training_job(client, researcher_headers, db):
     token = client.post("/api/v1/auth/login", json={"username": "other", "password": "other-password"}).json()["data"]["token"]
     response = client.get(f"/api/v1/jobs/{job['job_id']}", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 404
+
+
+def test_recovery_after_registration_does_not_train_or_register_twice(client, researcher_headers, db, settings, monkeypatch):
+    from datetime import timedelta
+    from app.db.base import utcnow
+    from app.db.models import JobTask, ModelRegistry, ExperimentRun
+    from app.domains import job_service
+    from app.domains.training import service as training_service
+    from app.workers.dispatcher import execute_job_inline
+
+    _, version_id = _frozen_dataset(client, researcher_headers)
+    monkeypatch.setattr(settings, "inline_jobs", False)
+    job = client.post("/api/v1/training/jobs", headers=researcher_headers, json=_request(version_id)).json()["data"]
+    original_finish = job_service.finish_job
+    def crash_after_registration(*args, **kwargs):
+        raise RuntimeError("simulated crash before terminal commit")
+    monkeypatch.setattr(job_service, "finish_job", crash_after_registration)
+    import pytest
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        execute_job_inline(job["job_id"])
+    assert db.query(ModelRegistry).filter_by(training_job_id=job["job_id"]).count() == 1
+    original_model = db.query(ModelRegistry).filter_by(training_job_id=job["job_id"]).one()
+    row = db.get(JobTask, job["job_id"])
+    row.lease_expires_at = utcnow() - timedelta(seconds=10)
+    row.heartbeat_at = utcnow() - timedelta(seconds=10)
+    db.commit()
+    assert job_service.mark_stale_interrupted(db, older_than_seconds=0, job_id=row.id) == 1
+    job_service.pause_for_resume(db, row)
+    monkeypatch.setattr(job_service, "finish_job", original_finish)
+    def forbidden_train(*args, **kwargs):
+        raise AssertionError("training must not repeat after model registration")
+    monkeypatch.setattr(training_service, "train", forbidden_train)
+    assert execute_job_inline(row.id) == "completed"
+    db.expire_all()
+    assert db.get(JobTask, row.id).result_json["model_id"] == original_model.id
+    assert db.query(ModelRegistry).filter_by(training_job_id=row.id).count() == 1
+    assert db.query(ExperimentRun).filter_by(training_job_id=row.id).count() == 1

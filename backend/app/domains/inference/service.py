@@ -13,10 +13,12 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser
 from app.core.config import Settings
 from app.core.errors import ApiError
-from app.core.storage import ensure_dir, normalize_relative
+from app.core.storage import ensure_dir, normalize_relative, resolve_under
 from app.db.models import ArtifactRecord, DatasetAsset, InferenceItem, InferencePrediction, InferenceRun
 from app.domains.datasets import service as dataset_service
 from app.domains.models import service as model_service
+from app.schemas.inference import InferenceParams
+from pydantic import ValidationError
 
 
 def create_run(
@@ -29,6 +31,10 @@ def create_run(
     asset_ids: list[int] | None = None,
     params: dict | None = None,
 ) -> InferenceRun:
+    try:
+        params = InferenceParams.model_validate(params or {}).model_dump()
+    except ValidationError as exc:
+        raise ApiError(422, "invalid_params", str(exc)) from exc
     model = model_service.get_model(db, model_id, user)
     model_service.verify_model_file(model, settings)
 
@@ -153,7 +159,14 @@ def resolve_item_path(db: Session, settings: Settings, item: InferenceItem) -> P
         from app.db.models import DatasetVersion
 
         version = db.get(DatasetVersion, asset.dataset_version_id)
-        return Path(version.root_path) / "images" / asset.relative_path
+        if version is None or asset.deleted_at is not None or version.deleted_at is not None:
+            raise ApiError(404, "not_found", "源图像不存在")
+        root = Path(version.root_path).resolve()
+        try:
+            root.relative_to(Path(settings.data_root).resolve())
+        except ValueError as exc:
+            raise ApiError(409, "invalid_path", "输入路径越界") from exc
+        return resolve_under(root / "images", asset.relative_path, must_exist=True)
     path = Path(item.image_relative_path or "")
     try:
         path.resolve().relative_to(Path(settings.data_root).resolve())

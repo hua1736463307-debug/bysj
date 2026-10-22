@@ -54,6 +54,7 @@ class JobContext:
         )
 
     def event(self, event_type: str, message: str, payload: dict | None = None) -> None:
+        self.lock_for_write()
         job_service.append_event(self.db, self.job, event_type, message, payload)
 
     def check_cancelled(self) -> None:

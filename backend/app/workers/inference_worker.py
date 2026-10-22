@@ -40,7 +40,10 @@ def handle_inference(ctx: JobContext) -> dict:
 
     class_map = model.class_map_json or {}
     adapter = get_adapter(ctx.settings)
+    gpu_wait_start = time.perf_counter()
     holder = _acquire_gpu(ctx)
+    gpu_wait_ms = (time.perf_counter() - gpu_wait_start) * 1000
+    queue_ms = max(0, (ctx.job.started_at - ctx.job.created_at).total_seconds() * 1000) if ctx.job.started_at else None
     handle = None
     try:
         load_start = time.perf_counter()
@@ -74,8 +77,10 @@ def handle_inference(ctx: JobContext) -> dict:
                 ctx.event("item_failed", f"第 {index} 张失败", {"item_id": item.id})
                 continue
             process_ms = (time.perf_counter() - process_start) * 1000
-
-            target = ensure_dir(Path(ctx.settings.artifact_root) / "inference" / run.id) / f"{item.id}.jpg"
+            storage_start = time.perf_counter()
+            # An obsolete attempt may finish rendering after losing ownership;
+            # isolate its file so it cannot overwrite the accepted artifact.
+            target = ensure_dir(Path(ctx.settings.artifact_root) / "inference" / run.id / str(ctx.attempt)) / f"{item.id}.jpg"
             try:
                 inference_service.save_annotated_image(source, predictions, target)
             except Exception:
@@ -116,11 +121,20 @@ def handle_inference(ctx: JobContext) -> dict:
             item.status = "completed"
             item.error = None
             item.image_sha256 = item.image_sha256 or None
+            measured = getattr(adapter, "last_timing", {})
             item.timing_json = {
-                "queue_ms": 0.0,
+                **measured,
+                "queue_ms": queue_ms,
+                "gpu_wait_ms": round(gpu_wait_ms, 3),
                 "load_ms": round(load_ms, 3) if index == 1 else 0.0,
-                "model_ms": round(process_ms, 3),
-                "total_ms": round(process_ms, 3),
+                "model_ms": measured.get("inference_ms"),
+                "predict_wall_ms": round(process_ms, 3),
+                "storage_ms": round((time.perf_counter() - storage_start) * 1000, 3),
+                "processing_ms": round((time.perf_counter() - process_start) * 1000, 3),
+                "total_ms": max(0, (utcnow() - run.created_at).total_seconds() * 1000),
+                "phase": "cold_model" if index == 1 else "warm_model",
+                "definition": "total: accepted run to item persistence start; queue: job creation to claim; GPU wait is separate; model: framework synchronized inference only",
+                "missing_reason": "dummy backend has no measured GPU kernel interval" if adapter.backend == "dummy" else None,
             }
             item.finished_at = utcnow()
             run.completed_count = int(run.completed_count or 0) + 1

@@ -19,7 +19,21 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
 from app.db.base import utcnow
-from app.db.models import JobEvent, JobTask
+from app.db.models import JobEvent, JobTask, InferenceRun, EvaluationRun
+
+
+def _sync_domain_state(db: Session, job: JobTask, status: str) -> None:
+    model, key = {"inference": (InferenceRun, "run_id"), "evaluation": (EvaluationRun, "evaluation_id")}.get(job.type, (None, None))
+    if model is None or status == "completed":
+        return  # Successful handlers retain their completed/partial result.
+    target = (job.input_json or {}).get(key)
+    if target:
+        values = {"status": status, "job_id": job.id}
+        if status in {"failed", "cancelled", "interrupted"}:
+            values["finished_at"] = utcnow()
+        elif status in {"pending", "running"}:
+            values["finished_at"] = None
+        db.query(model).filter(model.id == target).update(values, synchronize_session=False)
 
 TERMINAL_STATES = {"completed", "failed", "cancelled"}
 ACTIVE_STATES = {"pending", "running", "cancelling", "interrupted"}
@@ -204,6 +218,8 @@ def claim_job(
                 synchronize_session=False,
             )
         )
+        if updated:
+            _sync_domain_state(db, candidate, "running")
         db.commit()
         if updated:
             db.refresh(candidate)
@@ -312,9 +328,11 @@ def _apply_terminal(db: Session, job: JobTask, target: str, *, message: str, res
     if target in {"completed", "failed", "cancelled"}:
         values["progress"] = 1.0 if target == "completed" else job.progress
     changed = query.update(values, synchronize_session=False)
-    db.commit()
     if not changed:
+        db.rollback()
         raise ApiError(409, "lease_lost", "任务状态或租约已变化，拒绝写入终态")
+    _sync_domain_state(db, job, target)
+    db.commit()
     db.refresh(job)
     append_event(db, job, target, message, result or {})
 
@@ -333,6 +351,8 @@ def cancel_job(db: Session, job: JobTask) -> JobTask:
         changed = db.query(JobTask).filter(JobTask.id == job.id, JobTask.status == job.status,
             JobTask.attempt == job.attempt).update(dict(status="cancelling", cancel_requested=True,
             message="已请求取消，等待执行进程退出"), synchronize_session=False)
+        if changed:
+            _sync_domain_state(db, job, "cancelling")
         db.commit()
         db.refresh(job)
         if not changed:
@@ -344,7 +364,7 @@ def cancel_job(db: Session, job: JobTask) -> JobTask:
     raise ApiError(409, "invalid_transition", f"当前状态不可取消: {job.status}")
 
 
-def mark_stale_interrupted(db: Session, *, older_than_seconds: int = 300) -> int:
+def mark_stale_interrupted(db: Session, *, older_than_seconds: int = 300, job_id: str | None = None) -> int:
     """把租约过期且心跳超时的 running 任务标为 interrupted（不改写活跃 worker）。"""
     now = utcnow()
     cutoff = now - timedelta(seconds=older_than_seconds)
@@ -353,6 +373,7 @@ def mark_stale_interrupted(db: Session, *, older_than_seconds: int = 300) -> int
         .filter(JobTask.status.in_(["running", "cancelling"]))
         .filter((JobTask.lease_expires_at.is_(None)) | (JobTask.lease_expires_at < now))
         .filter((JobTask.heartbeat_at.is_(None)) | (JobTask.heartbeat_at < cutoff))
+        .filter(JobTask.id == job_id if job_id is not None else True)
         .all()
     )
     count = 0
@@ -362,6 +383,8 @@ def mark_stale_interrupted(db: Session, *, older_than_seconds: int = 300) -> int
             (JobTask.lease_expires_at.is_(None)) | (JobTask.lease_expires_at < now),
             (JobTask.heartbeat_at.is_(None)) | (JobTask.heartbeat_at < cutoff),
         ).update(dict(status="interrupted", stage="interrupted", message="worker 心跳超时，任务中断"), synchronize_session=False)
+        if changed:
+            _sync_domain_state(db, job, "interrupted")
         db.commit()
         if changed:
             count += 1
@@ -374,17 +397,15 @@ def pause_for_resume(db: Session, job: JobTask) -> JobTask:
     db.refresh(job)
     if job.status != "interrupted":
         raise ApiError(409, "invalid_transition", "只有 interrupted 任务可以重新排队")
-    job.status = "pending"
-    job.stage = "queued"
-    job.attempt = int(job.attempt or 1) + 1
-    job.cancel_requested = False
-    job.lease_owner = None
-    job.lease_expires_at = None
-    job.started_at = None
-    job.finished_at = None
-    job.error_code = None
-    job.error_detail = None
-    job.message = "任务重新排队"
+    changed = db.query(JobTask).filter(JobTask.id == job.id, JobTask.status == "interrupted",
+        JobTask.attempt == job.attempt).update(dict(status="pending", stage="queued", attempt=job.attempt + 1,
+        cancel_requested=False, lease_owner=None, lease_expires_at=None, started_at=None, finished_at=None,
+        error_code=None, error_detail=None, message="任务重新排队"), synchronize_session=False)
+    if not changed:
+        db.rollback()
+        raise ApiError(409, "state_changed", "任务状态已变化，请刷新")
+    _sync_domain_state(db, job, "pending")
     db.commit()
+    db.refresh(job)
     append_event(db, job, "requeued", "任务重新排队", {"attempt": job.attempt})
     return job

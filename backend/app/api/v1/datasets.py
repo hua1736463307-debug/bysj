@@ -319,6 +319,6 @@ def restore_asset(
 ):
     if not user.is_admin:
         raise ApiError(403, "forbidden", "只有管理员可以恢复资产")
-    asset = service.get_asset(db, asset_id, user)
+    asset = service.get_asset(db, asset_id, user, include_deleted=True)
     service.restore_asset(db, asset)
     return ok({"asset_id": asset_id, "restored": True}, message="图像资产已恢复")
