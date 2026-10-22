@@ -16,7 +16,7 @@ from pathlib import Path
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 DEV_JWT_SECRET = "dev-only-secret-change-me-bysj-medical-0123456789"
 
@@ -87,12 +87,18 @@ class Settings(BaseSettings):
         if not os.environ.get("MODEL_ROOT") and os.environ.get("TRAINING_LOG_ROOT"):
             self.model_root = Path(os.environ["TRAINING_LOG_ROOT"]).resolve()
         if not self.database_url:
+            if self.is_production:
+                raise ValueError("DATABASE_URL 必须在生产环境显式配置为 PostgreSQL")
             self.database_url = f"sqlite:///{(REPO_ROOT / '.data' / 'bysj.db').as_posix()}"
+        if self.is_production and not self.database_url.startswith(("postgresql://", "postgresql+psycopg://")):
+            raise ValueError("生产环境必须使用 PostgreSQL")
+        if self.is_production and self.inline_jobs:
+            raise ValueError("生产环境必须使用独立 worker，INLINE_JOBS 必须为 false")
         if not self.jwt_secret_key:
-            if self.app_env in {"production"}:
+            if self.is_production:
                 raise ValueError("JWT_SECRET_KEY 必须在生产环境显式配置且不少于 32 字符")
             self.jwt_secret_key = DEV_JWT_SECRET
-        if len(self.jwt_secret_key) < 32 and self.app_env == "production":
+        if (len(self.jwt_secret_key) < 32 or self.jwt_secret_key == DEV_JWT_SECRET) and self.is_production:
             raise ValueError("JWT_SECRET_KEY 必须不少于 32 字符")
         return self
 
@@ -107,6 +113,9 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    # Test processes must not inherit an unrelated local deployment's dotenv.
+    if os.environ.get("APP_ENV", "").lower() == "test":
+        return Settings(_env_file=None)
     return Settings()
 
 

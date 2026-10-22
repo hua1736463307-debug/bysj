@@ -1,0 +1,9 @@
+# Preserve the locally verified GPU tuple while adding bysj's missing runtime/tools.
+torch==2.6.0+cu124
+torchvision==0.21.0+cu124
+ultralytics==8.4.53
+numpy==2.4.4
+fastapi==0.136.1
+pydantic==2.13.4
+SQLAlchemy==2.0.49
+psycopg==3.3.4

@@ -1,35 +1,14 @@
-# 医学图像智能分析训推平台 · 重构执行基线
+# 医学图像智能分析训推平台
 
-课题：**面向医学图像智能分析的深度学习训推一体化平台设计与实现**。执行模型：**deepseek-v4.1-flash**。
+用于公开医学图像的教学与实验：导入、BBox 标注、不可变三集版本、异步训练、独立评估、模型管理、批量推理、人工复核与训练集反馈。
 
-本版本交付现有源码与详细重构任务书。业务重构尚未执行；不能把任务书、原有测试报告或本次文档验证当作医学平台已经完成。
+当前权威入口为 `backend/app/main.py` 和 Vue 六个业务页面。旧行业后端、姿态/监控/告警入口已按引用清单清退，历史源码仍在 Git 中。继续实施的状态、证据和未完成项见 [续作状态](docs/refactor/execution/unblock/STATUS.md)；此文件不代表全部毕业实验已经完成。
 
-## 从这里开始
+- [运行手册](docs/runbook.md)：部署、独立 worker、健康检查及故障恢复。
+- [开发说明](docs/DEVELOPMENT.md)：Python 3.12、目标平台锁、测试和前端构建。
+- [架构](docs/architecture.md) / [API](docs/api.md) / [数据库](docs/database.md)。
+- [续作计划](docs/refactor/execution/unblock/PLAN.md) / [原始任务书](docs/refactor/TASK_BOOK.md) / [原始需求](docs/requirements/医学信息系统开发_v1.0.md)。
 
-1. 阅读 [执行入口与可直接复制的指令](docs/refactor/START_HERE.md)。
-2. 按 [详细任务书](docs/refactor/TASK_BOOK.md) 的 PR-00 至 PR-09 顺序实施。
-3. 实现时遵循 [接口、数据库和数据治理契约](docs/refactor/CONTRACTS.md)，按 [验证与验收](docs/refactor/ACCEPTANCE.md) 提交证据。
-4. 查看 [现状审查](docs/refactor/BASELINE_AUDIT.md)、[需求追踪](docs/refactor/TRACEABILITY.md)、[源码锚点](docs/refactor/SOURCE_ANCHORS.md)、[待创建脚本规范](docs/refactor/EXECUTION_ASSETS.md) 和 [机器可读基线](docs/refactor/baseline-manifest.json)。
+当前已实测候选 GPU 环境、PG 并发、取消/崩溃/断库恢复及浏览器闭环。正式干净镜像、完整 E1–E4 与备份恢复分别以续作状态为准，未验收部分不写成通过。合成旧 schema 迁移已通过；真实旧库副本兼容性尚未验证。
 
-用户提供的 [原始需求文档](docs/requirements/医学信息系统开发_v1.0.md) 原样保存。文档中的旧仓库名、旧审查结论及面向 Codex 的指令，与本次用户请求分开处理；当前执行入口及审查说明明确了适用范围。
-
-## 源码来源与保留范围
-
-本次在线核对源仓库为 [xtythpt](https://github.com/hua1736463307-debug/xtythpt)，固定提交 `aa331df0657ad4ffcf3c105f9ba52b7e159deb2a`。目标仓库既有提交 `401cef475718e6adb00007b5e4d1b1c921ed91c4` 已从这一提交筛选代码，具有 192 个文件；173 个与源仓库 Git blob 完全相同，14 个经过适配，5 个是目标独有文档。
-
-新基线在上述目标提交上追加任务交付，不覆盖已完成的脱敏与简化导航，不重新引入源仓库排除项，不重写历史。`backend/`、`frontend/`、许可证和现有环境示例保持原有内容。原筛选说明与历史验证记录保留供追溯。
-
-## 本次范围
-
-- P0：公开医学图像导入、BBox 标注、不可变版本与分组划分、YOLO 检测训练、独立评估、模型血缘、图像推理与导出、登录权限、独立部署。
-- P1 必做闭环：人工复核 → 新训练版本 → 再训练 → 固定独立测试集对比。
-- 可选项：实例分割；DICOM、主动学习、多模型和复杂调度排在核心验收之后。
-- 不纳入：摄像头/NVR、九宫格监控、行为告警、人脸抓拍、外部告警推送、真实患者数据、临床诊断。
-
-现有后端仍有公司业务耦合模块和启动钩子，不能直接作为已经剥离完成的医学系统运行。后续仅在独立实验环境实施；不连接原生产服务器。
-
-## 验证边界
-
-本次验证源码对象、文件锚点、需求覆盖、任务依赖、文档链接、交付基线与远端发布一致性。未进行 Docker/GPU/PostgreSQL 启动、真实训练或医学评估。历史记录中的 97 项后端测试、24 项前端测试及前端构建结果属于此前筛选阶段，本次没有重跑，不代表洁净部署已通过。
-
-原许可见 [LICENSE](LICENSE)。未来代码修改使用独立分支和可审阅 PR；学校模板、成果认定、代码展示范围保留为交付记录，不由 AI 虚构结论。
+源码源于 [xtythpt](https://github.com/hua1736463307-debug/xtythpt) 的筛选基线，再沿 bysj 历史连续重构。保留许可证、来源记录和历史提交；本项目不连接原生产系统，不包含患者数据或模型权重。原始资料和历史执行记录中的旧路径仅供追溯，启动以本手册为准。

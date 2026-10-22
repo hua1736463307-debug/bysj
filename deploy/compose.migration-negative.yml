@@ -1,0 +1,4 @@
+# Isolated validation only: use a new project, volume prefix and unused ports.
+services:
+  migrate:
+    command: ["python", "-m", "alembic", "-c", "/opt/bysj/backend/alembic.ini", "upgrade", "intentionally_missing_revision"]

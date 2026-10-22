@@ -1,0 +1,3 @@
+# Test and CLI tooling; resolved together with runtime inputs on Linux Python 3.12.
+pytest>=8,<9
+httpx>=0.27,<1

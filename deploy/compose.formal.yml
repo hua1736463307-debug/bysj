@@ -1,0 +1,14 @@
+# Prebuilt clean images. Do not combine this override with compose.candidate.yml.
+services:
+  migrate:
+    image: ${BYSJ_API_IMAGE:?set verified clean API image}
+  api:
+    image: ${BYSJ_API_IMAGE:?set verified clean API image}
+  dataset-worker:
+    image: ${BYSJ_API_IMAGE:?set verified clean API image}
+  worker:
+    image: ${BYSJ_WORKER_IMAGE:?set verified clean GPU image}
+  inference-worker:
+    image: ${BYSJ_WORKER_IMAGE:?set verified clean GPU image}
+  frontend:
+    image: ${BYSJ_FRONTEND_IMAGE:?set verified frontend image}

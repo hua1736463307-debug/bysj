@@ -1,13 +1,25 @@
-> 历史筛选阶段记录，保留追溯。当前医学方向、实施范围和详细任务已由 [重构执行入口](refactor/START_HERE.md) 与 [详细任务书](refactor/TASK_BOOK.md) 明确；下文的“题目未定/后续确定”等描述不再作为当前计划。
+# 开发说明
 
-# 开发与环境边界
+## 当前入口与环境
 
-本次目标是代码筛选与保存，尚未完成独立部署重构。前端为 Vue 3/Vite 4，后端为 FastAPI、SQLAlchemy、PyTorch、Ultralytics；保留原依赖声明，不宣称已锁定可复现版本。
+后端唯一入口 `app.main:app`；`python backend/start_api.py` 是同一入口的本机启动包装。先执行 Alembic，再分别启动 dataset/trainer/inference worker。API 不导入 Torch，也不启动行业模块。
 
-创建独立 Python 环境后安装 `backend/requirements.txt`，另装 pytest 才能运行测试。前端使用 `npm ci`。PyTorch/CUDA 版本应按实际开发机单独确定；本仓库没有模型权重或数据集。
+正式目标为 Linux amd64 / Python 3.12。`requirements-core-linux-py312.lock.txt` 用于 API，`requirements-test-linux-py312.lock.txt` 包含测试工具，`requirements-ml-linux-py312-cu124.lock.txt` 用于真实 GPU worker。锁是实际 Linux pip report 的完整图和 wheel SHA256；Windows 本机环境不等价于正式 Linux 验收。
 
-`.env.example` 仅列配置名称；复制为 `.env` 后自行设置密钥及独立 PostgreSQL 连接。代码不自动加载所有进程的根目录 `.env`，启动方式需要显式传入环境。空数据库首次初始化要求管理员账号和非默认密码。训练任务还需要独立训练 worker，入口为 `backend/start_training_worker.py`；增强入口为 `backend/start_dataset_augmentation_worker.py`。当前不会仅因启动前端就完成训练任务。
+```sh
+python -m pip install --require-hashes -r backend/requirements-test-linux-py312.lock.txt
+python -m pip check
+PYTHONPATH=backend APP_ENV=test python -m pytest backend/tests/medical backend/tests/test_app_factory_auth.py scripts/tests -q
+```
 
-原单体后端仍带额外模块路由和启动钩子，需要按重构计划解除。部分工具使用固定 `/app/static`、`/app/runs` 或相对工作目录；隔离测试提供空临时目录，不代表这些路径已经可移植。现阶段不提供可能误导的生产 Compose 或“一键可部署”承诺。
+旧行为对照从 Git 固定提交 `113181f498bac6d16988f97261ad628c9cdc8ea8` 读取纯函数，CI 需要完整历史。离线容器可先执行 `python scripts/export_legacy_fixtures.py --output .runtime/legacy-fixtures`，再把 `BYSJ_LEGACY_FIXTURES` 指向导出目录；逐文件 hash 校验，不加载旧应用启动逻辑，不把历史源码装入运行镜像。
 
-验证使用完全独立的只读候选源码、临时 SQLite、空数据/输出目录、CPU、无网络；依赖来自已有兼容镜像，结果不能替代新环境安装、PostgreSQL worker、真实训练和 GPU 验收。测试报告与来源清单在 `docs/`。
+PostgreSQL 集成测试独立于 SQLite fixture：设置专用本地 `BYSJ_TEST_DATABASE_URL`，数据库名必须以 `bysj_test_` 开头，然后执行 `PYTHONPATH=backend python -m pytest tests/integration -q`。每次用随机 schema，Alembic 初始化，不得指向共享库。
+
+前端使用 Node 22：在 `frontend/` 执行 `npm ci`、`npm test`、`npm run build`。浏览器用例需要真实独立后端、数据及用户，配置 `BYSJ_E2E_URL`、`BYSJ_E2E_USERNAME`、`BYSJ_E2E_PASSWORD`、`BYSJ_E2E_DATA` 后执行 `npm run test:e2e`；具体变量以 e2e 文件为准，凭据仅放进程环境。
+
+## 本机开发
+
+根目录 `.env.example` 用于非 Docker 开发；Compose 使用 `deploy/.env.example`。不要把容器内 `/data` 等路径照搬到 Windows 本机。生产配置必须显式 PostgreSQL、足够长的非开发 JWT 密钥、`INLINE_JOBS=false`。测试模式不读取本地部署 dotenv。
+
+数据、权重、下载缓存、数据库副本、认证信息和 Playwright trace 均不提交。实验配置、代码 SHA、锁 hash、数据版本与初始权重 hash 必须可追溯；正式协议冻结后不能按 test 指标调参。

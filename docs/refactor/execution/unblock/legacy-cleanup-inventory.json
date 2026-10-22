@@ -1,0 +1,1659 @@
+{
+  "baseline": "113181f498bac6d16988f97261ad628c9cdc8ea8",
+  "mode": "inventory_only",
+  "candidate_count": 163,
+  "files": [
+    {
+      "file": "backend/admin_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/alarm_flow.py",
+      "references": [
+        "backend/algorithm_catalog.py",
+        "backend/inference_service/catalog.py",
+        "backend/monitoring_policy.py",
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/inference.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/alarm_push.py",
+      "references": [
+        "backend/behavior/event_store.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/algorithm_catalog.py",
+      "references": [
+        "backend/continuous_monitoring.py",
+        "backend/database.py",
+        "backend/inference_service/catalog.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_workspace.py",
+        "backend/pose_training/image_routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/annotation_class_aliases.py",
+      "references": [
+        "backend/annotation_export.py",
+        "backend/dataset_versioning.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/annotation_draft_batches.py",
+      "references": [
+        "backend/tests/test_annotation_draft_completeness.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/annotation_drafts.py",
+      "references": [
+        "backend/annotation_draft_batches.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/annotation_export.py",
+      "references": [
+        "backend/dataset_augmentation_jobs.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/annotation_session_classes.py",
+      "references": [
+        "backend/dataset_augmentation_jobs.py",
+        "backend/tests/test_annotation_session_isolation.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/auth_audit.py",
+      "references": [
+        "backend/system_admin_routes.py",
+        "backend/tests/test_auth_audit.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/auth_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/auth_utils.py",
+      "references": [
+        "backend/admin_routes.py",
+        "backend/alarm_push.py",
+        "backend/algorithm_catalog.py",
+        "backend/auth_routes.py",
+        "backend/behavior/event_routes.py",
+        "backend/continuous_monitoring.py",
+        "backend/face_capture/routes.py",
+        "backend/inference_service/router.py",
+        "backend/monitoring_webrtc.py",
+        "backend/monitoring_workspace.py",
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/routes.py",
+        "backend/recorder_config.py",
+        "backend/system_admin_routes.py",
+        "backend/system_fault_routes.py",
+        "backend/system_log_routes.py",
+        "backend/tests/test_role_consistency.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/__init__.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/action_classifier.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/verifier_runtime.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/analyzer.py",
+      "references": [
+        "backend/behavior/__init__.py",
+        "backend/behavior/batch_jobs.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/batch_jobs.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/clip_extractor.py",
+      "references": [
+        "backend/behavior/analyzer.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/event_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/event_store.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/behavior/event_routes.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/evidence.py",
+      "references": [
+        "backend/alarm_flow.py",
+        "backend/behavior/runtime.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/fall_posture.py",
+      "references": [
+        "backend/alarm_flow.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/feedback_mapping.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/event_routes.py",
+        "backend/behavior/realtime_engine.py",
+        "backend/behavior/temporal_fusion.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/object_tracker.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/runtime.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/pose_clip_extractor.py",
+      "references": [
+        "backend/behavior/action_classifier.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/pose_feature_encoder.py",
+      "references": [
+        "backend/behavior/action_classifier.py",
+        "backend/behavior/pose_clip_extractor.py",
+        "backend/behavior/pose_image_extractor.py",
+        "backend/behavior/realtime_engine.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/pose_image_extractor.py",
+      "references": [
+        "backend/behavior/action_classifier.py",
+        "backend/behavior/pose_clip_extractor.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/realtime_engine.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/batch_jobs.py",
+        "backend/behavior/event_routes.py",
+        "backend/behavior/event_store.py",
+        "backend/behavior/runtime.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/realtime_queue.py",
+      "references": [
+        "backend/behavior/event_routes.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/rules.py",
+      "references": [
+        "backend/alarm_push.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/runtime.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/sample_manager.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/temporal_fusion.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/behavior/temporal_runtime.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/temporal_runtime.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/runtime.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/verifier_runtime.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior/video_output.py",
+      "references": [
+        "backend/behavior/analyzer.py",
+        "backend/behavior/clip_extractor.py",
+        "backend/behavior/evidence.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/behavior_worker_health.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/continuous_monitoring.py",
+      "references": [
+        "backend/algorithm_catalog.py",
+        "backend/inference_service/catalog.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_workspace.py",
+        "backend/pose_training/image_routes.py",
+        "backend/recorder_config.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/continuous_monitoring_grid.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/credential_crypto.py",
+      "references": [
+        "backend/recorder_config.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/database.py",
+      "references": [
+        "backend/admin_routes.py",
+        "backend/alarm_push.py",
+        "backend/algorithm_catalog.py",
+        "backend/annotation_draft_batches.py",
+        "backend/annotation_drafts.py",
+        "backend/auth_audit.py",
+        "backend/auth_routes.py",
+        "backend/auth_utils.py",
+        "backend/behavior/batch_jobs.py",
+        "backend/behavior/event_routes.py",
+        "backend/behavior/event_store.py",
+        "backend/behavior/temporal_runtime.py",
+        "backend/behavior/verifier_runtime.py",
+        "backend/continuous_monitoring.py",
+        "backend/continuous_monitoring_grid.py",
+        "backend/dataset_access.py",
+        "backend/dataset_augmentation_jobs.py",
+        "backend/dataset_augmentation_worker_service.py",
+        "backend/dataset_versioning.py",
+        "backend/face_capture/camera.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/sampling.py",
+        "backend/inference_service/catalog.py",
+        "backend/inference_service/router.py",
+        "backend/job_store.py",
+        "backend/log_utils.py",
+        "backend/model_lifecycle.py",
+        "backend/model_registry.py",
+        "backend/model_usage.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_webrtc.py",
+        "backend/monitoring_workspace.py",
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/jobs.py",
+        "backend/pose_training/routes.py",
+        "backend/pose_training/worker.py",
+        "backend/recorder_config.py",
+        "backend/recorder_playback.py",
+        "backend/system_admin_routes.py",
+        "backend/system_log_routes.py",
+        "backend/tests/test_annotation_draft_completeness.py",
+        "backend/tests/test_annotation_session_isolation.py",
+        "backend/tests/test_auth_audit.py",
+        "backend/tests/test_dataset_record_deletion.py",
+        "backend/tests/test_model_delete_rollback.py",
+        "backend/training_model_test.py",
+        "backend/training_worker.py",
+        "backend/training_worker_service.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_access.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_augmentation_jobs.py",
+      "references": [
+        "backend/dataset_augmentation_worker_service.py",
+        "backend/tests/test_annotation_session_isolation.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_augmentation_worker_service.py",
+      "references": [
+        "backend/start_dataset_augmentation_worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_config_utils.py",
+      "references": [
+        "backend/dataset_versioning.py",
+        "backend/training_worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_deletion.py",
+      "references": [
+        "backend/model_lifecycle.py",
+        "backend/tests/test_dataset_delete_quarantine.py",
+        "backend/tests/test_model_delete_rollback.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_merge.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/dataset_versioning.py",
+      "references": [
+        "backend/annotation_session_classes.py",
+        "backend/dataset_augmentation_jobs.py",
+        "backend/tests/test_annotation_geometry_filter.py",
+        "backend/tests/test_dataset_record_deletion.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/__init__.py",
+      "references": [
+        "backend/face_capture/detector.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/alarm_gate.py",
+      "references": [
+        "backend/alarm_flow.py",
+        "backend/behavior/runtime.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/assets/LICENSE",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/assets/head_pose_6drepnet360.json",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/camera.py",
+      "references": [
+        "backend/face_capture/manual_test.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/detector.py",
+      "references": [
+        "backend/behavior/runtime.py",
+        "backend/face_capture/alarm_gate.py",
+        "backend/face_capture/manual_test.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/manual_test.py",
+      "references": [
+        "backend/face_capture/routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/models.py",
+      "references": [
+        "backend/face_capture/manual_test.py",
+        "backend/face_capture/push.py",
+        "backend/face_capture/receiver.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/sampling.py",
+        "backend/face_capture/service.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/pose.py",
+      "references": [
+        "backend/face_capture/detector.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/push.py",
+      "references": [
+        "backend/face_capture/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/receiver.py",
+      "references": [
+        "backend/face_capture/push.py",
+        "backend/face_capture/routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/sampling.py",
+      "references": [
+        "backend/face_capture/alarm_gate.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/worker.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/service.py",
+      "references": [
+        "backend/face_capture/push.py",
+        "backend/face_capture/receiver.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/sampling.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/signals.py",
+      "references": [
+        "backend/face_capture/routes.py",
+        "backend/face_capture/sampling.py",
+        "backend/face_capture/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/streams.py",
+      "references": [
+        "backend/face_capture/camera.py",
+        "backend/face_capture/routes.py",
+        "backend/face_capture/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/structure.py",
+      "references": [
+        "backend/face_capture/detector.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/face_capture/worker.py",
+      "references": [
+        "backend/face_capture/routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/gpu_probe_service.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/gpu_runtime.py",
+        "backend/pose_training/gpu.py",
+        "backend/pose_training/jobs.py",
+        "backend/training_worker.py",
+        "backend/utils/inference_utils.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/gpu_runtime.py",
+      "references": [
+        "backend/behavior_worker_health.py",
+        "backend/pose_training/gpu.py",
+        "backend/training_worker.py",
+        "backend/training_worker_health.py",
+        "backend/training_worker_service.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/grid_batch_inference.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/http_access.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/image_augmentation.py",
+      "references": [
+        "backend/dataset_augmentation_jobs.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/image_size_processing.py",
+      "references": [
+        "backend/dataset_versioning.py",
+        "backend/tests/test_image_size_processing.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/inference_service/__init__.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/inference_service/catalog.py",
+      "references": [
+        "backend/algorithm_catalog.py",
+        "backend/continuous_monitoring.py",
+        "backend/inference_service/router.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_workspace.py",
+        "backend/pose_training/image_routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/inference_service/client.py",
+      "references": [
+        "backend/alarm_flow.py",
+        "backend/behavior/runtime.py",
+        "backend/continuous_monitoring.py",
+        "backend/grid_batch_inference.py",
+        "backend/inference_service/catalog.py",
+        "backend/inference_service/router.py",
+        "backend/monitoring_gpu_admission.py",
+        "backend/pose_training/image_routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/inference_service/router.py",
+      "references": [
+        "backend/continuous_monitoring.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/job_store.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/dataset_augmentation_jobs.py",
+        "backend/dataset_augmentation_worker_service.py",
+        "backend/model_lifecycle.py",
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/jobs.py",
+        "backend/pose_training/routes.py",
+        "backend/pose_training/worker.py",
+        "backend/training_worker.py",
+        "backend/training_worker_service.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/log_utils.py",
+      "references": [
+        "backend/admin_routes.py",
+        "backend/auth_routes.py",
+        "backend/auth_utils.py",
+        "backend/system_admin_routes.py",
+        "backend/system_log_routes.py",
+        "backend/tests/test_auth_audit.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/menu_structure_migration.py",
+      "references": [
+        "backend/database.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_capabilities.py",
+      "references": [
+        "backend/model_registry.py",
+        "backend/training_optimization.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_export.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_lifecycle.py",
+      "references": [
+        "backend/tests/test_model_delete_rollback.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_registry.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/training_worker.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_tasks.py",
+      "references": [
+        "backend/algorithm_catalog.py",
+        "backend/inference_service/catalog.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/model_usage.py",
+      "references": [
+        "backend/tests/test_model_delete_rollback.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_gpu_admission.py",
+      "references": [
+        "backend/continuous_monitoring.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_inference.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_live_frames.py",
+      "references": [
+        "backend/face_capture/manual_test.py",
+        "backend/monitoring_workspace.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_menu_migration.py",
+      "references": [
+        "backend/algorithm_catalog.py",
+        "backend/database.py",
+        "backend/menu_structure_migration.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_policy.py",
+      "references": [
+        "backend/behavior/runtime.py",
+        "backend/continuous_monitoring_grid.py",
+        "backend/monitoring_gpu_admission.py",
+        "backend/monitoring_inference.py",
+        "backend/monitoring_workspace.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_webrtc.py",
+      "references": [
+        "backend/continuous_monitoring.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/monitoring_workspace.py",
+      "references": [
+        "backend/continuous_monitoring.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/password_crypto.py",
+      "references": [
+        "backend/face_capture/camera.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_webrtc.py",
+        "backend/monitoring_workspace.py",
+        "backend/recorder_playback.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/phone_badge_geometry.py",
+      "references": [
+        "backend/image_size_processing.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/phone_badge_slicing.py",
+      "references": [
+        "backend/image_size_processing.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/__init__.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/data.py",
+      "references": [
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/inference.py",
+        "backend/pose_training/jobs.py",
+        "backend/pose_training/routes.py",
+        "backend/pose_training/trainer.py",
+        "backend/pose_training/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/features.py",
+      "references": [
+        "backend/pose_training/data.py",
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/inference.py",
+        "backend/pose_training/network.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/gpu.py",
+      "references": [
+        "backend/pose_training/image_routes.py",
+        "backend/pose_training/jobs.py",
+        "backend/pose_training/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/image_routes.py",
+      "references": [
+        "backend/pose_training/routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/inference.py",
+      "references": [
+        "backend/alarm_flow.py",
+        "backend/algorithm_catalog.py",
+        "backend/pose_training/image_routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/jobs.py",
+      "references": [
+        "backend/pose_training/routes.py",
+        "backend/pose_training/worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/network.py",
+      "references": [
+        "backend/pose_training/inference.py",
+        "backend/pose_training/trainer.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/routes.py",
+      "references": [
+        "backend/pose_training/image_routes.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/trainer.py",
+      "references": [
+        "backend/pose_training/jobs.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/pose_training/worker.py",
+      "references": [
+        "backend/pose_training/routes.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/recorder_config.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/recorder_connection.py",
+      "references": [
+        "backend/face_capture/camera.py",
+        "backend/monitoring_policy.py",
+        "backend/monitoring_webrtc.py",
+        "backend/monitoring_workspace.py",
+        "backend/recorder_config.py",
+        "backend/recorder_playback.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/recorder_playback.py",
+      "references": [
+        "backend/behavior/event_routes.py",
+        "backend/recorder_config.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/sql/20260714_dataset_versions.sql",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/sql/20260714_job_tasks.sql",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/sql/20260714_model_registry.sql",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/sql/postgresql_system_management.sql",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/start_dataset_augmentation_worker.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/start_training_worker.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/system_admin_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/system_fault_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/system_faults.py",
+      "references": [
+        "backend/system_fault_routes.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/system_log_routes.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_admin_authorization.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_annotation_draft_completeness.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_annotation_geometry_filter.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_annotation_prompt_classes.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_annotation_session_isolation.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_auth_audit.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_dataset_delete_quarantine.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_dataset_record_deletion.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_image_size_processing.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_model_delete_rollback.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_role_consistency.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/tests/test_yoloe_trainer_profile.py",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_acceptance.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_model_test.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_optimization.py",
+      "references": [
+        "backend/training_worker.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_validation.py",
+      "references": [
+        "backend/training_worker.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_worker.py",
+      "references": [
+        "backend/training_worker_service.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_worker_health.py",
+      "references": [
+        "backend/training_worker_service.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_worker_service.py",
+      "references": [
+        "backend/start_training_worker.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/training_workspace.py",
+      "references": [
+        "backend/training_worker.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/__init__.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/dataset_augmentation_jobs.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/archive_utils.py",
+      "references": [
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/constants.py",
+      "references": [
+        "backend/behavior/batch_jobs.py",
+        "backend/dataset_augmentation_jobs.py",
+        "backend/utils/__init__.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/dataset_utils.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/file_utils.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/image_utils.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/inference_utils.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/result_utils.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/task_manager.py",
+      "references": [
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/utils/video_utils.py",
+      "references": [
+        "backend/face_capture/streams.py",
+        "backend/monitoring_live_frames.py",
+        "backend/utils/__init__.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/yolo_api.py",
+      "references": [
+        "backend/start_api.py",
+        "backend/tests/test_annotation_draft_completeness.py",
+        "backend/tests/test_annotation_session_isolation.py"
+      ],
+      "outside_retirement_set": [
+        "backend/start_api.py"
+      ],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "backend/yolo_trainer.py",
+      "references": [
+        "backend/tests/test_yoloe_trainer_profile.py",
+        "backend/training_worker.py",
+        "backend/utils/inference_utils.py",
+        "backend/yolo_api.py"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/api/api.js",
+      "references": [
+        "frontend/src/components/PoseImageTestPanel.vue",
+        "frontend/src/components/PoseTrainingPanel.vue"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/components/BatchInferencePanel.vue",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/components/PoseImageTestPanel.vue",
+      "references": [
+        "frontend/src/components/PoseTrainingPanel.vue"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/components/PoseTrainingPanel.vue",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/composables/useAnnotationHistory.js",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/composables/useTrainingJobs.js",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/annotationLabeling.mjs",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/api.js",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/imageAugmentation.mjs",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/modelCapabilities.mjs",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/poseSubmission.test.mjs",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/poseTraining.mjs",
+      "references": [
+        "frontend/src/components/PoseImageTestPanel.vue",
+        "frontend/src/components/PoseTrainingPanel.vue",
+        "frontend/src/utils/poseSubmission.test.mjs",
+        "frontend/src/utils/poseTraining.test.mjs"
+      ],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    },
+    {
+      "file": "frontend/src/utils/poseTraining.test.mjs",
+      "references": [],
+      "outside_retirement_set": [],
+      "runtime_use": "legacy-only or unreachable from the v1 entry; verify external references before removal",
+      "reason": "retire superseded industry/runtime path after v1 browser, comparison and migration gates"
+    }
+  ]
+}

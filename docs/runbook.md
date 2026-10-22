@@ -1,104 +1,65 @@
 # 运行手册
 
-## 1. 前置
+## 目标与验收状态
 
-- Docker Engine + Compose v2（或 WSL2 + Docker Desktop）
-- 可选 GPU：NVIDIA 驱动 + nvidia-container-toolkit
-- 端口：`8080`（前端）、`8000`（API）、`5433`（DB）默认只绑定 `127.0.0.1`
+Linux amd64 / Python 3.12；API 核心依赖、测试依赖和 GPU 依赖分别使用带目标平台的 SHA256 锁。GPU 组合为 torch 2.6.0+cu124 / torchvision 0.21.0+cu124 / Ultralytics 8.4.53，单卡串行领取任务。候选环境通过不能代替正式镜像通过；当前状态见 [续作 STATUS](refactor/execution/unblock/STATUS.md)。
 
-## 2. 首次启动
+## 首次部署
 
-```bash
-cp deploy/.env.example deploy/.env
-# 必填：DB_PASSWORD、JWT_SECRET_KEY（≥32 字符）、BOOTSTRAP_ADMIN_PASSWORD
-python -c "import secrets;print(secrets.token_urlsafe(48))"
+将 deploy/.env.example 复制为 deploy/.env，填写独立数据库密码、32 字符以上 JWT 密钥、初始管理员密码、BYSJ_CODE_SHA（实际干净提交）、独立卷前缀 BYSJ_VOLUME_PREFIX 及空闲端口。不要复用其他工程的卷。默认端口仅绑定 127.0.0.1。
 
+```sh
 docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml config --quiet
-docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml build
-docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml up -d db api frontend
+docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml --profile workers build
+docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml -f deploy/compose.gpu.yml --profile workers up -d
 ```
 
-API 容器启动时自动执行 `alembic upgrade head`；空库会创建 21 张业务表。
+启动顺序为 db healthy → migrate upgrade head 成功 → API/worker → frontend。迁移是独立一次性服务；迁移失败时业务不能启动。空库会创建 21 张业务表，重复 upgrade head 应无破坏。不得把未知旧库直接 stamp head。
 
-验证：
+无 GPU 的导入/标注开发可以仅启动 db/migrate/api/frontend/dataset-worker；真实训练/评估/推理必须在具备可用 NVIDIA 驱动与 Docker GPU 支持的 worker 上运行。正式运行保持 INLINE_JOBS=false；dataset worker 无需安装 Torch。
 
-```bash
-curl -s http://127.0.0.1:8000/api/v1/health/live
-curl -s http://127.0.0.1:8000/api/v1/health/ready
-curl -s -X POST http://127.0.0.1:8000/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"<BOOTSTRAP_ADMIN_PASSWORD>"}'
+```sh
+curl --fail http://127.0.0.1:8000/api/v1/health/live
+curl --fail http://127.0.0.1:8000/api/v1/health/ready
 ```
 
-前端：<http://127.0.0.1:8080>，子路由刷新由 nginx `try_files` 回落。
+`live` 表示 API 进程存活；`ready` 验证数据库和配置要求的 worker 心跳。完整部署应配置 REQUIRED_WORKER_ROLES 为 JSON 数组 ["dataset","trainer","inference"]。浏览器打开 8080 端口，六页面通过同源 /api/v1 访问；Nginx 代理在 deploy/nginx.conf。
 
-## 3. worker
+## 依赖下载与离线构建
 
-```bash
-# 无 GPU：只跑导入/冻结/导出
-docker compose ... --profile workers up -d dataset-worker
+锁必须来自目标 Linux/Python 的完整 pip report（--ignore-installed --only-binary=:all:），不是开发机 pip freeze。scripts/generate_lock.py 校验官方源、目标、冲突、摘要，全部成功后原子写入。CUDA 在线锁保留官方直链。
 
-# GPU：训练与推理（确认 nvidia-smi 在容器可见）
-docker compose ... -f deploy/compose.gpu.yml --profile workers up -d worker inference-worker
-```
+网络断续时可使用 scripts/download_report_wheels.py --report <report.json> --directory <wheelhouse>。工具按有界 Range 续传并校验完整 SHA256；--nvidia-mirror 只将 NVIDIA 包转至其官方 pypi.nvidia.com，同一摘要不能更改。代理只设置在当前下载进程，不改宿主全局配置。
 
-worker 领取数据库任务；不需要 Redis。停止 worker 不会丢任务，重启后
-`mark_stale_interrupted` 会把心跳超时的 running 标为 interrupted。
+离线安装要先用 generate_lock.py --wheelhouse <wheelhouse> --offline 生成经过全部 wheel 实物校验的离线锁，再使用 --no-index --find-links --require-hashes。在线 Torch URL 锁即使传 --no-index 仍可能访问直链，不能把这当成离线验收。
 
-## 4. 停止与清理
+## 作业取消和故障恢复
 
-```bash
-docker compose ... stop            # 停止，保留数据卷
-docker compose ... down            # 移除容器，保留卷
-# 禁止把 down -v 作为常规步骤
-```
+取消由 API 请求、worker 确认；训练子进程停止并回收后才释放 GPU。排队 waiting_gpu 可取消。不要手工将数据库任务改成 completed，也不要仅因 GPU 租约超时便清空 holder。
 
-## 5. 备份与恢复
+异常退出后，旧租约进入隔离状态。先确认具体 owner 容器、该容器已经停止且 PID=0，再运行 scripts/recover_gpu_lease.py，默认只检查；传 --apply 才对匹配的 holder/generation/job 做 CAS 恢复。只允许本次 bysj Compose 项目。命令参数见 --help；恢复完按明确任务选择 resume 或 cancel，不批量重置状态。
 
-```bash
-# 备份
-docker compose ... exec -T db pg_dump -U bysj bysj > backup-$(date +%F).sql
-docker run --rm -v bysj-data:/data -v "$PWD":/backup alpine \
-  tar czf /backup/data-$(date +%F).tar.gz -C /data .
+数据库断连应使计算停止并避免模型注册；恢复数据库后仍需要处理隔离租约。此路径已有真实 GPU 故障注入证据，见 U03。停止服务使用 compose stop；常规停止不使用 down -v，不执行全局 prune。
 
-# 恢复（空卷）
-docker compose ... stop api worker inference-worker dataset-worker
-docker compose ... exec -T db psql -U bysj bysj < backup-2026-10-21.sql
-docker run --rm -v bysj-data:/data -v "$PWD":/backup alpine \
-  tar xzf /backup/data-2026-10-21.tar.gz -C /data
-docker compose ... start api frontend
-```
+## 备份与旧库迁移
 
-恢复后核对：`manifest_sha256`、模型 `sha256`、`inference_runs` 计数与备份前一致。
+一致性备份必须暂停新提交、等待在途任务结束并停止 API/worker 写入，同时备份 PostgreSQL、data、models、artifacts 和文件 SHA256 清单。只备份 data 不足以恢复模型和血缘。备份含用户和认证数据，禁止提交 Git。
 
-## 6. 本地开发（不用 Docker）
+恢复必须在另一套新卷/数据库进行，核对表计数、版本/模型/资产 hash、登录和已完成记录，再提交一次新推理；恢复前持有的 running/cancelling 作业必须转为可解释状态，不能幽灵运行。实际备份脚本与演练结果以 U08 为准，尚未验收时不声称可恢复。
 
-```bash
-python -m venv .venv
-.venv/Scripts/pip install --require-hashes -r backend/requirements.lock.txt
-export PYTHONPATH=backend DATABASE_URL=sqlite:///./.data/bysj.db
-export JWT_SECRET_KEY=dev-only-secret-key-0123456789abcdef
-export INLINE_JOBS=true ML_BACKEND=dummy
-python -m uvicorn app.main:app --reload --port 8000
-```
+旧库迁移工具 scripts/migrate_legacy_snapshot.py 目前为经测试的离线拷贝函数：只读 REPEATABLE READ 源、严格识别旧 schema、已 Alembic 初始化且空的目标库。源文件不改写。合成演练通过，真实旧库尚未提供授权副本，不能直接用于未知生产库。
 
-`INLINE_JOBS=true` 仅用于测试/单机演示：任务仍先落库再执行，但会阻塞请求。
-
-## 7. 常见问题
+## 常见问题
 
 | 现象 | 排查 |
 |---|---|
-| 启动报 `JWT_SECRET_KEY` | 生产环境必须 ≥32 字符，且不能使用默认值 |
-| `ready` 503 | 看 `components.database`；确认 DB 健康检查通过 |
-| 训练任务 `gpu_busy` | 有其它任务持有 `gpu:0` 租约；检查 `resource_leases` |
-| 训练 `ml_dependency_missing` | worker 镜像未安装 ML lock；重建 worker target |
-| 上传 413 | 检查 `MAX_*` 配置；ZIP 压缩比上限 100 |
-| 标注 409 | 其它会话已更新 revision；重新加载或另存子版本 |
-| 回流 409 `test_leak_blocked` | 复核资产属于 test/val 或与之同源，禁止回流 |
-| 模型 409 `model_tampered` | 文件被替换；重新登记或恢复备份 |
-| 前端 404 子路由 | nginx 未应用 `try_files`，检查 `deploy/nginx.conf` |
+| ready 503 | 检查 components.database 和缺少角色心跳；live 正常不代表业务就绪 |
+| waiting_gpu | 等待共享单 GPU 租约；确认 holder 的任务与隔离状态，勿抢占 |
+| ml_dependency_missing | 检查真实 worker 镜像、ML 锁与 pip check |
+| 上传 413/422 | 检查数量/尺寸/压缩比、重复 ZIP 路径、标签格式 |
+| 标注 409 | 保留本地草稿，明确加载服务器版本后再编辑，不静默覆盖 |
+| test_leak_blocked | val/test 及同源资产禁止回流训练 |
+| model_tampered | 文件摘要与登记不符，恢复可信备份或重新登记 |
+| 子路由 404 | 核对 Nginx try_files 与 /api 代理 |
 
-## 8. 证据与报告
-
-每个阶段记录写入 `docs/refactor/execution/PR-XX.md`；大文件放 `artifacts/`（不入库）。
-报告必须包含命令、退出码、时间、环境和失败分类，不以“已通过”代替原始输出。
+开发测试见 [DEVELOPMENT](DEVELOPMENT.md)。原始日志/大模型/原图/trace 放忽略的 artifacts 或 .runtime，公开证据只写脱敏统计与 hash。

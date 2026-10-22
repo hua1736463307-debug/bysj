@@ -1,5 +1,6 @@
 # 毕业版后端镜像：默认只装核心依赖；worker target 额外安装 ML 依赖。
-FROM python:3.11-slim AS base
+ARG PYTHON_BASE=python:3.12-slim
+FROM ${PYTHON_BASE} AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -8,12 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq5 curl \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY backend/requirements.lock.txt /app/requirements.lock.txt
-RUN python -m pip install --require-hashes -r /app/requirements.lock.txt
+COPY backend/requirements-core-linux-py312.lock.txt /app/requirements-core-linux-py312.lock.txt
+RUN python -m pip install --require-hashes -r /app/requirements-core-linux-py312.lock.txt
 
 COPY backend /app/backend
 COPY deploy/version.json /app/version.json
@@ -31,10 +28,12 @@ EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
 
 FROM base AS worker
-ARG INSTALL_ML=true
-RUN if [ "$INSTALL_ML" = "true" ] && [ -f /app/backend/requirements-ml.lock.txt ]; then \
-        python -m pip install --require-hashes -r /app/backend/requirements-ml.lock.txt; \
-    else \
-        echo "ML lock missing: worker 只能执行 dummy 后端" >&2; \
-    fi
+# The single opencv-python wheel declared by Ultralytics needs these runtime
+# libraries even when the application never opens a desktop window.
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+# Missing ML lock is an error: a real worker must not silently become dummy.
+RUN test -s /app/backend/requirements-ml-linux-py312-cu124.lock.txt \
+    && python -m pip install --require-hashes -r /app/backend/requirements-ml-linux-py312-cu124.lock.txt \
+    && python -m pip check
 CMD ["python", "-m", "app.workers.trainer_worker"]

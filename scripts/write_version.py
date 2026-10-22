@@ -32,8 +32,8 @@ def main() -> int:
     payload = {
         "code_sha": git_sha(),
         "build_time": datetime.now(timezone.utc).astimezone().isoformat(),
-        "requirements_lock_sha256": file_hash(REPO_ROOT / "backend" / "requirements.lock.txt"),
-        "requirements_ml_lock_sha256": file_hash(REPO_ROOT / "backend" / "requirements-ml.lock.txt"),
+        "requirements_lock_sha256": file_hash(REPO_ROOT / "backend" / "requirements-core-linux-py312.lock.txt"),
+        "ml_lock_sha256": file_hash(REPO_ROOT / "backend" / "requirements-ml-linux-py312-cu124.lock.txt"),
         "schema_version": 1,
     }
     target = Path(args.output)

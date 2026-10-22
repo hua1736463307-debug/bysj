@@ -40,4 +40,5 @@ def build_info() -> dict:
     # Dependency identity belongs to the mounted/built source, not stale JSON.
     payload["requirements_lock_sha256"] = _lock_hash(REPO_ROOT / "backend" / "requirements-core-linux-py312.lock.txt")
     payload["ml_lock_sha256"] = _lock_hash(REPO_ROOT / "backend" / "requirements-ml-linux-py312-cu124.lock.txt")
+    payload.pop("requirements_ml_lock_sha256", None)
     return payload

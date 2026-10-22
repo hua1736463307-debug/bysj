@@ -1,5 +1,6 @@
 """标注域：草稿会话与修订 compare-and-swap。"""
 from __future__ import annotations
+import math
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -27,6 +28,8 @@ def _validate_box(box: dict, class_map: dict) -> dict:
         except (TypeError, ValueError) as exc:
             raise ApiError(422, "invalid_box", f"{name} 必须是数值") from exc
     cx, cy, w, h = values
+    if not all(math.isfinite(value) for value in values):
+        raise ApiError(422, "invalid_box", "bbox 坐标必须是有限数值")
     if w <= 0 or h <= 0:
         raise ApiError(422, "invalid_box", "bbox 宽高必须大于 0")
     if not (-1e-6 <= cx <= 1 + 1e-6 and -1e-6 <= cy <= 1 + 1e-6):
@@ -106,7 +109,7 @@ def get_annotation_state(db: Session, asset_id: int, user: CurrentUser) -> dict:
         "draft_id": draft.id if draft is not None else None,
         "annotations": annotations,
         "deleted_ids": (draft_asset.deleted_json or []) if draft_asset is not None else [],
-        "editable": version.state != "frozen",
+        "editable": version.state in {"draft", "failed"},
     }
 
 

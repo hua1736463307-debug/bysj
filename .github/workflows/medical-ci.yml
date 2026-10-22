@@ -13,25 +13,29 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: bysj_ci
+          POSTGRES_DB: bysj_test_ci
           POSTGRES_USER: bysj
           POSTGRES_PASSWORD: bysj-ci-password
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U bysj -d bysj_ci"
+          --health-cmd "pg_isready -U bysj -d bysj_test_ci"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fixed legacy baseline for migration/behavior comparisons
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install locked dependencies
-        run: python -m pip install --require-hashes -r backend/requirements.lock.txt
+        run: |
+          python -m pip install --require-hashes -r backend/requirements-test-linux-py312.lock.txt
+          python -m pip check
       - name: Alembic upgrade on empty PostgreSQL
         env:
-          DATABASE_URL: postgresql+psycopg://bysj:bysj-ci-password@127.0.0.1:5432/bysj_ci
+          DATABASE_URL: postgresql+psycopg://bysj:bysj-ci-password@127.0.0.1:5432/bysj_test_ci
           JWT_SECRET_KEY: ci-only-secret-key-0123456789abcdef
           APP_ENV: test
         run: PYTHONPATH=backend python -m alembic -c backend/alembic.ini upgrade head
@@ -39,10 +43,13 @@ jobs:
         env:
           PYTHONPATH: backend
         run: python -m pytest backend/tests/medical backend/tests/test_app_factory_auth.py -q
-      - name: P0 smoke (dummy backend, no GPU)
+      - name: PostgreSQL concurrency and fencing (separate schemas)
         env:
           PYTHONPATH: backend
-        run: python -m pytest backend/tests/medical/test_dataset_versions.py backend/tests/medical/test_training_lifecycle.py -q
+          BYSJ_TEST_DATABASE_URL: postgresql+psycopg://bysj:bysj-ci-password@127.0.0.1:5432/bysj_test_ci
+        run: python -m pytest tests/integration -q
+      - name: Lock and experiment tool regressions
+        run: python -m pytest scripts/tests -q
 
   frontend:
     runs-on: ubuntu-latest
@@ -70,6 +77,7 @@ jobs:
           sed -i 's/^DB_PASSWORD=$/DB_PASSWORD=ci-db-password/' deploy/.env
           sed -i 's/^JWT_SECRET_KEY=$/JWT_SECRET_KEY=ci-only-secret-key-0123456789abcdef/' deploy/.env
           sed -i 's/^BOOTSTRAP_ADMIN_PASSWORD=$/BOOTSTRAP_ADMIN_PASSWORD=ci-admin-password/' deploy/.env
+          sed -i "s/^BYSJ_CODE_SHA=$/BYSJ_CODE_SHA=$GITHUB_SHA/" deploy/.env
           docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml config --quiet
       - name: Reject secrets and absolute data paths
         run: |
@@ -84,8 +92,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: GPU presence
         run: nvidia-smi
-      - name: Real training smoke
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install API test client
+        run: python -m pip install --require-hashes -r backend/requirements-test-linux-py312.lock.txt
+      - name: Real API training and feedback smoke
         env:
-          PYTHONPATH: backend
-          BYSJ_RUN_GPU_TESTS: "1"
-        run: python -m pytest backend/tests/medical/test_training_lifecycle.py -q -k gpu
+          SMOKE_ADMIN_USER: ${{ vars.BYSJ_SMOKE_ADMIN_USER }}
+          SMOKE_ADMIN_PASSWORD: ${{ secrets.BYSJ_SMOKE_ADMIN_PASSWORD }}
+          SMOKE_RESEARCH_USER: gpu-ci-researcher
+          SMOKE_RESEARCH_PASSWORD: ${{ secrets.BYSJ_SMOKE_RESEARCH_PASSWORD }}
+          BYSJ_SMOKE_URL: ${{ vars.BYSJ_SMOKE_URL }}
+          BYSJ_SMOKE_IMAGES: ${{ vars.BYSJ_SMOKE_IMAGES }}
+        run: |
+          test -n "$BYSJ_SMOKE_URL" && test -d "$BYSJ_SMOKE_IMAGES"
+          python scripts/smoke_medical.py --base-url "$BYSJ_SMOKE_URL" --config configs/experiments/bccd-gpu-smoke.json --images "$BYSJ_SMOKE_IMAGES" --evidence artifacts/ci-gpu

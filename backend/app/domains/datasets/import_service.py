@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import zipfile
 from collections import Counter
@@ -21,6 +22,7 @@ from app.core.errors import ApiError
 from app.core.storage import (
     ensure_dir,
     normalize_relative,
+    resolve_under,
     probe_image,
     remove_tree,
     sha256_file,
@@ -109,17 +111,34 @@ def safe_extract_zip(archive: Path, destination: Path, settings: Settings) -> li
         if total_declared / compressed > settings.max_compression_ratio:
             raise ApiError(413, "zip_ratio", "ZIP 压缩比异常，疑似压缩炸弹")
 
-        written_total = 0
+        # Validate the whole central directory before creating any output.
+        # Never overwrite duplicate members or follow pre-existing symlinks.
+        targets = set()
+        validated = []
         for info in infos:
-            if info.is_dir():
-                continue
             mode = (info.external_attr >> 16) & 0o170000
             if mode == 0o120000:
                 raise ApiError(422, "zip_symlink", f"ZIP 含符号链接: {info.filename}")
             relative = normalize_relative(info.filename)
-            target = destination / relative
+            target = resolve_under(destination, relative.as_posix())
+            key = os.path.normcase(str(target))
+            if key in targets or (target.exists() and not (info.is_dir() and target.is_dir())):
+                raise ApiError(422, "zip_duplicate", f"ZIP 目标路径重复或已存在: {info.filename}")
+            targets.add(key)
+            if info.file_size > settings.max_image_bytes:
+                raise ApiError(413, "zip_file_too_large", "ZIP 单文件超过图像大小上限")
+            if info.file_size / max(1, info.compress_size) > settings.max_compression_ratio:
+                raise ApiError(413, "zip_ratio", "ZIP 单文件压缩比异常")
+            validated.append((info, relative, target))
+        if shutil.disk_usage(destination).free < total_declared:
+            raise ApiError(413, "storage_full", "磁盘空间不足以解压")
+        written_total = 0
+        for info, relative, target in validated:
+            if info.is_dir():
+                ensure_dir(target)
+                continue
             ensure_dir(target.parent)
-            with bundle.open(info) as source, target.open("wb") as sink:
+            with bundle.open(info) as source, target.open("xb") as sink:
                 while True:
                     chunk = source.read(1024 * 1024)
                     if not chunk:
