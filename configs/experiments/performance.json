@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "base_url": "http://127.0.0.1:8000",
+  "model_id": null,
+  "input_manifest": null,
+  "count": 100,
+  "concurrency": 1,
+  "warmup_count": 5,
+  "timeout_seconds": 120,
+  "cold_start": true,
+  "device": "cuda:0",
+  "repeat_count": 3,
+  "note": "密码与 token 从环境变量读取，不写入本文件"
+}

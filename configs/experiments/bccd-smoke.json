@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "purpose": "smoke",
+  "note": "仅验证链路，不进入论文统计；结果必须带 smoke 标签",
+  "source_repository": "https://github.com/Shenggan/BCCD_Dataset",
+  "class_map": {
+    "0": "RBC",
+    "1": "WBC",
+    "2": "Platelets"
+  },
+  "group_level": "original_image",
+  "split_seed": 42,
+  "train_ratio": 0.6,
+  "val_ratio": 0.2,
+  "test_ratio": 0.2,
+  "subset_images": 24,
+  "epochs": 1,
+  "batch": 4,
+  "imgsz": 320
+}

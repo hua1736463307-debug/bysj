@@ -49,7 +49,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { login, saveAuth } from '../utils/api'
+import { login } from '../api/auth'
 
 const router = useRouter()
 const loginFormRef = ref(null)
@@ -81,13 +81,11 @@ const submitLogin = async () => {
 
   loading.value = true
   try {
-    const response = await login(form.username, form.password)
-    saveAuth(response)
-
-    const user = response.user
+    await login(form.username, form.password)
     ElMessage.success('登录成功')
-
     router.replace('/')
+  } catch (error) {
+    ElMessage.error(error?.message || '登录失败，请检查用户名和密码')
   } finally {
     loading.value = false
   }

@@ -1,0 +1,133 @@
+"""PR-02：导入、不可变版本、分页与引用保护。"""
+from __future__ import annotations
+
+import support
+
+
+def test_import_creates_draft_version_with_annotations(client, researcher_headers):
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
+    detail = client.get(f"/api/v1/datasets/{dataset_id}", headers=researcher_headers).json()["data"]
+    assert detail["latest_version"]["state"] == "draft"
+    assert detail["latest_version"]["asset_count"] == 3
+    assert detail["owner"] == "researcher1"
+
+    assets = client.get(
+        f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}", headers=researcher_headers
+    ).json()["data"]
+    assert assets["total"] == 3
+    assert assets["page_size"] == 50
+    first = assets["items"][0]
+    assert len(first["annotations"]) == 3
+    assert 0 < first["annotations"][0]["cx"] < 1
+
+
+def test_duplicate_content_is_deduplicated(client, researcher_headers):
+    payload = support.image_bytes((10, 20, 30))
+    response = support.import_dataset(
+        client,
+        researcher_headers,
+        files=[
+            ("a.jpg", payload),
+            ("copy-of-a.jpg", payload),
+            ("b.jpg", support.image_bytes((30, 20, 10))),
+            ("a.txt", support.yolo_txt([(0, 0.5, 0.5, 0.2, 0.2)]).encode()),
+        ],
+    )
+    job = response.json()["data"]
+    assert job["status"] == "completed", job
+    report = job["result"]["report"]
+    assert report["counts"]["images_imported"] == 2
+    assert len(report["duplicates"]) == 1
+    assert report["duplicates"][0]["duplicate_of"] == "a.jpg"
+
+
+def test_freeze_produces_manifest_and_split_stats(client, researcher_headers):
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=9)
+    response = support.freeze(client, researcher_headers, dataset_id, version_id=version_id)
+    job = response.json()["data"]
+    assert job["status"] == "completed", job
+    result = job["result"]
+    assert result["state"] == "frozen"
+    assert result["asset_count"] == 9
+    assert sum(result["split_counts"].values()) == 9
+    assert all(result["split_counts"][split] >= 1 for split in ("train", "val", "test"))
+    assert len(result["manifest_sha256"]) == 64
+
+    version = client.get(f"/api/v1/dataset-versions/{version_id}", headers=researcher_headers).json()["data"]
+    assert version["state"] == "frozen"
+    assert version["manifest_sha256"] == result["manifest_sha256"]
+    assert version["class_map"] == {"0": "RBC", "1": "WBC", "2": "Platelets"}
+
+
+def test_same_seed_same_split_hash(client, researcher_headers):
+    hashes = []
+    for _ in range(2):
+        dataset_id, version_id = support.make_dataset(client, researcher_headers, count=9)
+        job = support.freeze(client, researcher_headers, dataset_id, version_id=version_id, seed=42).json()["data"]
+        assert job["status"] == "completed", job
+        hashes.append(job["result"]["split_manifest_hash"])
+    assert hashes[0] == hashes[1]
+
+
+def test_frozen_version_rejects_mutation(client, researcher_headers):
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=6)
+    assert support.freeze(client, researcher_headers, dataset_id, version_id=version_id).json()["data"]["status"] == "completed"
+
+    refreeze = support.freeze(client, researcher_headers, dataset_id, version_id=version_id)
+    assert refreeze.status_code == 202
+    assert refreeze.json()["data"]["status"] == "failed"
+    assert refreeze.json()["data"]["error"]["code"] == "version_frozen"
+
+    assets = client.get(
+        f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}", headers=researcher_headers
+    ).json()["data"]
+    delete = client.delete(f"/api/v1/assets/{assets['items'][0]['asset_id']}", headers=researcher_headers)
+    assert delete.status_code == 409
+    assert delete.json()["code"] == "version_frozen"
+
+
+def test_delete_referenced_dataset_returns_409(client, researcher_headers, db):
+    from app.db.models import ModelRegistry
+
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
+    db.add(
+        ModelRegistry(
+            name="referenced.pt",
+            path="/tmp/referenced.pt",
+            sha256="0" * 64,
+            source="training",
+            dataset_version_id=version_id,
+            class_map_json={"0": "RBC"},
+        )
+    )
+    db.commit()
+    response = client.delete(f"/api/v1/datasets/{dataset_id}", headers=researcher_headers)
+    assert response.status_code == 409
+    assert response.json()["code"] == "resource_referenced"
+
+
+def test_asset_pagination_bounds(client, researcher_headers):
+    dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
+    ok = client.get(
+        f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}&page_size=200",
+        headers=researcher_headers,
+    )
+    assert ok.status_code == 200
+    over = client.get(
+        f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}&page_size=201",
+        headers=researcher_headers,
+    )
+    assert over.status_code == 422
+
+
+def test_cross_user_access_is_404(client, researcher_headers, admin_headers, db):
+    from app.domains.auth_service import create_user
+
+    dataset_id, _ = support.make_dataset(client, researcher_headers, count=3)
+    create_user(db, username="researcher2", password="researcher-password", role="researcher")
+    login = client.post(
+        "/api/v1/auth/login", json={"username": "researcher2", "password": "researcher-password"}
+    ).json()["data"]["token"]
+    other = {"Authorization": f"Bearer {login}"}
+    assert client.get(f"/api/v1/datasets/{dataset_id}", headers=other).status_code == 404
+    assert client.get(f"/api/v1/datasets/{dataset_id}", headers=admin_headers).status_code == 200

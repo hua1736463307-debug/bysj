@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "purpose": "baseline",
+  "source_repository": "https://github.com/Shenggan/BCCD_Dataset",
+  "source_revision": "d272fb14cdff6e473fafeeeba32aba5f560e9e43",
+  "source_license_ref": "MIT (BCCD_Dataset LICENSE)",
+  "class_map": {
+    "0": "RBC",
+    "1": "WBC",
+    "2": "Platelets"
+  },
+  "group_level": "original_image",
+  "split_seed": 42,
+  "train_ratio": 0.8,
+  "val_ratio": 0.1,
+  "test_ratio": 0.1,
+  "approved_model_id": null,
+  "base_weight_sha256": null,
+  "dataset_version_id": null,
+  "test_manifest_sha256": null,
+  "epochs": 80,
+  "batch": 8,
+  "imgsz": 640,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "deterministic": true,
+  "augmentation": {
+    "hsv_h": 0.015,
+    "hsv_s": 0.7,
+    "hsv_v": 0.4,
+    "degrees": 0.0,
+    "translate": 0.1,
+    "scale": 0.5,
+    "fliplr": 0.5,
+    "flipud": 0.0,
+    "mosaic": 1.0,
+    "close_mosaic": 10
+  },
+  "early_stopping": {
+    "patience": 20,
+    "monitor": "val/mAP50-95"
+  },
+  "evaluation_protocol": {
+    "primary_metric": "map50_95",
+    "secondary_metrics": [
+      "map50",
+      "precision",
+      "recall"
+    ],
+    "test_usage": "final_only",
+    "note": "test 只在预先固定的协议下评估一次，不用于调参"
+  }
+}
