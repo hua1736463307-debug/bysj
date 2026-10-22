@@ -11,8 +11,8 @@
 </template>
 <script setup>
 import {useRoute,useRouter} from 'vue-router'
-import api from './api/api.js'
+import { logout as logoutSession } from './api/auth'
 const route=useRoute(),router=useRouter()
 const navigation=[{path:'/raw-dataset',label:'原始数据'},{path:'/dataset-annotation',label:'数据标注'},{path:'/train-dataset',label:'训练数据'},{path:'/model-training',label:'模型训练'},{path:'/model-hub',label:'模型管理'},{path:'/inference-service',label:'推理验证'}]
-async function logout(){try{await api.post('/auth/logout')}finally{for(const k of ['token','access_token','auth_token','user'])localStorage.removeItem(k);router.replace('/login')}}
+async function logout(){try{await logoutSession()}finally{router.replace('/login')}}
 </script>

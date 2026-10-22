@@ -16,8 +16,8 @@ export function listRuns(params = {}) {
   return api.get('/inference/runs', { params })
 }
 
-export function getRun(runId, { signal } = {}) {
-  return api.get(`/inference/runs/${runId}`, { signal })
+export function getRun(runId, { signal, page = 1, page_size = 50 } = {}) {
+  return api.get(`/inference/runs/${runId}`, { signal, params: { page, page_size } })
 }
 
 export function exportRun(runId, format = 'json') {

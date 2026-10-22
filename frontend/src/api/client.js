@@ -85,8 +85,7 @@ client.interceptors.response.use(
         requestId: body.request_id
       })
     }
-    // 旧端点没有 envelope，原样返回，避免新客户端把旧格式当失败。
-    return body
+    throw new ApiError('服务器响应不符合 v1 契约', { code: 'invalid_envelope', status: response.status })
   },
   (error) => {
     const response = error.response
