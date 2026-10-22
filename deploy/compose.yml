@@ -1,0 +1,153 @@
+name: bysj
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bysj}
+      POSTGRES_USER: ${POSTGRES_USER:-bysj}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?deploy/.env 必须设置 DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bysj} -d ${POSTGRES_DB:-bysj}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bysj}:${DB_PASSWORD}@db:5432/${POSTGRES_DB:-bysj}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?deploy/.env 必须设置 JWT_SECRET_KEY}
+      BOOTSTRAP_ADMIN_USERNAME: ${BOOTSTRAP_ADMIN_USERNAME:-admin}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?deploy/.env 必须设置 BOOTSTRAP_ADMIN_PASSWORD}
+      DATA_ROOT: /data
+      MODEL_ROOT: /models
+      ARTIFACT_ROOT: /artifacts
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8080}
+      ML_BACKEND: ${ML_BACKEND:-ultralytics}
+    command: >
+      sh -c "python -m alembic -c /app/backend/alembic.ini upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"
+    volumes:
+      - data:/data
+      - models:/models
+      - artifacts:/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/live', timeout=5)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/frontend.Dockerfile
+      args:
+        VITE_API_BASE: /api/v1
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:80"
+
+  # worker 使用 profiles 分离；不带 --profile workers 时不会启动训练/推理
+  worker:
+    profiles: ["workers"]
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bysj}:${DB_PASSWORD}@db:5432/${POSTGRES_DB:-bysj}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      DATA_ROOT: /data
+      MODEL_ROOT: /models
+      ARTIFACT_ROOT: /artifacts
+      ML_BACKEND: ${ML_BACKEND:-ultralytics}
+      WORKER_TYPE: trainer
+    command: ["python", "-m", "app.workers.trainer_worker"]
+    volumes:
+      - data:/data
+      - models:/models
+      - artifacts:/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+
+  dataset-worker:
+    profiles: ["workers"]
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bysj}:${DB_PASSWORD}@db:5432/${POSTGRES_DB:-bysj}
+      DATA_ROOT: /data
+      MODEL_ROOT: /models
+      ARTIFACT_ROOT: /artifacts
+      ML_BACKEND: dummy
+    command: ["python", "-m", "app.workers.dataset_worker"]
+    volumes:
+      - data:/data
+      - models:/models
+      - artifacts:/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+
+  inference-worker:
+    profiles: ["workers"]
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+      target: worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bysj}:${DB_PASSWORD}@db:5432/${POSTGRES_DB:-bysj}
+      DATA_ROOT: /data
+      MODEL_ROOT: /models
+      ARTIFACT_ROOT: /artifacts
+      ML_BACKEND: ${ML_BACKEND:-ultralytics}
+    command: ["python", "-m", "app.workers.inference_worker"]
+    volumes:
+      - data:/data
+      - models:/models
+      - artifacts:/artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:
+    name: bysj-db-data
+  data:
+    name: bysj-data
+  models:
+    name: bysj-models
+  artifacts:
+    name: bysj-artifacts

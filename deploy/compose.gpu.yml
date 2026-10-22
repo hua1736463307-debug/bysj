@@ -1,0 +1,21 @@
+# GPU override：仅在确认设备可见时追加，缺 GPU 的机器不要传入本文件。
+# 用法：docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml \
+#         -f deploy/compose.gpu.yml --profile workers up -d
+services:
+  worker:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  inference-worker:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

@@ -1,0 +1,91 @@
+name: medical-ci
+
+on:
+  push:
+    branches: [main, "graduation/**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: bysj_ci
+          POSTGRES_USER: bysj
+          POSTGRES_PASSWORD: bysj-ci-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U bysj -d bysj_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install locked dependencies
+        run: python -m pip install --require-hashes -r backend/requirements.lock.txt
+      - name: Alembic upgrade on empty PostgreSQL
+        env:
+          DATABASE_URL: postgresql+psycopg://bysj:bysj-ci-password@127.0.0.1:5432/bysj_ci
+          JWT_SECRET_KEY: ci-only-secret-key-0123456789abcdef
+          APP_ENV: test
+        run: PYTHONPATH=backend python -m alembic -c backend/alembic.ini upgrade head
+      - name: Contract and medical tests (SQLite)
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest backend/tests/medical backend/tests/test_app_factory_auth.py -q
+      - name: P0 smoke (dummy backend, no GPU)
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest backend/tests/medical/test_dataset_versions.py backend/tests/medical/test_training_lifecycle.py -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: node --test tests/*.test.mjs src/utils/*.test.mjs
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose config validation
+        run: |
+          cp deploy/.env.example deploy/.env
+          sed -i 's/^DB_PASSWORD=$/DB_PASSWORD=ci-db-password/' deploy/.env
+          sed -i 's/^JWT_SECRET_KEY=$/JWT_SECRET_KEY=ci-only-secret-key-0123456789abcdef/' deploy/.env
+          sed -i 's/^BOOTSTRAP_ADMIN_PASSWORD=$/BOOTSTRAP_ADMIN_PASSWORD=ci-admin-password/' deploy/.env
+          docker compose --env-file deploy/.env -p bysj -f deploy/compose.yml config --quiet
+      - name: Reject secrets and absolute data paths
+        run: |
+          ! grep -rInE "(BEGIN (RSA|OPENSSH) PRIVATE KEY|password\s*=\s*['\"][^'\"]{6,})" backend/app deploy docs || exit 1
+          ! grep -rIn "/app/static\|/app/runs" backend/app || exit 1
+
+  gpu-acceptance:
+    # 普通 runner 没有 GPU，此 job 只在手动触发且自备 GPU runner 时执行。
+    if: github.event_name == 'workflow_dispatch' && vars.BYSJ_GPU_RUNNER == 'true'
+    runs-on: [self-hosted, gpu]
+    steps:
+      - uses: actions/checkout@v4
+      - name: GPU presence
+        run: nvidia-smi
+      - name: Real training smoke
+        env:
+          PYTHONPATH: backend
+          BYSJ_RUN_GPU_TESTS: "1"
+        run: python -m pytest backend/tests/medical/test_training_lifecycle.py -q -k gpu
