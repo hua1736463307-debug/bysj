@@ -20,6 +20,12 @@ export function createVersion(datasetId, payload) {
   return api.post(`/datasets/${datasetId}/versions`, payload)
 }
 
+export function createTrainTiles(datasetId, payload, key) {
+  return api.post(`/datasets/${datasetId}/train-tile-versions`, payload, {
+    headers: { 'Idempotency-Key': key }
+  })
+}
+
 export function deleteDataset(datasetId) {
   return api.delete(`/datasets/${datasetId}`)
 }

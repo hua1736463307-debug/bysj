@@ -24,7 +24,7 @@ from app.workers.dispatcher import JobContext, JobCancelled, run_claimed_job
 
 logger = logging.getLogger("bysj.worker.dataset")
 
-WORKER_TYPES = ("dataset_import", "dataset_version", "annotation_export", "feedback_export", "dataset_export")
+WORKER_TYPES = ("dataset_import", "dataset_version", "dataset_process", "annotation_export", "feedback_export", "dataset_export")
 
 
 def handle_dataset_import(ctx: JobContext) -> dict:
@@ -54,7 +54,7 @@ def handle_dataset_version(ctx: JobContext) -> dict:
         ctx.db,
         ctx.settings,
         version=version,
-        seed=int(payload.get("split_seed") or 42),
+        seed=int(payload["split_seed"] if payload.get("split_seed") is not None else 42),
         ratios=payload.get("ratios") or (0.8, 0.1, 0.1),
         progress=ctx.progress,
     )

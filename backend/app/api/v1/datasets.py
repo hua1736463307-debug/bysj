@@ -5,9 +5,9 @@ import json
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, Query, UploadFile
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_user, settings_dep
@@ -208,6 +208,30 @@ class VersionCreateRequest(BaseModel):
     base_version_id: str | None = None
     split_seed: int = Field(default=42, ge=0)
     ratios: list[float] = Field(default_factory=lambda: [0.8, 0.1, 0.1])
+
+
+class TrainTilesRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    parent_version_id: str
+    tile_size: int = Field(default=320, ge=64, le=2048)
+    overlap: float = Field(default=.2, ge=0, le=.75)
+    min_visibility: float = Field(default=.5, gt=0, le=1)
+
+
+@router.post('/datasets/{dataset_id}/train-tile-versions', response_model=None)
+def create_train_tiles(dataset_id: str, payload: TrainTilesRequest,
+    idempotency_key: str = Header(..., alias='Idempotency-Key', min_length=1, max_length=128),
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db), settings: Settings = Depends(settings_dep)):
+    service.get_dataset(db,dataset_id,user)
+    parent=service.get_version(db,payload.parent_version_id,user)
+    if parent.dataset_id!=dataset_id:raise ApiError(404,'not_found','父版本不属于该数据集')
+    if parent.state!='frozen':raise ApiError(409,'parent_not_frozen','先冻结父版本再创建训练切片')
+    job,created=job_service.create_job(db,job_type='dataset_process',owner_id=user.id,owner_username=user.username,
+        payload=payload.model_dump(),idempotency_key=idempotency_key)
+    if created and settings.inline_jobs:
+        from app.workers.dispatcher import execute_job_inline
+        execute_job_inline(job.id);db.refresh(job)
+    return accepted(job.to_public(),message='训练集切片任务已接收，验证/测试图像保持原样')
 
 
 @router.post("/datasets/{dataset_id}/versions", response_model=None)

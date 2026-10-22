@@ -4,6 +4,15 @@ from __future__ import annotations
 import support
 
 
+def test_zero_split_seed_reaches_frozen_manifest(client, researcher_headers):
+    dataset, version = support.make_dataset(client, researcher_headers, count=12)
+    response = support.freeze(client, researcher_headers, dataset, version_id=version, seed=0)
+    assert response.status_code == 202, response.text
+    assert response.json()['data']['status'] == 'completed'
+    frozen = client.get('/api/v1/dataset-versions/'+version, headers=researcher_headers).json()['data']
+    assert frozen['split_config']['seed'] == 0
+
+
 def test_admin_can_restore_deleted_draft_asset(client, researcher_headers, admin_headers):
     dataset_id, version_id = support.make_dataset(client, researcher_headers, count=3)
     asset = client.get(f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}", headers=researcher_headers).json()["data"]["items"][0]

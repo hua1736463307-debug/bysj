@@ -152,6 +152,7 @@ class UltralyticsAdapter:
             split=split,
             imgsz=int(params.get("imgsz", 640)),
             batch=int(params.get("batch", 8)),
+            workers=0,
             device=params.get("device") or None,
             verbose=False,
             plots=True,

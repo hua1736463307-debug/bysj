@@ -51,6 +51,17 @@ test('real v1 workflow: 24 images, three pages, freeze, GPU train, evaluate, inf
   const freezePromise=page.waitForResponse(r=>r.url().endsWith(`/datasets/${ids.dataset_id}/versions`)&&r.request().method()==='POST')
   await page.getByRole('button',{name:'冻结版本',exact:true}).click()
   ids.freeze_job=(await (await freezePromise).json()).data.job_id;await waitJob(ids.freeze_job)
+  await page.getByRole('button',{name:'刷新数据',exact:true}).click()
+  await page.getByLabel('版本',{exact:true}).selectOption(ids.version_id)
+  const tilePromise=page.waitForResponse(r=>r.url().endsWith(`/datasets/${ids.dataset_id}/train-tile-versions`)&&r.request().method()==='POST')
+  await page.getByRole('button',{name:'创建切片版本',exact:true}).click()
+  ids.tile_job=(await (await tilePromise).json()).data.job_id
+  ids.tile_version=(await waitJob(ids.tile_job)).result.version_id
+  const tileVersion=await data('/dataset-versions/'+ids.tile_version)
+  expect(tileVersion.state).toBe('frozen');expect(tileVersion.parent_version_id).toBe(ids.version_id)
+  const parentVersion=await data('/dataset-versions/'+ids.version_id)
+  expect(tileVersion.split_counts.val).toBe(parentVersion.split_counts.val)
+  expect(tileVersion.split_counts.test).toBe(parentVersion.split_counts.test)
   const base=(await data('/models?page_size=200')).items.find(m=>m.trusted_source==='base');expect(base).toBeTruthy()
   await page.getByRole('link',{name:'模型训练',exact:true}).click()
   await page.getByLabel('数据集',{exact:true}).selectOption(ids.dataset_id)

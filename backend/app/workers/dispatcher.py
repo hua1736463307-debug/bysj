@@ -22,6 +22,7 @@ logger = logging.getLogger("bysj.worker")
 HANDLERS: dict[str, str] = {
     "dataset_import": "app.workers.dataset_worker:handle_dataset_import",
     "dataset_version": "app.workers.dataset_worker:handle_dataset_version",
+    "dataset_process": "app.domains.datasets.processing_service:process_train_tiles",
     "annotation_export": "app.workers.dataset_worker:handle_annotation_export",
     "feedback_export": "app.workers.dataset_worker:handle_feedback_export",
     "training": "app.workers.trainer_worker:handle_training",

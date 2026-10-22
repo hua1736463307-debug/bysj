@@ -5,6 +5,13 @@
     <template v-if="version"><div class="toolbar"><strong>{{ version.state }} · {{ version.asset_count }} 图</strong><label>划分种子 <input type="number" min="0" v-model.number="seed" /></label><el-button type="primary" :disabled="busy || !['draft','failed'].includes(version.state)" @click="act(freeze)">冻结版本</el-button><el-button @click="act(exportLabels)">导出标签 ZIP</el-button><el-button v-if="artifactId" @click="act(download)">下载导出文件</el-button></div>
       <p>train / val / test：{{ version.split_counts.train ?? '待划分' }} / {{ version.split_counts.val ?? '待划分' }} / {{ version.split_counts.test ?? '待划分' }}</p>
       <p class="hash">Manifest SHA256：{{ version.manifest_sha256 || '冻结后生成' }}</p>
+      <fieldset v-if="version.state==='frozen'"><legend>创建训练集切片版本</legend>
+        <p>仅对训练图像切片；验证集、测试集保留原图和原标注。原版本保持可用。</p>
+        <div class="toolbar"><label>切片边长 <input aria-label="切片边长" type="number" min="64" max="2048" v-model.number="tileSize" /></label>
+          <label>重叠比例 <input aria-label="重叠比例" type="number" min="0" max="0.75" step="0.05" v-model.number="overlap" /></label>
+          <label>标注最小可见比例 <input aria-label="标注最小可见比例" type="number" min="0.01" max="1" step="0.05" v-model.number="minVisibility" /></label>
+          <el-button :disabled="busy || processing" @click="act(tileTrain)">创建切片版本</el-button></div>
+      </fieldset>
       <JobProgress :job-id="jobId" @terminal="finished" />
       <table><thead><tr><th>图像</th><th>尺寸</th><th>来源组</th><th>split</th><th>标签数</th><th>操作</th></tr></thead><tbody><tr v-for="a in assets" :key="a.asset_id"><td>{{ a.relative_path }}</td><td>{{ a.width }} × {{ a.height }}</td><td>{{ a.source_group }}</td><td>{{ a.split || '未划分' }}</td><td>{{ a.annotations.length }}</td><td><el-button :disabled="version.state==='frozen'" @click="act(()=>remove(a))">删除图像</el-button></td></tr></tbody></table>
       <el-pagination v-model:current-page="page" :page-size="8" :total="total" layout="total, prev, pager, next" @current-change="act(loadAssets)" />
@@ -16,17 +23,26 @@ import { ref } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import DatasetVersionPicker from '../components/medical/DatasetVersionPicker.vue'
 import JobProgress from '../components/medical/JobProgress.vue'
-import { listAssets, createVersion, deleteAsset } from '../api/datasets'
+import { listAssets, createVersion, createTrainTiles, deleteAsset } from '../api/datasets'
 import { exportAnnotations } from '../api/annotations'
 import { getArtifact } from '../api/inference'
 import { saveBlob } from '../utils/download'
 import { useTaskAction } from '../composables/useTaskAction'
 const {error,busy,act}=useTaskAction(),picker=ref(null),version=ref(null),datasetId=ref(''),assets=ref([]),page=ref(1),total=ref(0),seed=ref(42),jobId=ref(''),artifactId=ref('')
+const tileSize=ref(320),overlap=ref(.2),minVisibility=ref(.5),processing=ref(false)
+const tileRequests=new Map()
 async function change(data){datasetId.value=data.datasetId;version.value=data.version;page.value=1;assets.value=[];if(data.version)await act(loadAssets)}
 async function loadAssets(){const data=await listAssets(datasetId.value,{version_id:version.value.version_id,page:page.value,page_size:8});assets.value=data.items;total.value=data.total}
 async function freeze(){jobId.value=(await createVersion(datasetId.value,{base_version_id:version.value.version_id,split_seed:seed.value,ratios:[.8,.1,.1]})).job_id}
+async function tileTrain(){
+  const payload={parent_version_id:version.value.version_id,tile_size:tileSize.value,overlap:overlap.value,min_visibility:minVisibility.value}
+  const signature=JSON.stringify([datasetId.value,payload])
+  if(!tileRequests.has(signature))tileRequests.set(signature,crypto.randomUUID())
+  const job=await createTrainTiles(datasetId.value,payload,tileRequests.get(signature))
+  jobId.value=job.job_id;processing.value=!['completed','failed','cancelled','interrupted'].includes(job.status)
+}
 async function exportLabels(){artifactId.value='';jobId.value=(await exportAnnotations(datasetId.value,version.value.version_id)).job_id}
-async function finished(job){if(job.status==='completed'){artifactId.value=job.result?.artifact_id || '';await picker.value.refresh()}}
+async function finished(job){processing.value=false;if(job.status==='completed'){artifactId.value=job.result?.artifact_id || '';await picker.value.refresh()}}
 async function download(){saveBlob(await getArtifact(artifactId.value),'labels.zip')}
 async function remove(asset){await ElMessageBox.confirm(`删除图像 ${asset.relative_path}？`,'删除图像');await deleteAsset(asset.asset_id);await loadAssets()}
 </script>

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import shutil
 import sys
 import traceback
@@ -44,25 +45,28 @@ def run(request: dict) -> dict:
     if cuda:
         torch.cuda.synchronize(0)
     elapsed = time.perf_counter() - started
+    peak_allocated = torch.cuda.max_memory_allocated(0) if cuda else None
+    peak_reserved = torch.cuda.max_memory_reserved(0) if cuda else None
     best = Path(getattr(trainer, "best", "") or "")
     if not best.exists():
         raise RuntimeError("训练完成但没有 best 权重")
     target = Path(request["workdir"]) / "best.pt"
     shutil.copy2(best, target)
 
-    metrics = {}
-    try:
-        val = model.val(data=request["dataset_yaml"], split="val", imgsz=params["imgsz"], device=training_args["device"], verbose=False)
-        box = getattr(val, "box", None)
-        if box is not None:
-            metrics = {
-                "precision": float(box.mp),
-                "recall": float(box.mr),
-                "map50": float(box.map50),
-                "map50_95": float(box.map),
-            }
-    except Exception as exc:  # 指标缺失保留 null + 原因
-        metrics = {"error": f"val_failed: {type(exc).__name__}: {exc}"}
+    # Standalone val otherwise restores framework defaults (8 loader workers),
+    # which can exhaust Docker's shared memory on the full dataset. Treat failed
+    # validation as a failed attempt; never register a success with error metrics.
+    validation_started = time.perf_counter()
+    val = model.val(data=request["dataset_yaml"], split="val", imgsz=params["imgsz"],
+                    batch=params["batch"], workers=0, device=training_args["device"], verbose=False,
+                    project=request["workdir"], name="validation", exist_ok=True)
+    box = getattr(val, "box", None)
+    if box is None:
+        raise RuntimeError("validation did not return detection metrics")
+    metrics = {"precision": float(box.mp), "recall": float(box.mr),
+               "map50": float(box.map50), "map50_95": float(box.map)}
+    if not all(math.isfinite(value) for value in metrics.values()):
+        raise RuntimeError("validation returned nonfinite metrics")
 
     return {
         "best_path": str(target),
@@ -73,8 +77,9 @@ def run(request: dict) -> dict:
         "results_dict": getattr(results, "results_dict", None),
         "effective_args": json.loads(json.dumps(vars(trainer.args) if trainer is not None else training_args, default=str)),
         "training_seconds": elapsed,
-        "peak_gpu_allocated_bytes": torch.cuda.max_memory_allocated(0) if cuda else None,
-        "peak_gpu_reserved_bytes": torch.cuda.max_memory_reserved(0) if cuda else None,
+        "validation_seconds": time.perf_counter() - validation_started,
+        "peak_gpu_allocated_bytes": peak_allocated,
+        "peak_gpu_reserved_bytes": peak_reserved,
         "environment": environment_snapshot(),
     }
 

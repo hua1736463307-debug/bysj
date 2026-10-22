@@ -1,5 +1,5 @@
 # 毕业版后端镜像：默认只装核心依赖；worker target 额外安装 ML 依赖。
-ARG PYTHON_BASE=python:3.12-slim
+ARG PYTHON_BASE=python:3.12-slim@sha256:dd29372629eeba2dd003fd9e9d35a5b8236c44727875a0364254b5127af88e65
 FROM ${PYTHON_BASE} AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
