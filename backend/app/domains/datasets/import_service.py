@@ -381,7 +381,7 @@ def import_dataset(
         manifest_path="",
         class_map_json=class_map,
         split_config_json={},
-        metadata_json={"source": payload},
+        metadata_json={"source": payload, "group_level": group_level},
         content_hash="",
         created_by=owner_username,
         created_by_user_id=owner_id,

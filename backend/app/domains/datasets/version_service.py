@@ -14,6 +14,39 @@ from app.db.models import DatasetAsset, DatasetVersion
 from app.domains.datasets.split_service import SplitError, build_manifest
 
 SPLITS = ("train", "val", "test")
+GROUP_LEVELS = {"original_image", "image_cluster"}
+
+
+def _explicit_group_level(value) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def resolve_group_level(metadata: dict | None) -> str:
+    """Resolve the declared grouping level without silently picking a side.
+
+    Read order: top-level ``group_level`` -> ``source.group_level`` ->
+    ``original_image``. Only the two supported levels are accepted; a draft
+    that declares both and they disagree is rejected instead of normalized.
+    """
+    metadata = metadata or {}
+    top = _explicit_group_level(metadata.get("group_level"))
+    source = metadata.get("source")
+    nested = _explicit_group_level(source.get("group_level")) if isinstance(source, dict) else None
+    if top and nested and top != nested:
+        raise ApiError(
+            409,
+            "group_level_conflict",
+            "版本元数据中的 group_level 声明冲突",
+            {"top_level": top, "source": nested},
+        )
+    value = top or nested or "original_image"
+    if value not in GROUP_LEVELS:
+        raise ApiError(422, "invalid_group_level", f"未知的 group_level: {value}")
+    return value
+
 
 
 def freeze_version(
@@ -34,6 +67,9 @@ def freeze_version(
         raise ApiError(409, "version_frozen", "版本已冻结，内容不可修改")
     if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_invalid_state", f"当前版本状态不可冻结: {version.state}")
+    # Resolve before changing state so a conflicting declaration cannot leave
+    # the version in "validating" or pick one of the two values silently.
+    declared_group_level = resolve_group_level(version.metadata_json)
     root = Path(version.root_path or "")
     if not version.root_path or not root.is_absolute():
         raise ApiError(422, "invalid_version_root", "版本目录必须是受控根下的绝对路径")
@@ -76,7 +112,7 @@ def freeze_version(
             dataset_id=version.dataset_id,
             version_id=version.id,
             parent_version_id=version.parent_version_id,
-            group_level=(version.metadata_json or {}).get("group_level", "original_image"),
+            group_level=declared_group_level,
             fixed_splits=fixed_splits,
         )
     except SplitError as exc:
@@ -115,6 +151,12 @@ def freeze_version(
             asset.label_path = "labels/" + normalize_relative(asset.relative_path).with_suffix(".txt").as_posix()
             if not asset.root_asset_id:
                 asset.root_asset_id = asset.id
+
+    # Freeze the declaration next to the manifest so later readers (API,
+    # processing, feedback) do not fall back to original_image.
+    metadata = dict(version.metadata_json or {})
+    metadata["group_level"] = declared_group_level
+    version.metadata_json = metadata
 
     version.state = "frozen"
     version.status = "ready"

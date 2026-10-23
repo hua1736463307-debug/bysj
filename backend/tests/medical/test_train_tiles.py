@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import pytest
 import support
 from app.db.models import DatasetAsset, DatasetVersion
@@ -22,6 +23,9 @@ def test_train_only_tiles_preserve_original_test_and_val_and_retry_identity(clie
     child=job['result']['version_id'];after=db.query(DatasetAsset).filter_by(dataset_version_id=child).all()
     original={a.id:a for a in before};child_version=db.get(DatasetVersion,child)
     assert child_version.parent_version_id==parent and child_version.state=='frozen'
+    assert child_version.metadata_json['group_level']=='original_image'
+    assert child_version.metadata_json['processing']['evaluation_space']=='original_image'
+    assert child_version.split_config_json['group_level']=='original_image'
     assert len([a for a in after if a.split=='train'])>len([a for a in before if a.split=='train'])
     parent_version=db.get(DatasetVersion,parent)
     for asset in after:
@@ -64,3 +68,28 @@ def test_processing_failure_never_publishes_a_frozen_child(client,researcher_hea
                          json={'parent_version_id':parent}).json()['data']
     assert response['status']=='failed'
     assert db.query(DatasetVersion).filter_by(parent_version_id=parent).count()==0
+
+
+def test_tiles_preserve_image_cluster_declaration(client,researcher_headers,db):
+    files=[];groups={}
+    for i in range(9):
+        name=f'g{i}.jpg'
+        files.append((name,support.image_bytes((i*17,i*23,i*29))))
+        files.append((f'g{i}.txt',support.yolo_txt([(c,.5,.5,.3,.3) for c in (0,1,2)]).encode()))
+        groups[name]='cluster-pair' if i<2 else f'cluster-{i}'
+    job=support.import_dataset(client,researcher_headers,files=files,
+        form={'group_level':'image_cluster','source_groups':json.dumps(groups)}).json()['data']
+    assert job['status']=='completed',job
+    dataset=job['result']['dataset_id'];parent=job['result']['version_id']
+    assert support.freeze(client,researcher_headers,dataset,version_id=parent).json()['data']['status']=='completed'
+    response=client.post(f'/api/v1/datasets/{dataset}/train-tile-versions',
+        headers={**researcher_headers,'Idempotency-Key':'cluster-tiles'},
+        json={'parent_version_id':parent,'tile_size':64,'overlap':.25,'min_visibility':.5})
+    job=response.json()['data'];assert job['status']=='completed',job
+    child=db.get(DatasetVersion,job['result']['version_id'])
+    assert child.metadata_json['group_level']=='image_cluster'
+    assert child.split_config_json['group_level']=='image_cluster'
+    # evaluation_space is the coordinate space of evaluation, not the group level.
+    assert child.metadata_json['processing']['evaluation_space']=='original_image'
+    manifest=json.loads((Path(child.root_path)/'manifest.json').read_text(encoding='utf-8'))
+    assert manifest['group_level']=='image_cluster'

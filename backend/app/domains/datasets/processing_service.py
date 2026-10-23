@@ -115,7 +115,7 @@ def process_train_tiles(ctx):
             parent_version_id=parent.id,status='ready',state='frozen',frozen_at=utcnow(),root_path=str(final),
             manifest_path=str(final/'manifest.json'),class_map_json=parent.class_map_json,
             split_config_json={'seed':seed,'ratios':manifest['ratios'],'group_level':manifest['group_level']},
-            metadata_json={'processing_hash':fingerprint,'processing':{**payload,'evaluation_space':'original_image','transformed_splits':['train']},'job_id':ctx.job.id},
+            metadata_json={'processing_hash':fingerprint,'processing':{**payload,'evaluation_space':'original_image','transformed_splits':['train']},'group_level':manifest['group_level'],'job_id':ctx.job.id},
             content_hash=stats['manifest_sha256'],manifest_sha256=stats['manifest_sha256'],
             split_manifest_hash=stats['split_manifest_hash'],class_map_hash=stats['class_map_hash'],
             split_counts_json=stats['split_counts'],asset_count=stats['asset_count'],

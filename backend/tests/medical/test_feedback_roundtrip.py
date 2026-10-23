@@ -101,6 +101,9 @@ def test_review_lifecycle_and_export(client, researcher_headers, admin_headers, 
     from pathlib import Path
     from app.db.models import DatasetVersion
     stored = db.get(DatasetVersion, child_id)
+    parent_row = db.get(DatasetVersion, ctx["version_id"])
+    assert stored.metadata_json["group_level"] == parent_row.metadata_json["group_level"]
+    assert stored.split_config_json["group_level"] == parent_row.split_config_json["group_level"]
     expected_root = Path(settings.data_root) / "datasets" / ctx["dataset_id"] / child_id
     assert Path(stored.root_path).resolve() == expected_root.resolve()
     assert Path(stored.manifest_path).resolve() == (expected_root / "manifest.json").resolve()
@@ -197,3 +200,66 @@ def test_unreviewable_asset_is_excluded_from_child(client, researcher_headers, a
         headers=researcher_headers,
     ).json()["data"]["items"]
     assert ctx["train_asset"]["relative_path"] not in {item["relative_path"] for item in child_assets}
+
+
+def test_feedback_child_inherits_image_cluster_declaration(client, researcher_headers, admin_headers, db):
+    """A grouped parent must stay grouped through review -> child version."""
+    import json
+
+    from app.db.models import DatasetVersion
+
+    files = []
+    groups = {}
+    for index in range(12):
+        name = f"cluster-{index:02d}.jpg"
+        files.append((name, support.image_bytes((index * 13, index * 7, index * 3))))
+        files.append(
+            (f"cluster-{index:02d}.txt", support.yolo_txt([(c, 0.5, 0.5, 0.3, 0.3) for c in (0, 1, 2)]).encode())
+        )
+        groups[name] = "cluster-pair" if index < 2 else f"cluster-{index}"
+    job = support.import_dataset(
+        client,
+        researcher_headers,
+        files=files,
+        form={"group_level": "image_cluster", "source_groups": json.dumps(groups)},
+    ).json()["data"]
+    assert job["status"] == "completed", job
+    dataset_id, version_id = job["result"]["dataset_id"], job["result"]["version_id"]
+    assert support.freeze(client, researcher_headers, dataset_id, version_id=version_id).json()["data"]["status"] == "completed"
+
+    trained = client.post(
+        "/api/v1/training/jobs",
+        headers=researcher_headers,
+        json={
+            "dataset_version_id": version_id,
+            "params": {"epochs": 1, "batch": 2, "imgsz": 64, "seed": 42, "deterministic": True, "device": "cpu"},
+        },
+    ).json()["data"]
+    assert trained["status"] == "completed", trained
+    model_id = trained["result"]["model_id"]
+
+    assets = client.get(
+        f"/api/v1/datasets/{dataset_id}/assets?version_id={version_id}&page_size=200",
+        headers=researcher_headers,
+    ).json()["data"]["items"]
+    train_asset = next(item for item in assets if item["split"] == "train")
+    run_id = client.post(
+        "/api/v1/inference/images",
+        headers=researcher_headers,
+        data={"model_id": model_id, "asset_ids": str(train_asset["asset_id"])},
+    ).json()["data"]["run_id"]
+    item = client.get(f"/api/v1/inference/runs/{run_id}", headers=researcher_headers).json()["data"]["items"][0]
+    review = _create_review(client, researcher_headers, item, verdict="missed_object").json()["data"]
+    _approve(client, admin_headers, review["review_id"])
+
+    exported = client.post(
+        "/api/v1/reviews/export-version",
+        headers=researcher_headers,
+        json={"parent_version_id": version_id, "review_ids": [review["review_id"]]},
+    ).json()["data"]
+    assert exported["status"] == "completed", exported
+    child = db.get(DatasetVersion, exported["result"]["child_version_id"])
+    assert child.metadata_json["group_level"] == "image_cluster"
+    assert child.split_config_json["group_level"] == "image_cluster"
+    manifest = json.loads((__import__("pathlib").Path(child.root_path) / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["group_level"] == "image_cluster"
