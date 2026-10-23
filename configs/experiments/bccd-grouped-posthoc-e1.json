@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "purpose": "posthoc_grouped_development; old test was used before the near-duplicate discovery; not confirmatory",
+  "source_repository": "https://github.com/Shenggan/BCCD_Dataset",
+  "source_revision": "d272fb14cdff6e473fafeeeba32aba5f560e9e43",
+  "source_license_ref": "MIT (BCCD_Dataset LICENSE)",
+  "class_map": {
+    "0": "RBC",
+    "1": "WBC",
+    "2": "Platelets"
+  },
+  "group_level": "image_cluster",
+  "split_seed": 42,
+  "train_ratio": 0.8,
+  "val_ratio": 0.1,
+  "test_ratio": 0.1,
+  "approved_model_id": "ebc82da059d24213b1b47965587204b7",
+  "base_weight_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+  "dataset_version_id": "fd962cbc-451d-47c2-9697-f0ed2530dbcb",
+  "test_manifest_sha256": "2e58c3252040eaa45a0b6ec3b3e9f46ab1d435446990324084f9de8daac6dec0",
+  "epochs": 80,
+  "batch": 8,
+  "imgsz": 640,
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "deterministic": true,
+  "optimizer": "AdamW",
+  "lr0": 0.001,
+  "lrf": 0.01,
+  "momentum": 0.937,
+  "weight_decay": 0.0005,
+  "warmup_epochs": 3,
+  "augmentation": {
+    "hsv_h": 0.015,
+    "hsv_s": 0.7,
+    "hsv_v": 0.4,
+    "degrees": 0.0,
+    "translate": 0.1,
+    "scale": 0.5,
+    "fliplr": 0.5,
+    "flipud": 0.0,
+    "mosaic": 1.0,
+    "close_mosaic": 10
+  },
+  "early_stopping": {
+    "patience": 20,
+    "monitor": "val/mAP50-95"
+  },
+  "evaluation_protocol": {
+    "primary_metric": "map50_95",
+    "secondary_metrics": [
+      "map50",
+      "precision",
+      "recall"
+    ],
+    "test_usage": "posthoc_development_only",
+    "note": "test snapshot was already used before this revision; report as post-hoc development/sensitivity, not unseen-test confirmation"
+  },
+  "profile": "formal",
+  "protocol_variant": "E1_grouped_original",
+  "note": "grouped original-image revision (291/37/36)"
+}
