@@ -87,3 +87,18 @@ v1 大部分表关系由业务代码维护，当前 SQL 外键数为 0；不能�
 | 子路由 404 | 核对 Nginx try_files 与 /api 代理 |
 
 开发测试见 [DEVELOPMENT](DEVELOPMENT.md)。原始日志/大模型/原图/trace 放忽略的 artifacts 或 .runtime，公开证据只写脱敏统计与 hash。
+
+## 分组版本导入与验证（2026-10-23）
+
+```text
+python scripts/run_grouped_revision.py --output artifacts/grouped-resume-<run> \
+  --run-id <run> --base-url http://127.0.0.1:18004 inspect
+python scripts/run_grouped_revision.py ... import
+python scripts/run_grouped_revision.py ... freeze
+python scripts/run_grouped_revision.py ... verify
+```
+
+凭据用 `BYSJ_USER/BYSJ_PASSWORD`，不要放命令行。`import/freeze` 在 POST 前写
+`submitting_*` 状态；超时且无 job id 时属于不确定提交，先查 `/jobs` 与数据集，禁止重发。
+`verify` 会全量分页核对 364 图/4,888 框/363 组、291/37/36、逐图 sha256 与标签。
+`image_cluster` 声明应同时出现在 resource、asset、version metadata、split_config 和磁盘 manifest。
