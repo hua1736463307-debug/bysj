@@ -28,6 +28,13 @@ HANDLERS: dict[str, str] = {
     "training": "app.workers.trainer_worker:handle_training",
     "evaluation": "app.workers.trainer_worker:handle_evaluation",
     "inference": "app.workers.inference_worker:handle_inference",
+    # CXR 五标签：复用同一 JobTask/租约/角色 worker，不另建作业系统。
+    "cxr_import": "app.workers.cxr_handlers:handle_cxr_import",
+    "cxr_freeze": "app.workers.cxr_handlers:handle_cxr_freeze",
+    "cxr_train": "app.workers.cxr_handlers:handle_cxr_train",
+    "cxr_evaluate": "app.workers.cxr_handlers:handle_cxr_evaluate",
+    "cxr_analyze": "app.workers.cxr_handlers:handle_cxr_analyze",
+    "cxr_explain": "app.workers.cxr_handlers:handle_cxr_explain",
 }
 
 

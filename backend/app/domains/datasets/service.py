@@ -21,13 +21,16 @@ def get_dataset(db: Session, dataset_id: str, user: CurrentUser, *, manage: bool
 
 
 def list_datasets(
-    db: Session, user: CurrentUser, *, page: int, page_size: int, include_deleted: bool = False
+    db: Session, user: CurrentUser, *, page: int, page_size: int, include_deleted: bool = False,
+    task_type: str | None = None,
 ) -> tuple[list[DatasetResource], int]:
     query = db.query(DatasetResource)
     if not user.is_admin:
         query = query.filter(DatasetResource.owner_user_id == user.id)
     if not include_deleted:
         query = query.filter(DatasetResource.deleted_at.is_(None))
+    if task_type:
+        query = query.filter(DatasetResource.task_type == task_type)
     total = query.count()
     items = (
         query.order_by(DatasetResource.created_at.desc(), DatasetResource.id.desc())
@@ -63,6 +66,23 @@ def latest_version(db: Session, dataset_id: str) -> DatasetVersion | None:
         .order_by(DatasetVersion.created_at.desc())
         .first()
     )
+
+
+def task_type_of_version(db: Session, version: DatasetVersion) -> str:
+    resource = db.get(DatasetResource, version.dataset_id)
+    return resource.task_type if resource is not None else "detect"
+
+
+def assert_detect_task(db: Session, version: DatasetVersion) -> None:
+    """BBox 冻结/切片/标注只服务 detect；CXR 版本必须走 `/api/v1/cxr`。"""
+    task = task_type_of_version(db, version)
+    if task != "detect":
+        raise ApiError(
+            409,
+            "task_mismatch",
+            "该版本不是检测任务版本，不能使用 BBox 冻结/切片/标注接口",
+            {"task_type": task, "expected": "detect"},
+        )
 
 
 def list_assets(

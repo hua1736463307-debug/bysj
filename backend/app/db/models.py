@@ -14,6 +14,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Float,
+    ForeignKey,
     Index,
     Integer,
     String,
@@ -503,3 +504,166 @@ class ResourceLease(Base):
     acquired_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     heartbeat_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+# ---------------------------------------------------------------------------
+# CXR 五标签（cxr_multilabel / cxr-five-v1）——与 detect/BBox 表并存，不改旧义。
+# 患者/检查/分组只保存稳定伪标识，不保存姓名等真实身份。
+# ---------------------------------------------------------------------------
+
+
+class CxrSample(Base):
+    """胸片样本与原始四态标签；annotations_json 对 CXR 恒为空。"""
+
+    __tablename__ = "cxr_samples"
+
+    id: Mapped[int] = mapped_column(BIGINT_PK, primary_key=True, autoincrement=True)
+    asset_id: Mapped[int] = mapped_column(
+        BIGINT_FK, ForeignKey("dataset_assets.id", ondelete="RESTRICT"), nullable=False
+    )
+    dataset_version_id: Mapped[str] = mapped_column(UUID, nullable=False, index=True)
+    patient_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    study_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    component_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    view: Mapped[str] = mapped_column(String(8), nullable=False, default="PA")
+    raw_labels_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="cxr-five-v1")
+    source_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    pixel_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("asset_id", name="uq_cxr_sample_asset"),
+        Index("ix_cxr_sample_version_patient", "dataset_version_id", "patient_key"),
+        Index("ix_cxr_sample_version_component", "dataset_version_id", "component_key"),
+    )
+
+
+class CxrAnalysisBatch(Base):
+    """一次胸片分析请求；按 owner 作用域幂等。"""
+
+    __tablename__ = "cxr_analysis_batches"
+
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    owner_id: Mapped[int] = mapped_column(BIGINT_FK, nullable=False, index=True)
+    owner_username: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    job_id: Mapped[str | None] = mapped_column(UUID, nullable=True, unique=True, index=True)
+    model_id: Mapped[str] = mapped_column(UUID, nullable=False, index=True)
+    model_sha256: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    request_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending", index=True)
+    total: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    completed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    failed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow, index=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("owner_id", "idempotency_key", name="uq_cxr_batch_idempotency"),
+    )
+
+
+class CxrAnalysis(Base):
+    """单图五标签结果；原始评分不可被复核覆盖。"""
+
+    __tablename__ = "cxr_analyses"
+
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    batch_id: Mapped[str] = mapped_column(
+        UUID, ForeignKey("cxr_analysis_batches.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    owner_id: Mapped[int] = mapped_column(BIGINT_FK, nullable=False, index=True)
+    asset_id: Mapped[int | None] = mapped_column(
+        BIGINT_FK, ForeignKey("dataset_assets.id", ondelete="RESTRICT"), nullable=True, index=True
+    )
+    item_key: Mapped[str] = mapped_column(String(160), nullable=False)
+    upload_ref: Mapped[str | None] = mapped_column(Text, nullable=True)
+    image_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    image_width: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    image_height: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    model_id: Mapped[str] = mapped_column(UUID, nullable=False, index=True)
+    model_sha256: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    task: Mapped[str] = mapped_column(String(32), nullable=False, default="cxr_multilabel")
+    label_schema: Mapped[str] = mapped_column(String(32), nullable=False, default="cxr-five-v1")
+    raw_scores_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    calibrated_scores_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    thresholds_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    calibration_status: Mapped[str] = mapped_column(String(32), nullable=False, default="not_calibrated")
+    threshold_source: Mapped[str] = mapped_column(String(64), nullable=False, default="default_no_calibration")
+    calibration_artifact_id: Mapped[str | None] = mapped_column(UUID, nullable=True)
+    quality_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    explanation_artifact_id: Mapped[str | None] = mapped_column(UUID, nullable=True)
+    explanation_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    backend: Mapped[str] = mapped_column(String(32), nullable=False, default="unknown")
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending", index=True)
+    attempt: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    timing_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("batch_id", "item_key", "attempt", name="uq_cxr_analysis_item_attempt"),
+    )
+
+
+class CxrReview(Base):
+    """逐标签人工复核；原模型分数以快照形式独立保存，不被覆盖。"""
+
+    __tablename__ = "cxr_reviews"
+
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    analysis_id: Mapped[str] = mapped_column(
+        UUID, ForeignKey("cxr_analyses.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    owner_id: Mapped[int] = mapped_column(BIGINT_FK, nullable=False, index=True)
+    reviewer_id: Mapped[int | None] = mapped_column(BIGINT_FK, nullable=True, index=True)
+    reviewer_username: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    state: Mapped[str] = mapped_column(String(16), nullable=False, default="draft", index=True)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    items_json: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    model_snapshot_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow, onupdate=utcnow)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    decided_by_id: Mapped[int | None] = mapped_column(BIGINT_FK, nullable=True)
+    decided_by_username: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("analysis_id", "owner_id", name="uq_cxr_review_analysis_owner"),
+    )
+
+
+class CxrReport(Base):
+    """不可变报告快照；最终报告引用指定复核 revision，修订出新版本。"""
+
+    __tablename__ = "cxr_reports"
+
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    analysis_id: Mapped[str] = mapped_column(
+        UUID, ForeignKey("cxr_analyses.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    review_id: Mapped[str] = mapped_column(
+        UUID, ForeignKey("cxr_reviews.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    review_revision: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    state: Mapped[str] = mapped_column(String(16), nullable=False, default="draft", index=True)
+    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    supersedes_id: Mapped[str | None] = mapped_column(UUID, nullable=True, index=True)
+    snapshot_json: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    snapshot_sha256: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    artifact_id: Mapped[str | None] = mapped_column(UUID, nullable=True)
+    owner_id: Mapped[int] = mapped_column(BIGINT_FK, nullable=False, index=True)
+    issued_by_id: Mapped[int | None] = mapped_column(BIGINT_FK, nullable=True)
+    issued_by_username: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow, index=True)
+    issued_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("analysis_id", "version", name="uq_cxr_report_version"),
+    )

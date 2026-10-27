@@ -56,6 +56,8 @@ def register_base_model(
     relative_path: str,
     expected_sha256: str,
     class_map: dict,
+    model_task: str = "detect",
+    metadata: dict | None = None,
 ) -> ModelRegistry:
     if not admin.is_admin:
         raise ApiError(403, "forbidden", "只有管理员可以登记基础权重")
@@ -78,11 +80,11 @@ def register_base_model(
         format="pt",
         created_by=admin.username,
         owner_id=admin.id,
-        model_task="detect",
+        model_task=model_task,
         trusted_source="base",
         available=True,
         class_map_json={str(k): str(v) for k, v in (class_map or {}).items()},
-        metadata_json={"registered_from": relative_path},
+        metadata_json={"registered_from": relative_path, **(metadata or {})},
     )
     db.add(model)
     db.commit()
@@ -104,6 +106,9 @@ def register_trained_model(
     metrics: dict,
     backend: str,
     training_result: dict | None = None,
+    model_task: str = "detect",
+    file_format: str = "pt",
+    metadata_extra: dict | None = None,
 ) -> ModelRegistry:
     # The dispatcher holds the current job row lock before this call. A retry
     # after registration but before terminal status must reuse that registration.
@@ -115,7 +120,7 @@ def register_trained_model(
         return existing
     digest = sha256_file(best_path)
     target_dir = ensure_dir(settings.model_root / "training" / job_id)
-    target = target_dir / "best.pt"
+    target = target_dir / f"best.{file_format}"
     shutil.copy2(best_path, target)
     model = ModelRegistry(
         id=__import__("uuid").uuid4().hex,
@@ -125,17 +130,22 @@ def register_trained_model(
         size=target.stat().st_size,
         source="training",
         status="active",
-        format="pt",
+        format=file_format,
         task_id=job_id,
         training_job_id=job_id,
         dataset_version_id=version_id,
         created_by=owner_username,
         owner_id=owner_id,
-        model_task="detect",
+        model_task=model_task,
         trusted_source="platform",
         available=True,
         class_map_json={str(k): str(v) for k, v in class_map.items()},
-        metadata_json={"metrics": metrics, "backend": backend, "training_result": training_result},
+        metadata_json={
+            "metrics": metrics,
+            "backend": backend,
+            "training_result": training_result,
+            **(metadata_extra or {}),
+        },
     )
     db.add(model)
     db.commit()

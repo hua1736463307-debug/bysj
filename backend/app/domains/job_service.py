@@ -23,7 +23,15 @@ from app.db.models import JobEvent, JobTask, InferenceRun, EvaluationRun
 
 
 def _sync_domain_state(db: Session, job: JobTask, status: str) -> None:
-    model, key = {"inference": (InferenceRun, "run_id"), "evaluation": (EvaluationRun, "evaluation_id")}.get(job.type, (None, None))
+    from app.db.models import CxrAnalysisBatch
+
+    mapping = {
+        "inference": (InferenceRun, "run_id"),
+        "evaluation": (EvaluationRun, "evaluation_id"),
+        "cxr_evaluate": (EvaluationRun, "evaluation_id"),
+        "cxr_analyze": (CxrAnalysisBatch, "batch_id"),
+    }
+    model, key = mapping.get(job.type, (None, None))
     if model is None or status == "completed":
         return  # Successful handlers retain their completed/partial result.
     target = (job.input_json or {}).get(key)
@@ -31,6 +39,9 @@ def _sync_domain_state(db: Session, job: JobTask, status: str) -> None:
         values = {"status": status, "job_id": job.id}
         if status in {"failed", "cancelled", "interrupted"}:
             values["finished_at"] = utcnow()
+            if model is CxrAnalysisBatch:
+                values["error_code"] = status
+                values["error_detail"] = job.error_detail or job.message or ""
         elif status in {"pending", "running"}:
             values["finished_at"] = None
         db.query(model).filter(model.id == target).update(values, synchronize_session=False)

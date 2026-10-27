@@ -68,6 +68,21 @@ class Settings(BaseSettings):
     max_pending_training_per_user: int = 5
     training_epoch_seconds: int = 0
 
+    # CXR（胸片五标签）只读来源配置。API 只接受已配置的 source_id，
+    # 不接受任意服务器绝对路径、网络 URL 或 pickle。
+    cxr_import_root: Path | None = Field(
+        default=None, description="CXR 只读来源根目录；source_id 作为其子目录名"
+    )
+    cxr_sources: dict[str, str] = Field(
+        default_factory=dict, description="source_id -> 只读目录的显式映射，优先于 cxr_import_root"
+    )
+    cxr_ml_backend: str = Field(
+        default="auto", description="auto|densenet121|dummy；dummy 只用于契约测试"
+    )
+    cxr_allow_synthetic: bool = Field(
+        default=False, description="是否允许导入显式标注 synthetic 的工程 fixture"
+    )
+
     cors_origins: list[str] = []
 
     @field_validator("data_root", "model_root", "artifact_root", mode="before")
@@ -75,6 +90,13 @@ class Settings(BaseSettings):
     def _expand_path(cls, value):
         if value in (None, ""):
             return value
+        return Path(os.path.expanduser(str(value))).resolve()
+
+    @field_validator("cxr_import_root", mode="before")
+    @classmethod
+    def _expand_cxr_root(cls, value):
+        if value in (None, ""):
+            return None
         return Path(os.path.expanduser(str(value))).resolve()
 
     @model_validator(mode="after")

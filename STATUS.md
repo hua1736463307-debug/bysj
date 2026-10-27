@@ -1,6 +1,9 @@
 # 项目现状（一页版）
 
-> **当前状态入口**：[停止状态书](docs/refactor/execution/unblock/STATEBOOK-20261022.md)。已按用户指令停止实施；工程主链路已有证据，旧 E1/E2 因跨集近重复风险停止续跑。分组修复已部署，分组包尚未真实导入，最终最新备份待补。下文保留原 DS 交接历史。
+> **当前主线入口**：[CXR 五标签辅助分析状态](docs/cxr/STATUS.md)（2026-10-27 起，分支 `graduation/cxr-assist-20261027`）。
+> 下文保留旧检测方向的 DS 交接历史；旧 BCCD 分组 E1/E2 已标 `DEFERRED_BY_SCOPE_CHANGE`，不再追加训练。
+
+> **旧状态入口**：[停止状态书](docs/refactor/execution/unblock/STATEBOOK-20261022.md)。已按用户指令停止实施；工程主链路已有证据，旧 E1/E2 因跨集近重复风险停止续跑。分组修复已部署，分组包尚未真实导入，最终最新备份待补。下文保留原 DS 交接历史。
 
 > 更新时间：2026-10-22 01:35（America/Los_Angeles）
 > 分支：`graduation/pr-00-baseline`　基线：`c47950b`

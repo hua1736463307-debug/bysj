@@ -1,0 +1,29 @@
+{
+  "name": "cxr-five-pilot-a0-a1",
+  "label_schema": "cxr-five-v1",
+  "dataset_version_id": "REPLACE_WITH_FROZEN_CXR_VERSION_ID",
+  "expected_manifest_sha256": null,
+  "base_model_id": "REPLACE_WITH_CXR_BACKBONE_MODEL_ID",
+  "expected_base_model_sha256": null,
+  "seeds": [42, 43, 44],
+  "arms": [
+    {"name": "A0", "class_weight": "none"},
+    {"name": "A1", "class_weight": "pos_weight"}
+  ],
+  "params": {
+    "epochs": 20,
+    "batch": 8,
+    "image_size": 224,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "patience": 5,
+    "num_workers": 0,
+    "amp": false,
+    "device": "0"
+  },
+  "test": {
+    "enabled": false,
+    "purpose": "冻结协议后的首次 test 评价（需管理员执行，读取一次）"
+  },
+  "notes": "A0=masked BCE；A1=同架构 + train 统计 pos_weight。两组同初始权重/数据/预算/增强/种子。未取得真实数据与 GPU 前不得提交。"
+}

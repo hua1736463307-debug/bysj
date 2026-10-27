@@ -153,12 +153,13 @@ def import_dataset(
 
 @router.get("/datasets", response_model=None)
 def list_datasets(
+    task: str | None = Query(default=None, description="按 task_type 过滤，例如 detect / cxr_multilabel"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
     user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    items, total = service.list_datasets(db, user, page=page, page_size=page_size)
+    items, total = service.list_datasets(db, user, page=page, page_size=page_size, task_type=task)
     return ok(
         {
             "items": [
@@ -239,6 +240,7 @@ def create_train_tiles(dataset_id: str, payload: TrainTilesRequest,
     service.get_dataset(db,dataset_id,user)
     parent=service.get_version(db,payload.parent_version_id,user)
     if parent.dataset_id!=dataset_id:raise ApiError(404,'not_found','父版本不属于该数据集')
+    service.assert_detect_task(db, parent)
     if parent.state!='frozen':raise ApiError(409,'parent_not_frozen','先冻结父版本再创建训练切片')
     job,created=job_service.create_job(db,job_type='dataset_process',owner_id=user.id,owner_username=user.username,
         payload=payload.model_dump(),idempotency_key=idempotency_key)
@@ -264,6 +266,7 @@ def create_version(
     )
     if version is None:
         raise ApiError(404, "not_found", "数据集还没有版本")
+    service.assert_detect_task(db, version)
     if len(payload.ratios) != 3 or any(value <= 0 for value in payload.ratios):
         raise ApiError(422, "invalid_ratios", "三集比例必须是三个正数")
     if version.dataset_id != resource.id:

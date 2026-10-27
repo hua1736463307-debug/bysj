@@ -20,10 +20,25 @@ import DatasetManager from './views/DatasetManager.vue'
 import Training from './views/Training.vue'
 import Inference from './views/Inference.vue'
 import ModelHub from './views/ModelHub.vue'
+import CxrDashboard from './views/cxr/Dashboard.vue'
+import CxrData from './views/cxr/Data.vue'
+import CxrTraining from './views/cxr/Training.vue'
+import CxrAnalysis from './views/cxr/Analysis.vue'
+import CxrReview from './views/cxr/Review.vue'
+import CxrReports from './views/cxr/Reports.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { guestOnly: true } },
-  { path: '/', redirect: '/raw-dataset' },
+  // 新主线：胸片五标签辅助分析
+  { path: '/', redirect: '/cxr/dashboard' },
+  { path: '/cxr', redirect: '/cxr/dashboard' },
+  { path: '/cxr/dashboard', component: CxrDashboard, meta: { requiresAuth: true } },
+  { path: '/cxr/data', component: CxrData, meta: { requiresAuth: true } },
+  { path: '/cxr/training', component: CxrTraining, meta: { requiresAuth: true } },
+  { path: '/cxr/analysis', component: CxrAnalysis, meta: { requiresAuth: true } },
+  { path: '/cxr/review', component: CxrReview, meta: { requiresAuth: true } },
+  { path: '/cxr/reports', component: CxrReports, meta: { requiresAuth: true } },
+  // 历史研究入口（BCCD 检测链路）保留 deep-link，不删除
   { path: '/raw-dataset', component: Dataset, meta: { requiresAuth: true } },
   { path: '/dataset', redirect: '/raw-dataset' },
   { path: '/image', redirect: '/raw-dataset' },

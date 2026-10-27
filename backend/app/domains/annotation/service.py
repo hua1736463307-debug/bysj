@@ -126,6 +126,7 @@ def save_annotations(
 ) -> dict:
     asset = dataset_service.get_asset(db, asset_id, user)
     version = dataset_service.get_version(db, asset.dataset_version_id, user)
+    dataset_service.assert_detect_task(db, version)
     version = db.query(DatasetVersion).filter(DatasetVersion.id == version.id).populate_existing().with_for_update().one()
     if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_frozen", "冻结版本内容只读；请创建子版本后再修改标注")

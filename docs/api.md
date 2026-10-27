@@ -145,3 +145,51 @@ Content-Type: application/json
 上例数字仅演示字段，不是性能验收。`total_ms` 为整批受理到该图写入阶段的累计时间，随批内位置增长；`processing_ms` 为本图预测及产物处理区间，`model_ms` 为框架同步后的推理区间。`queue_ms` 是领取前等待，`gpu_wait_ms` 是领取后 GPU 租约等待；不能把累计 `total_ms` 解释成单图 GPU 耗时。完整定义和实测样本见 [E4 性能报告](experiments/2026-10-22/PERFORMANCE.md)。
 
 正式训练应显式固定 `optimizer/lr0/lrf/momentum/weight_decay/warmup_epochs`；当前只接受 AdamW 或 SGD，不接受随迭代规模改变行为的 auto。有效参数、增强、早停与锁/源码摘要保存在训练结果中。被取消的训练不能经 `/resume` 复活；工具的 `--retry-cancelled` 是显式创建新任务并保留旧证据。
+
+## 9. 胸片五标签辅助分析（`/api/v1/cxr`）
+
+新主线接口，与 detect 契约并存但互不混用。标签契约 `cxr-five-v1`，任务 `cxr_multilabel`，顺序固定为
+`atelectasis / cardiomegaly / consolidation / edema / pleural_effusion`。
+
+| 方法 | 路径 | 权限 | 说明 |
+|---|---|---|---|
+| GET | `/cxr/schema` | 登录 | 固定 key/中文名、四态、四集、格式、borderline margin |
+| GET | `/cxr/dashboard` | 登录 | 真实统计（无数据为 0） |
+| POST | `/cxr/datasets/import` | 管理员 | 202 `cxr_import`；`Idempotency-Key` 必需；只接受已配置 `source_id` |
+| GET | `/cxr/datasets` | 登录 | 仅 `task_type=cxr_multilabel` |
+| POST | `/cxr/datasets/{id}/versions` | 登录 | 202 `cxr_freeze`；四集 70/10/10/10，`split_seed=42` |
+| GET | `/cxr/datasets/{id}/versions/{vid}/summary` | 登录 | 四集图数/患者/component、四态覆盖、重复候选、训练门禁 |
+| POST | `/cxr/training/preflight` | 登录 | 独立 `CxrTrainingParams` 白名单与门禁 |
+| POST | `/cxr/training/jobs` | 登录 | 202 `cxr_train`；`Idempotency-Key` 必需 |
+| GET | `/cxr/models` | 登录 | `task=cxr_multilabel\|cxr_backbone` |
+| POST | `/cxr/evaluations` | 登录 | 202 `cxr_evaluate`；`calibrate` 只能 calibration；`test` 需 admin + purpose |
+| GET | `/cxr/evaluations` | 登录 | 摘要指标（不含 map50） |
+| POST | `/cxr/analysis-batches` | 登录 | 202 `cxr_analyze`；`asset_ids`（≤100，不截断） |
+| POST | `/cxr/analysis-batches/upload` | 登录 | 同上，multipart JPG/PNG |
+| GET | `/cxr/analysis-batches`、`/{id}` | 登录 | 批次与逐项状态，不返回服务器路径 |
+| GET | `/cxr/analyses/{id}`、`/{id}/image` | 登录 | 五项完整结果；原图回读 |
+| POST | `/cxr/analyses/{id}/explanations` | 登录 | 202 `cxr_explain`；`label_key` 必需 |
+| POST | `/cxr/reviews`、PATCH `/{id}` | 登录 | 逐标签意见；PATCH 需 `expected_revision`（CAS，409 保草稿） |
+| POST | `/cxr/reviews/{id}/submit`、`/decision` | 登录 / 复核权限 | `draft→submitted→approved\|rejected`；五项未填全或含 indeterminate 不可批准 |
+| POST | `/cxr/reports`、GET `/{id}`、`/{id}/export` | 登录 | 不可变快照；`format=json\|html`；无批准复核只出草稿 |
+
+单项分析输出示例（字段语义固定，数值仅示意）：
+
+```json
+{"analysis_id":"...","status":"completed",
+ "calibration":{"status":"not_calibrated","threshold_source":"default_no_calibration"},
+ "labels":[
+  {"label_key":"atelectasis","display_name":"肺不张","raw_score":0.4123,"calibrated_score":null,
+   "threshold":0.5,"flag":"below_threshold","calibration_status":"not_calibrated"},
+  {"label_key":"cardiomegaly","display_name":"心影增大","raw_score":0.7302,"calibrated_score":null,
+   "threshold":0.5,"flag":"above_threshold","calibration_status":"not_calibrated"}
+ ],
+ "quality":{"flags":["low_resolution"],"definition":"工程提示，不是经临床验证的质量评估"},
+ "explanation":{"score_semantics":"模型评分，不是临床确诊概率；未超过阈值不等于排除该征象或其他疾病"}}
+```
+
+`flag` 取值 `above_threshold / below_threshold / borderline / not_available`，永不返回 `confirmed_disease` 或 `healthy`。
+`raw_uncertain`（来源报告不确定）、`borderline`（预测接近阈值）、`not_calibrated`（校准数据不足）是三个不同字段，不合并成"置信度低"。
+
+任务类型保护：对 `task_type != detect` 的版本调用 BBox 冻结/切片/标注接口返回 `409 task_mismatch`；
+用 `cxr_backbone` 或 detect 模型做胸片分析返回 `422 cxr_backbone_not_analyzable` / `422 model_task_mismatch`。

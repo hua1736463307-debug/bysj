@@ -102,3 +102,64 @@ python scripts/run_grouped_revision.py ... verify
 `submitting_*` 状态；超时且无 job id 时属于不确定提交，先查 `/jobs` 与数据集，禁止重发。
 `verify` 会全量分页核对 364 图/4,888 框/363 组、291/37/36、逐图 sha256 与标签。
 `image_cluster` 声明应同时出现在 resource、asset、version metadata、split_config 和磁盘 manifest。
+
+## 9. 胸片五标签（CXR）操作手册
+
+### 9.1 配置只读来源
+
+管理员在部署环境中设置（不写入镜像、不进 Git）：
+
+```
+CXR_IMPORT_ROOT=/data/raw/chexpert          # source_id 作为子目录名
+# 或显式映射（优先）：
+CXR_SOURCES={"chexpert-local":"/data/raw/chexpert"}
+CXR_ML_BACKEND=densenet121                  # auto|densenet121|dummy
+CXR_ALLOW_SYNTHETIC=false                   # 合成 fixture 默认拒绝
+```
+
+API 只接受已配置的 `source_id`；任何服务器绝对路径、网络 URL、pickle 一律拒绝。
+
+### 9.2 离线审计与选择规划
+
+```bash
+python scripts/prepare_chexpert.py --source-root /data/raw/chexpert \
+  --source-csv train.csv --output artifacts/cxr-prep --max-patients 10000 --split-seed 42 --dry-run
+```
+
+`--dry-run` 只审计与规划，不写数据库、不发布版本；去掉后额外写 `prepare-report.json` 与 `selection.csv`。
+
+### 9.3 导入与冻结（HTTP）
+
+1. `POST /api/v1/cxr/datasets/import`，body `{"source_id","source_csv","max_patients"}`，头 `Idempotency-Key` 必需，管理员。
+2. `POST /api/v1/cxr/datasets/{id}/versions`，body `{"split_seed":42,"ratios":[0.7,0.1,0.1,0.1]}`。
+3. `GET /api/v1/cxr/datasets/{id}/versions/{vid}/summary` 读四集、四态覆盖、重复候选与训练门禁。
+
+冻结失败（`422 cxr_split_invalid` / `cxr_insufficient_components`）时不要反复改阈值重试，先看 `details`。
+
+### 9.4 工程 smoke（真实 2 epoch）
+
+1. 先把 ImageNet 骨干登记为 `cxr_backbone`（`register_base_model(..., model_task="cxr_backbone")`）。
+2. `POST /api/v1/cxr/training/preflight`，body `{"dataset_version_id","base_model_id","params":{"epochs":2,"batch":8}}`。
+3. `POST /api/v1/cxr/training/jobs`，同一 body + `Idempotency-Key`，返回 202 与 `job_id`。
+
+smoke 不读 test；随机/dummy 产物带 `research_valid=false`，不得进入研究汇总。
+
+### 9.5 三 seed 对比
+
+先 `--prepare-only` 冻结协议并确认没有提交任何作业，再导出进程级环境变量 `BYSJ_USER` / `BYSJ_PASSWORD`
+（不要写进命令行或文件），然后去掉 `--prepare-only` 并加 `--resume` 执行。`test` 默认 `enabled=false`，
+开启需管理员执行且只读一次。
+
+### 9.6 常见错误码
+
+| code | 含义 | 处置 |
+|---|---|---|
+| `cxr_source_not_configured` | 未配置来源 | 设置 `CXR_IMPORT_ROOT`/`CXR_SOURCES` 后重试 |
+| `cxr_synthetic_source_rejected` | 来源是合成 fixture | 仅工程验证时开 `CXR_ALLOW_SYNTHETIC` |
+| `task_mismatch` | 用 detect 接口操作 CXR 版本（或反之） | 改用 `/api/v1/cxr` |
+| `cxr_backbone_not_analyzable` | 用 ImageNet 骨干做分析 | 先训练出 `cxr_multilabel` 模型 |
+| `model_tampered` | 模型文件 hash 与登记不符 | 重新登记，勿手改权重文件 |
+| `cxr_calibration_split` | 在非 calibration 集拟合温度 | 改用 `split=calibration` |
+| `cxr_test_purpose_required` | test 评价缺目的 | 填写 `purpose`（管理员） |
+| `cxr_batch_too_large` | 超过单批上限 | 分批提交，系统不会静默截断 |
+| `cxr_revision_conflict` | 复核 CAS 冲突 | 刷新后重填，草稿已保留 |

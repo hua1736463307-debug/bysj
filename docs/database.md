@@ -101,3 +101,36 @@ erDiagram
 ## 7. 引用检查边界
 
 当前模型未声明 SQL ForeignKey；跨表引用主要由域服务检查，不能把本文件的关系描述误认为数据库强制外键。`scripts/audit_database_links.py` 在只读一致性快照中对 48 项明确的非空标量引用执行反连接检查。2026-10-22 对本轮恢复库实测均为 0 悬空引用；该结果只说明受检关系，不涵盖 JSON、多态 resource_id、授权及全部业务语义。后续若引入物理 FK，应先审计数据并设计增量迁移，不在正式训练中改变 schema。
+
+## 8. CXR 五标签表（Alembic `4a6b1222f003`）
+
+新增 5 张表，接在 `4a6b1222f002` 之后；不 drop 旧表、不 stamp 未知库、不批量改旧记录。
+
+```mermaid
+erDiagram
+    dataset_assets ||--o| cxr_samples : labels
+    dataset_resources ||--o{ dataset_versions : contains
+    cxr_analysis_batches ||--o{ cxr_analyses : contains
+    cxr_analyses ||--o{ cxr_reviews : reviewed_by
+    cxr_analyses ||--o{ cxr_reports : reported_by
+    cxr_reviews ||--o{ cxr_reports : revision_locked
+    job_tasks ||--o| cxr_analysis_batches : executes
+```
+
+| 表 | 主键/唯一 | 关键列 |
+|---|---|---|
+| `cxr_samples` | `id`；`asset_id` 唯一 | `dataset_version_id`、`patient_key`/`study_key`/`component_key`、`view`、`raw_labels_json`（四态）、`pixel_hash`、`source_hash` |
+| `cxr_analysis_batches` | `id`；`(owner_id, idempotency_key)`；`job_id` 唯一 | `model_id/model_sha256`、`request_hash`、`status/total/completed/failed` |
+| `cxr_analyses` | `id`；`(batch_id, item_key, attempt)` | `asset_id`(nullable)、`upload_ref`、`raw_scores_json`/`calibrated_scores_json`/`thresholds_json`、`calibration_status`/`threshold_source`、`quality_json`、`explanation_*`、`backend`、`attempt` |
+| `cxr_reviews` | `id`；`(analysis_id, owner_id)` | `state`、`revision`（CAS）、`items_json`、`model_snapshot_json`（原评分不可覆写）、`decided_by_*` |
+| `cxr_reports` | `id`；`(analysis_id, version)` | `review_id + review_revision`、`state`、`supersedes_id`、`snapshot_json + snapshot_sha256`、`issued_by_*` |
+
+**外键**：`cxr_samples.asset_id`、`cxr_analyses.batch_id/asset_id`、`cxr_reviews.analysis_id`、`cxr_reports.analysis_id/review_id` 均为
+`FOREIGN KEY ... ON DELETE RESTRICT`。这是本项目首次声明物理 FK：软删除的模型/资产仍保留引用，审核与报告不级联物理删除历史。
+旧表关系仍由域服务检查（见第 7 节），本节的 FK 不改变旧表行为。
+
+**与 detect 的边界**：`cxr_samples.annotations_json` 对 CXR 恒为空（不生成假 BBox）；`dataset_resources.task_type` 默认仍为 `detect`，
+CXR 数据集显式写 `cxr_multilabel`；`group_level` 为 CXR 专属 `patient_component`，未并入旧 `GROUP_LEVELS`。
+
+**迁移验证**：空库 21→27 表；重复 upgrade 无变更；`downgrade 4a6b1222f002` 只删 5 张 CXR 表且 `dataset_assets` 等保留；再 upgrade 成功。
+真实库副本升级 **NOT_RUN**（无可用 PG/容器）。

@@ -24,7 +24,7 @@ from app.workers.dispatcher import JobContext, JobCancelled, run_claimed_job
 
 logger = logging.getLogger("bysj.worker.dataset")
 
-WORKER_TYPES = ("dataset_import", "dataset_version", "dataset_process", "annotation_export", "feedback_export", "dataset_export")
+WORKER_TYPES = ("dataset_import", "dataset_version", "dataset_process", "annotation_export", "feedback_export", "dataset_export", "cxr_import", "cxr_freeze")
 
 
 def handle_dataset_import(ctx: JobContext) -> dict:

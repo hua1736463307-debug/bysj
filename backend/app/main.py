@@ -15,6 +15,7 @@ from app import __version__
 from app.api.v1 import annotations as annotations_api
 from app.api.v1 import auth as auth_api
 from app.api.v1 import artifacts as artifacts_api
+from app.api.v1 import cxr as cxr_api
 from app.api.v1 import datasets as datasets_api
 from app.api.v1 import evaluations as evaluations_api
 from app.api.v1 import experiments as experiments_api
@@ -61,7 +62,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title="医学图像训推平台 API",
         version=__version__,
-        description="毕业设计医学图像检测平台（P0 + 人工复核闭环）。",
+        description=(
+            "面向多病种的医学影像辅助诊断系统（研究原型）：胸片五标签辅助分析"
+            "（cxr_multilabel / cxr-five-v1）为主链路；检测/标注为历史研究模块。"
+            "默认研究用途、需人工复核，不提供临床诊断结论。"
+        ),
         lifespan=lifespan,
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
@@ -84,6 +89,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         artifacts_api,
         reviews_api,
         experiments_api,
+        cxr_api,
     ):
         app.include_router(module.router, prefix=settings.api_prefix)
 
