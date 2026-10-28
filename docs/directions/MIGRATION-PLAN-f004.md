@@ -108,9 +108,17 @@ docker run --rm --entrypoint python bysj-worker:f004-$SHA \
 | `bysj-api:drill-20261027` | `sha256:f73aa98680f6011cc074ccfb1c883190732386885bd55ddb9efe13013a55f457` | fastapi 0.136.1 / sqlalchemy 2.0.49 / psycopg 3.3.4 / numpy 2.4.4 |
 | `bysj-worker:drill-20261027` | `sha256:cfa03bd9320e1b0971fb2e218a5b8fec11b9f2c0f76b7b220ee4a02446c90989` | torch 2.6.0+cu124 / torchvision 0.21.0+cu124 |
 
-`git diff 6b06e5b..abfd310 -- backend deploy` 为空，因此上述镜像的后端代码与 `abfd310` 一致；
-但生产迁移仍应**按迁移提交重新构建并记录新 ID**，避免"镜像 SHA 与 HEAD 不符"的追溯缺口。
-worker 重建需重新下载 ML 依赖（首次实测 34m48s），建议在窗口前一天完成。
+已构建并记录的候选（**都不含最终代码，只能作为构建可行性证据**）：
+
+| 镜像 | ID | 代码 | 用途 |
+|---|---|---|---|
+| `bysj-api:candidate-ddce908` | `sha256:e9e88b31f18f…` | `ddce908` | 候选构建验证 |
+| `bysj-worker:candidate-ddce908` | `sha256:d84039e38b19…` | `ddce908` | 同上 |
+| `bysj-api:isic-63bff5f` | `sha256:5104dd8b849d…` | `63bff5f` | ISIC smoke |
+| `bysj-worker:isic-63bff5f` | `sha256:a9ef8869eddb…` | `63bff5f` | ISIC smoke |
+
+生产迁移仍**必须按最终提交重新构建并记录新 ID**，避免"镜像 SHA 与 HEAD 不符"的追溯缺口。
+worker 重建要重新下载 ML 依赖（实测 34–53 分钟，随网络波动），**建议窗口前一天完成构建**。
 
 前端镜像 `bysj-frontend:20261022` 无需重建（前端已包含 `/cxr/*` 页面，见 E2E 证据）。
 
@@ -126,8 +134,12 @@ PYTHONPATH=scripts python scripts/backup_project.py \
   --output "D:/毕业设计/backups/$(date +%Y%m%d-%H%M)-pre-f004"
 ```
 
-脚本会：停 frontend/api/worker（保留 db）→ 复查无在途任务 → dump → 打包三卷（含逐文件 SHA）→ 重启服务 → 写 `backup.json`。
+脚本会：停 frontend/api/worker（保留 db）→ 复查无在途任务 → dump → 打包三卷（含逐文件 SHA）→ **自动重启被停的服务** → 写 `backup.json`。
 要求 `status=complete`、`restart_failures=[]`。
+
+> **注意：备份脚本会在 `finally` 里自动 `docker start` 被停的容器**（源码 `backup_project.py` 第 103–108 行）。
+> 也就是说备份完成后服务会**重新对外提供服务**，此时到迁移之间可能出现新写入。
+> 因此备份完成后必须**立即再次停写并核对行数**（见 6.2），不能把"备份完成"当成"已经停写"。
 
 独立复核（不依赖脚本自述）：
 
@@ -144,7 +156,32 @@ print("backup verified", m["status"], m["alembic_revision"], len(m["row_counts"]
 PY
 ```
 
-### 6.2 迁移数据库（只跑迁移，不启动业务）
+### 6.2 停写验证（不可跳过）
+
+```bash
+# a) 再次停掉所有业务进程（db 保持运行）
+docker stop bysj-restore2-20261022-api-1 \
+  bysj-restore2-20261022-dataset-worker-1 \
+  bysj-restore2-20261022-worker-1 \
+  bysj-restore2-20261022-inference-worker-1 \
+  bysj-restore2-20261022-frontend-1
+
+# b) 确认没有活跃业务连接（除本机的 psql 外应为空）
+docker exec bysj-restore2-20261022-db-1 psql -U bysj -d bysj -tAc \
+ "select count(*) from pg_stat_activity
+  where datname='bysj' and pid <> pg_backend_pid() and state <> 'idle';"
+
+# c) 再取一次行数，与备份报告的 row_counts 逐表比对
+docker exec bysj-restore2-20261022-db-1 psql -U bysj -d bysj -tAc \
+ "select 'job_tasks='||count(*) from job_tasks union all
+  select 'dataset_assets='||count(*) from dataset_assets union all
+  select 'model_registry='||count(*) from model_registry;"
+```
+
+与 `backup.json` 的 `row_counts` **必须一致**；不一致说明备份后又有写入，**重新备份**再继续。
+只有在"业务进程已停 + 无活跃连接 + 行数与备份一致"三条同时成立时，才允许执行迁移。
+
+### 6.3 迁移数据库（只跑迁移，不启动业务）
 
 ```bash
 docker run --rm --network bysj-restore2-20261022_default \
@@ -156,7 +193,7 @@ docker run --rm --network bysj-restore2-20261022_default \
 
 预期输出：`Running upgrade 4a6b1222f002 -> 4a6b1222f003` 与 `4a6b1222f003 -> 4a6b1222f004`。
 
-### 6.3 迁移后、启动前的校验
+### 6.4 迁移后、启动前的校验
 
 ```bash
 DB=bysj-restore2-20261022-db-1
@@ -168,7 +205,7 @@ docker exec $DB psql -U bysj -d bysj -tAc "select count(*) from pg_constraint wh
 
 旧表行数必须与备份报告逐表一致（演练已验证：迁移前后零差异）。
 
-### 6.4 切换镜像并启动
+### 6.5 切换镜像并启动
 
 ```bash
 cd D:/毕业设计/bysj-unblock/.runtime/restore2-20261022
@@ -203,17 +240,24 @@ docker compose --env-file .env -p bysj-restore2-20261022 \
 | 方案 | 步骤 | 代价 | 适用 |
 |---|---|---|---|
 | **A. 备份恢复（推荐）** | 用 6.1 的备份 `restore_project.py` 恢复到新项目 `bysj-restore3-<ts>`（新卷、新端口），验证后把前端/反代指向新项目 | 约 3–5 分钟；旧项目保留只读 | 任何失败 |
-| **B. 降级 + 旧镜像** | `alembic downgrade 4a6b1222f002` → 改回旧镜像 → 启动 | 约 2 分钟；**必须降级成功后才能用旧镜像**，否则旧镜像不认识 f003/f004 revision | 仅当新表为空且降级已演练 |
+| **B. 降级 + 旧镜像** | `alembic downgrade 4a6b1222f002` → 改回旧镜像 → 启动 | 约 2 分钟；**会永久丢失 CXR/ISIC 数据** | 仅当新表数据可丢弃 |
 
-**首选 A**：不依赖降级正确性，且旧库原样保留。**B 的前提**是 `downgrade` 已验证会删除 6 张新表且不动旧表
-（空库 SQLite 已验；PG 未演练）。
+**首选 A**：不依赖降级正确性，且旧库原样保留。
+
+**B 的实测结果（2026-10-28，隔离库 PG）**：`downgrade 4a6b1222f002` 成功，
+22 张旧表行数**逐表零差异**、6 张新表被删除、外键约束归零；再 `upgrade head` 也成功。
+但降级**不可逆地丢弃新表数据**（`cxr_samples`/`isic_samples` 归 0），并留下
+**14 条 `dataset_assets` 与 14 个数据卷文件成为孤立资产**（不会自动清理）。
+
+因此 B 只在"新表数据可丢弃、且接受孤立资产人工清理"时使用；
+需要保留 CXR/ISIC 数据时**只能用 A**。详见 `MIGRATION-READINESS-20261028.md` 第 4 节。
 
 回滚后必须：恢复服务 → `/health/ready` 200 → 抽查数据集/模型数量 → 记录失败原因与镜像 ID。
 
 ## 9. 风险与仍未满足的条件
 
 1. **GPU 未参与演练**：演练栈未挂 GPU，迁移后 GPU 训练/推理的实际可用性仍属未验证（代码路径在目标镜像内单独测过）。
-2. **PG 降级未演练**：方案 B 依赖 `alembic downgrade` 在 PG 上的行为，只在空库 SQLite 验过。
+2. **PG 降级已演练**（2026-10-28）：可用，但会丢新表数据并留下孤立资产，故仍以方案 A 为主。
 3. **备份未加密、仅本机**：窗口前应确认磁盘余量，必要时复制到第二块盘。
 4. **真实数据未就绪**：CXR 无数据、ISIC 图像未齐（见第 10 节），迁移后新方向只有空态页面，不产生任何指标。
 5. **浏览器 E2E 针对隔离环境**：生产切换后建议手工走一遍 CXR 空态页面。

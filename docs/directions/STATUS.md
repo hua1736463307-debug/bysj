@@ -4,6 +4,7 @@
 > 数据盘点与实测：`docs/datasets/DATASET_INVENTORY.md`。
 > 隔离备份恢复演练：`docs/directions/RESTORE-DRILL-20261027.md`。
 > 生产迁移窗口方案（**未执行**）：`docs/directions/MIGRATION-PLAN-f004.md`。
+> 迁移前补充验证（BCCD 功能、GPU 取消、PG 降级、备份保护）：`docs/directions/MIGRATION-READINESS-20261028.md`。
 > ISIC 数据核验与四集方案：`docs/datasets/ISIC-SPLIT-PLAN.md`。
 > 分支 `graduation/cxr-assist-20261027`，草稿 PR #2（base `graduation/unblock-20261022`，未合并）。
 
@@ -16,8 +17,9 @@
 工程侧已完成：分支已推送、CI 全绿；f004 备份恢复演练在隔离环境全链路通过（运行项目仍为 f002、未被改动）；
 ISIC 三个子集图像已全部下载并校验；生产迁移方案已写好但**未执行**，等待窗口确认。
 
-**ISIC 数据侧已就绪，训练侧仍缺**：平台只有 `isic_import` / `isic_freeze`，
-没有七类 softmax 适配器与 `isic_train` / `isic_evaluate`，因此仍不能产生任何 ISIC 指标。
+**ISIC 训练链路已实现**（`63bff5f`）：七类 softmax 适配器、`isic_train` / `isic_evaluate` 作业、
+逐类 P/R/F1 + macro-F1 + 混淆矩阵 + top-1 ECE，走既有 trainer 角色与 GPU 租约。
+真实数据 smoke 见 `docs/directions/ISIC-SMOKE-20261028.md`；smoke 数值不是论文指标。
 
 ## 1. 方向矩阵
 
@@ -73,12 +75,15 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 | 运行中项目 | **未改动** | 仍 `4a6b1222f002`、22 表、5,255 资产、115 任务；容器未重启 |
 | ISIC 数据完整性 | **PASS** | 三个 ZIP 字节数与官方一致、`unzip -t` 无错误、SHA-256 已记录；标签↔图像 1:1 |
 | ISIC 分组/重复审计 | **PASS（有边界）** | 7,470 lesion、训练覆盖 100%；11,720 张全量比对，跨子集字节重复 **0**；重编码重复未检测 |
-| 生产迁移方案 | **READY（未执行）** | 门禁命令、备份、迁移、验证、回滚、清单均已写明；等窗口确认 |
+| 生产迁移方案 | **READY（未执行）** | 门禁、停写验证、备份、迁移、验证、回滚、清单均已写明；等窗口确认 |
+| PG 降级演练 | **PASS（有代价）** | 隔离库 f004→f002 成功，旧表零变化；但丢新表数据并留 14 条孤立资产 |
+| 旧 BCCD 功能 | **部分 PASS** | 推理作业 3/3 完成、71 框落库；但旧训练权重 0 框（退化），只能验到管线级 |
+| 备份保护 | **未完成** | 未加密、仅本机；方案见 READINESS 第 5 节，等你决定 |
 
 ## 5. 本轮未做（明确）
 
-- **没有真实训练**：ISIC 三个子集图像已全部下载并校验，但**训练链路未实现**（无 softmax 适配器、
-  无 `isic_train`），因此仍不能开始训练；CXR 真实数据不可达。
+- **没有正式训练**：ISIC 训练链路已实现，只跑过 1 epoch 的工程 smoke；CXR 真实数据不可达。
+- **旧 BCCD 权重不可用**：现有 `best.pt` 在 conf=0.01 下仍 0 框，属既有数据问题，未修复。
 - **生产迁移未执行**：方案已就绪，运行库仍 f002。
 - **没有 ISIC 模型/分析/报告页面**：本轮只接通数据与冻结；模型推理沿用 CXR 的 DenseNet 适配器
   （`isic` 方向已声明 `softmax` 输出，但尚未接入训练/评价/报告链路）。
@@ -87,7 +92,8 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 
 ## 6. 下一步
 
-1. 实现 ISIC 训练链路（7 类 softmax 适配器、多类损失、逐类指标、`isic_train`/`isic_evaluate`）
-   → 导入 + 按 lesion 冻结四集 → 1–2 epoch GPU smoke（smoke 不作论文指标）。
+1. ISIC 正式实验：多 epoch、多 seed、calibration 拟合、test 只读一次、外部留出集对照
+   （smoke 已完成，见 `docs/directions/ISIC-SMOKE-20261028.md`）。
+2. 生产迁移：等窗口确认；按最终提交重建镜像并重新验证（见 `MIGRATION-PLAN-f004.md`）。
 2. NIH 数据到位后新建 `nih-chestxray14-v1` 适配器（14 列布尔，不复用四态）。
 3. ISIC 训练/评价/报告链路接入（softmax 指标：逐类 P/R/F1、macro-F1、混淆矩阵、ECE）。

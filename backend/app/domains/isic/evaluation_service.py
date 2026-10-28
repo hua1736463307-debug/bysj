@@ -95,15 +95,15 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         if not (payload.get("purpose") or "").strip():
             raise ApiError(422, "isic_test_purpose_required", "test 评价必须写明预登记目的")
 
-    adapter = get_isic_adapter(settings)
-    checks.append(
-        {
-            "name": "backend",
-            "status": "pass" if adapter.backend == "densenet121" else "warn",
-            "detail": f"backend={adapter.backend}"
-                      + ("（dummy 只验证契约，不产生研究指标）" if adapter.backend == "dummy" else ""),
-        }
-    )
+    configured = (getattr(settings, "isic_ml_backend", "auto") or "auto").lower()
+    if configured == "dummy":
+        checks.append({"name": "backend", "status": "warn",
+                       "detail": "显式配置 ISIC_ML_BACKEND=dummy：只验证契约，不产生研究指标"})
+    elif configured == "auto":
+        checks.append({"name": "backend", "status": "pass",
+                       "detail": "ISIC_ML_BACKEND=auto：实际后端由 trainer worker 决定（API 容器不含 torch）"})
+    else:
+        checks.append({"name": "backend", "status": "pass", "detail": f"ISIC_ML_BACKEND={configured}"})
 
     return {
         "ok": all(item["status"] != "fail" for item in checks),
@@ -111,7 +111,7 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         "split": split,
         "dataset_version_id": version.id if version else None,
         "model_id": model.id if model else None,
-        "backend": adapter.backend,
+        "backend": configured,
         "label_schema": ISIC_LABEL_SCHEMA,
     }
 

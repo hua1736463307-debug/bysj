@@ -147,15 +147,17 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
             {"name": "base_model", "status": "pass", "detail": "未提供初始权重：从随机初始化开始（smoke 允许）"}
         )
 
-    adapter = get_isic_adapter(settings)
-    checks.append(
-        {
-            "name": "backend",
-            "status": "pass" if adapter.backend == "densenet121" else "warn",
-            "detail": f"backend={adapter.backend}"
-                      + ("（dummy 只验证契约，不产生研究指标）" if adapter.backend == "dummy" else ""),
-        }
-    )
+    # 预检在 API 进程里跑，而 API 镜像按契约不含 torch；真正的训练在 trainer worker 里。
+    # 因此这里报告**配置值**并说明由谁决定，不能因为 API 没有 torch 就断言"后端是 dummy"。
+    configured = (getattr(settings, "isic_ml_backend", "auto") or "auto").lower()
+    if configured == "dummy":
+        checks.append({"name": "backend", "status": "warn",
+                       "detail": "显式配置 ISIC_ML_BACKEND=dummy：只验证契约，不产生研究指标"})
+    elif configured == "auto":
+        checks.append({"name": "backend", "status": "pass",
+                       "detail": "ISIC_ML_BACKEND=auto：实际后端由 trainer worker 决定（API 容器不含 torch）"})
+    else:
+        checks.append({"name": "backend", "status": "pass", "detail": f"ISIC_ML_BACKEND={configured}"})
 
     return {
         "ok": all(item["status"] != "fail" for item in checks),
@@ -163,7 +165,7 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         "params": params,
         "dataset_version_id": version.id if version else None,
         "base_model_id": base_model.id if base_model else None,
-        "backend": adapter.backend,
+        "backend": configured,
         "label_schema": ISIC_LABEL_SCHEMA,
         "class_order": list(ISIC_CLASS_KEYS),
     }

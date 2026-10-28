@@ -79,7 +79,17 @@ def run_child(
         )
         try:
             while process.poll() is None:
-                if should_stop and should_stop():
+                # 注意：`ctx.should_stop()` 在租约丢失/收到取消时是**抛 JobCancelled**，
+                # 不是返回 True。若直接调用，异常会跳过下面的优雅终止，子进程被 finally
+                # 里的 SIGKILL 直接杀掉。这里显式接住异常并走"写 stop.flag → SIGTERM →
+                # 宽限 → SIGKILL"的路径，让子进程有机会按 batch 边界自行退出。
+                cancelled = False
+                if should_stop:
+                    try:
+                        cancelled = bool(should_stop())
+                    except JobCancelled:
+                        cancelled = True
+                if cancelled:
                     stop_file.write_text("cancel", encoding="utf-8")
                     _signal_child(process, hard=False)
                     try:
