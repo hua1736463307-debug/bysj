@@ -3,6 +3,8 @@
 > 方向注册表：`backend/app/directions/`，对外只读接口 `GET /api/v1/directions`。
 > 数据盘点与实测：`docs/datasets/DATASET_INVENTORY.md`。
 > 隔离备份恢复演练：`docs/directions/RESTORE-DRILL-20261027.md`。
+> 生产迁移窗口方案（**未执行**）：`docs/directions/MIGRATION-PLAN-f004.md`。
+> ISIC 数据核验与四集方案：`docs/datasets/ISIC-SPLIT-PLAN.md`。
 > 分支 `graduation/cxr-assist-20261027`，草稿 PR #2（base `graduation/unblock-20261022`，未合并）。
 
 ## 0. 一句话结论
@@ -11,15 +13,18 @@
 胸片多标签（已实现，真实数据受限）、皮肤镜单标签（数据通路已实现，标签已审计、训练集已下载）、
 血细胞检测（历史模块保留）。**没有任何真实训练结果**，所有模型结论仍为空。
 
-工程侧另有两项已完成：分支已推送、CI 全绿；f004 备份恢复演练在隔离环境全链路通过，
-运行中的项目仍为 f002 且未被改动。
+工程侧已完成：分支已推送、CI 全绿；f004 备份恢复演练在隔离环境全链路通过（运行项目仍为 f002、未被改动）；
+ISIC 三个子集图像已全部下载并校验；生产迁移方案已写好但**未执行**，等待窗口确认。
+
+**ISIC 数据侧已就绪，训练侧仍缺**：平台只有 `isic_import` / `isic_freeze`，
+没有七类 softmax 适配器与 `isic_train` / `isic_evaluate`，因此仍不能产生任何 ISIC 指标。
 
 ## 1. 方向矩阵
 
 | 方向 key | 任务语义 | 输出 | 标签 | 分组 | 代码 | 真实数据 |
 |---|---|---|---|---|---|---|
 | `cxr` | 多标签分类 | 逐标签独立评分（sigmoid） | `cxr-five-v1`，5 项 + 四态 | patient_component | **已实现** | **BLOCKED_ACCESS** |
-| `isic2018` | 单标签分类 | softmax 分布（和为 1） | `isic2018-task3-v1`，7 类 | lesion（无分组时单图） | **已实现** | **PARTIAL**：标签 100%，验证集图像下载中 |
+| `isic2018` | 单标签分类 | softmax 分布（和为 1） | `isic2018-task3-v1`，7 类 | lesion（无分组时单图） | **已实现** | **已完整取得**：标签 + 三个子集图像，均校验 |
 | `bccd_detect` | 目标检测 | bbox + 置信度 | `bccd-detect-v1`，3 类 | image_cluster | **已实现（历史）** | 旧工作区已有，未在本轮验证 |
 
 任务语义分离是硬约束：注册表 `validate()` 会拒绝"单标签任务配多标签输出"这类错配；
@@ -66,11 +71,15 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 | CI（`82ccf42`） | **PASS** | backend / frontend / compose 均 success；gpu-acceptance skipped（无 GPU runner） |
 | f004 备份恢复演练 | **PASS** | 两套隔离项目，28 表 / 14,122 行，文件哈希全一致，新代码读取 200 |
 | 运行中项目 | **未改动** | 仍 `4a6b1222f002`、22 表、5,255 资产、115 任务；容器未重启 |
+| ISIC 数据完整性 | **PASS** | 三个 ZIP 字节数与官方一致、`unzip -t` 无错误、SHA-256 已记录；标签↔图像 1:1 |
+| ISIC 分组/重复审计 | **PASS（有边界）** | 7,470 lesion、训练覆盖 100%；11,720 张全量比对，跨子集字节重复 **0**；重编码重复未检测 |
+| 生产迁移方案 | **READY（未执行）** | 门禁命令、备份、迁移、验证、回滚、清单均已写明；等窗口确认 |
 
 ## 5. 本轮未做（明确）
 
-- **没有真实训练**：ISIC 训练集压缩包已完整下载（2,771,732,744 B，与官方 Content-Length 一致），
-  但验证集图像仅 13.6/53 MB、测试集未开始；CXR 真实数据不可达。
+- **没有真实训练**：ISIC 三个子集图像已全部下载并校验，但**训练链路未实现**（无 softmax 适配器、
+  无 `isic_train`），因此仍不能开始训练；CXR 真实数据不可达。
+- **生产迁移未执行**：方案已就绪，运行库仍 f002。
 - **没有 ISIC 模型/分析/报告页面**：本轮只接通数据与冻结；模型推理沿用 CXR 的 DenseNet 适配器
   （`isic` 方向已声明 `softmax` 输出，但尚未接入训练/评价/报告链路）。
 - **没有 NIH 适配器**：NIH 数据未取得，不写"看起来能用"的空实现。
@@ -78,6 +87,7 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 
 ## 6. 下一步
 
-1. 补齐 ISIC 验证集 / 测试集图像 → 冻结真实四集 → 1 epoch GPU smoke。
+1. 实现 ISIC 训练链路（7 类 softmax 适配器、多类损失、逐类指标、`isic_train`/`isic_evaluate`）
+   → 导入 + 按 lesion 冻结四集 → 1–2 epoch GPU smoke（smoke 不作论文指标）。
 2. NIH 数据到位后新建 `nih-chestxray14-v1` 适配器（14 列布尔，不复用四态）。
 3. ISIC 训练/评价/报告链路接入（softmax 指标：逐类 P/R/F1、macro-F1、混淆矩阵、ECE）。

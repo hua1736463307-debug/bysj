@@ -212,10 +212,51 @@ PYTHONPATH=scripts python scripts/restore_project.py \
 5. **未做备份加密与异地存放**：备份含私有数据，当前仅本机磁盘。
 6. **恢复耗时未做容量规划**：数据卷约 1 GB 时约 1 分钟；更大数据量未测。
 
-## 11. 演练资源处置
+## 11. 演练资源清单（暂时保留，未清理）
 
-两套隔离项目的容器已停止（`docker compose stop`），**卷保留**以便复核；
-未删除任何数据库、卷、备份、模型、数据集或运行服务。如需彻底移除：
+两套隔离项目的容器已停止（`docker compose stop`），**卷与备份全部保留**；
+未删除任何数据库、卷、备份、模型、数据集或运行服务。
+
+### 11.1 容器（11 个，全部 Exited）
+
+| 项目 | 容器 |
+|---|---|
+| `bysj-drill-f004-20261027` | `api-1`、`db-1`、`dataset-worker-1`、`frontend-1`、`inference-worker-1`、`migrate-1`、`worker-1` |
+| `bysj-drill2-f004-20261027` | `api-1`、`db-1`、`frontend-1`、`migrate-1` |
+
+### 11.2 卷（8 个，合计约 2.42 GB）
+
+| 卷 | 项目 | 占用 |
+|---|---|---|
+| `bysj-drill-f004-20261027-data` | drill 1 | 972.3 MB |
+| `bysj-drill-f004-20261027-models` | drill 1 | 125.6 MB |
+| `bysj-drill-f004-20261027-artifacts` | drill 1 | 28.54 MB |
+| `bysj-drill-f004-20261027-db-data` | drill 1 | 80.02 MB |
+| `bysj-drill2-f004-20261027-data` | drill 2 | 972.3 MB |
+| `bysj-drill2-f004-20261027-models` | drill 2 | 125.6 MB |
+| `bysj-drill2-f004-20261027-artifacts` | drill 2 | 28.54 MB |
+| `bysj-drill2-f004-20261027-db-data` | drill 2 | 79.99 MB |
+
+### 11.3 备份与报告
+
+| 路径 | 归属 | 大小 | 是否唯一 |
+|---|---|---|---|
+| `D:/毕业设计/backups/20261027-before-cxr` | **运行项目的 f002 备份（非演练产物）** | 997 MB | **不可删除** |
+| `D:/毕业设计/backups/20261027-drill-f004` | 演练创建（f004） | 997 MB | 可由演练卷重建 |
+| `bysj-unblock/.runtime/drill-f004-20261027/` | 演练创建（compose 副本 + restore.json） | < 1 MB | 结论已写入本文 |
+| `bysj-unblock/.runtime/drill2-f004-20261027/` | 演练创建 | < 1 MB | 同上 |
+| `bysj-unblock/artifacts/drill-20261027/` | 演练创建（seed/读取证据） | < 1 MB | 合成数据可由脚本确定性重建 |
+
+### 11.4 唯一性判断
+
+- 演练卷内的数据是 **f002 备份的副本 + 15 个合成文件**；f002 原件仍在
+  `backups/20261027-before-cxr`，合成文件可由 `scripts/seed_drill_synthetic.py` 确定性重建。
+- 因此清理演练项目**不会丢失任何唯一数据**；唯一会消失的是演练自身的运行态，
+  结论与命令已固化在本文与 `backups/20261027-drill-f004/backup.json`。
+- **未执行清理**，等待确认。确认后只删除上表标注"演练创建"的项目，且**不带** `bysj-restore2-*`
+  与 `backups/20261027-before-cxr`。
+
+清理命令（仅在确认后执行）：
 
 ```bash
 docker compose --env-file .runtime/drill-f004-20261027/.env -p bysj-drill-f004-20261027 \
