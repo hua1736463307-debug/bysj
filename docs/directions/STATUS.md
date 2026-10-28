@@ -2,12 +2,17 @@
 
 > 方向注册表：`backend/app/directions/`，对外只读接口 `GET /api/v1/directions`。
 > 数据盘点与实测：`docs/datasets/DATASET_INVENTORY.md`。
+> 隔离备份恢复演练：`docs/directions/RESTORE-DRILL-20261027.md`。
+> 分支 `graduation/cxr-assist-20261027`，草稿 PR #2（base `graduation/unblock-20261022`，未合并）。
 
 ## 0. 一句话结论
 
 **架构已从"单方向胸片"改为"方向注册 + 任务语义分离"**，三个方向共存互不污染：
-胸片多标签（已实现，真实数据受限）、皮肤镜单标签（数据通路已实现，标签已审计、图像部分下载）、
+胸片多标签（已实现，真实数据受限）、皮肤镜单标签（数据通路已实现，标签已审计、训练集已下载）、
 血细胞检测（历史模块保留）。**没有任何真实训练结果**，所有模型结论仍为空。
+
+工程侧另有两项已完成：分支已推送、CI 全绿；f004 备份恢复演练在隔离环境全链路通过，
+运行中的项目仍为 f002 且未被改动。
 
 ## 1. 方向矩阵
 
@@ -31,6 +36,7 @@
 | 任务 | `isic_import` / `isic_freeze` 挂到 dataset 角色 worker | `workers/isic_handlers.py` |
 | API | `/api/v1/isic/{schema,datasets,import,versions,summary}` | 6 个端点 |
 | 测试 | 11 项（注册表、导入正/反例、冻结、跨方向拒绝） | `backend/tests/isic/` |
+| 恢复演练 | 合成 ISIC 4 类记录随 f004 备份恢复，新代码可读 | `RESTORE-DRILL-20261027.md` |
 | 审计 | 真实标签表审计：train 10,015 / val 193 / test 1,512；7,470 个 lesion 组 | `scripts/prepare_isic.py` |
 
 ## 3. 真实数据审计（2026-10-27，实际运行）
@@ -51,16 +57,27 @@ train 的确认方式分布：histopathology 5,340 / serial imaging 3,704 / expe
 **限制（必须随结果一起报告）**：validation/test 无官方分组表，患者级隔离不可证明；
 val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 
-## 4. 本轮未做（明确）
+## 4. 交付与验证状态（2026-10-27 收尾）
 
-- **没有真实训练**：ISIC 训练集图像 2.77 GB 因带宽（实测 9–12 KB/s）未下完；CXR 真实数据不可达。
+| 项 | 状态 | 证据 |
+|---|---|---|
+| 分支推送 | **PASS** | `e96a424`→`82ccf42` 已推送；`github.com` 经 7890 代理可写，7897 会 TLS 失败 |
+| PR #2 | **OPEN / DRAFT** | head `82ccf42`，base `graduation/unblock-20261022`，8 commits / 98 files，未合并 |
+| CI（`82ccf42`） | **PASS** | backend / frontend / compose 均 success；gpu-acceptance skipped（无 GPU runner） |
+| f004 备份恢复演练 | **PASS** | 两套隔离项目，28 表 / 14,122 行，文件哈希全一致，新代码读取 200 |
+| 运行中项目 | **未改动** | 仍 `4a6b1222f002`、22 表、5,255 资产、115 任务；容器未重启 |
+
+## 5. 本轮未做（明确）
+
+- **没有真实训练**：ISIC 训练集压缩包已完整下载（2,771,732,744 B，与官方 Content-Length 一致），
+  但验证集图像仅 13.6/53 MB、测试集未开始；CXR 真实数据不可达。
 - **没有 ISIC 模型/分析/报告页面**：本轮只接通数据与冻结；模型推理沿用 CXR 的 DenseNet 适配器
   （`isic` 方向已声明 `softmax` 输出，但尚未接入训练/评价/报告链路）。
 - **没有 NIH 适配器**：NIH 数据未取得，不写"看起来能用"的空实现。
 - 所有合成 fixture / dummy 后端产物带 `synthetic` / `research_valid=false`，不得进入论文。
 
-## 5. 下一步
+## 6. 下一步
 
-1. 用更好带宽下载 ISIC `Training_Input.zip`（2.77 GB）→ 冻结真实四集 → 1 epoch GPU smoke。
+1. 补齐 ISIC 验证集 / 测试集图像 → 冻结真实四集 → 1 epoch GPU smoke。
 2. NIH 数据到位后新建 `nih-chestxray14-v1` 适配器（14 列布尔，不复用四态）。
 3. ISIC 训练/评价/报告链路接入（softmax 指标：逐类 P/R/F1、macro-F1、混淆矩阵、ECE）。

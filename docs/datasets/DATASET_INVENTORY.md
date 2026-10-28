@@ -9,7 +9,7 @@
 | 方向 | 推荐 | 状态 | 理由 |
 |---|---|---|---|
 | 胸部 X 光 | **NIH ChestX-ray14**（首选）、CheXpert（备选） | **BLOCKED_ACCESS**（本网络无法访问官方 Box；Kaggle 需账号） | 无 DUA、有 Patient ID、规模大；但下载入口在本机不可达 |
-| 皮肤镜 | **ISIC 2018 Task 3**（首选）、ISIC 2019（备选） | **已取得（部分）**：全部标签表 + 验证集图像；训练/测试图像受带宽限制未完成 | 官方直链可下载、CC BY-NC 4.0、官方 lesion 分组表、四集可派生 |
+| 皮肤镜 | **ISIC 2018 Task 3**（首选）、ISIC 2019（备选） | **已取得（部分）**：全部标签表 + 训练集图像（已校验）；验证/测试图像未完成 | 官方直链可下载、CC BY-NC 4.0、官方 lesion 分组表、四集可派生 |
 
 **本机条件**：D 盘剩余 85.7 GB、C 盘 197.8 GB；RTX 4060 Laptop 8 GB（容器内 torch 2.6.0+cu124 已验证）；
 到 ISIC S3 实测带宽峰值 74 KB/s、持续 9–12 KB/s（决定了下文"能不能下"的结论）。
@@ -69,12 +69,18 @@ Atelectasis / Cardiomegaly / Consolidation / Edema / Pleural Effusion 五项同�
 | 已知限制 | 仅 training 有 lesion 分组，validation/test **无分组**→患者级隔离不可证明；类别极不平衡（NV 占多数）；皮肤镜专用，不适用临床照片；非商业许可 | 已写入注册表 `report_limitations` |
 | 适配成本 | **中**：新建单标签适配器 + lesion 分组切分（已实现，见 `app/domains/isic/`） | 已实现 |
 
-**已实际下载**（2026-10-27）：
-`ISIC2018_Task3_Training_GroundTruth.zip`、`Training_LesionGroupings.csv`、
-`Validation_GroundTruth.zip`、`Test_GroundTruth.zip`、`Validation_Input.zip`（进行中）。
-**未完成**：`Training_Input.zip`（2.77 GB）、`Test_Input.zip`（421 MB）——受 9–12 KB/s 带宽限制，
-按实测速度需约 10 小时 / 1.6 小时。本轮结束时 `Validation_Input.zip` 已下载 13.6 MB / 53 MB（26%），
-`Training_Input.zip` 未开始。
+**已实际下载并校验**（2026-10-27）：
+
+| 文件 | 字节 | 完整性 |
+|---|---|---|
+| `Training_GroundTruth.zip` / `Validation_GroundTruth.zip` / `Test_GroundTruth.zip` | 36,681 / 7,619 / 12,202 | 已解压读取 |
+| `Training_LesionGroupings.csv` | — | 10,015 行，已审计 |
+| **`Training_Input.zip`** | **2,771,732,744** | 与官方 `Content-Length` 完全一致；`unzip -t` **无错误**，10,018 个条目 |
+| `Validation_Input.zip` | 13,657,277 / 53,292,381 | **不完整（26%）**，下载中断 |
+| `Test_Input.zip` | 0 / 420,586,171 | **未开始** |
+
+> 训练集图像已可用；验证集/测试集图像仍未齐。冻结真实四集需要全部三份图像，
+> 因此真实训练仍未开始，不得引用任何 ISIC 指标。
 
 断点续传命令（已下载部分会被 `-C -` 跳过）：
 

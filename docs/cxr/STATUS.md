@@ -16,7 +16,8 @@
 | 运行环境（GPU/Docker/torch/CUDA） | **VERIFIED** | RTX 4060 + Docker 29.4.1 + torch 2.6.0+cu124 + CUDA 12.4 容器内实测通过；但部署镜像/DB 尚未更新，见下 |
 | PostgreSQL 集成测试 | **PASS** | 专用 `bysj_test_agent` 库，`tests/integration` 15 passed |
 | 浏览器 E2E | **PASS** | `e2e/cxr-flow.spec.cjs` 1 passed（导入→冻结→分析→解释→复核→批准→报告→导出） |
-| 一致性备份 | **PASS（备份）** | `backups/20261027-before-cxr`，complete、restart_failures=[]；恢复演练 NOT_RUN（见说明） |
+| 一致性备份 | **PASS** | `backups/20261027-before-cxr`，complete、restart_failures=[] |
+| f004 恢复演练 | **PASS（隔离环境）** | 两套独立项目恢复 f002→迁移 f004→合成 CXR/ISIC→备份→再恢复；运行项目未改动，见 [../directions/RESTORE-DRILL-20261027.md](../directions/RESTORE-DRILL-20261027.md) |
 | 研究交付（三 seed 对比） | **NOT_RUN** | 无真实数据、无 GPU、torch/torchvision 未安装；runner 与协议冻结已就绪 |
 | 人工/临床证据 | **NOT_AVAILABLE** | 无真实审核者；系统仅出"待复核研究草稿" |
 
@@ -48,7 +49,7 @@
 | 迁移 | `alembic upgrade head` / `downgrade 4a6b1222f002` / 再 upgrade | 21→27 表；回退只删 5 张 CXR 表，detect 表保留 |
 | 前端 | `npm test` / `npm run build` | 13 passed / exit 0 |
 
-未执行：真实 GPU 训练、真实数据校准/评价、100 图性能测试、Docker 镜像构建与部署、备份**恢复**演练。
+未执行：真实 GPU 训练、真实数据校准/评价、100 图性能测试、**运行项目的**镜像更新与迁移（演练只在隔离环境完成）。
 已完成（2026-10-27 第二轮）：PostgreSQL 集成测试 15 passed、浏览器 E2E 1 passed、一致性备份 complete——详见 [../directions/VERIFICATION-20261027.md](../directions/VERIFICATION-20261027.md)。
 
 ## 阻塞与外部待补
@@ -58,7 +59,7 @@
 | CheXpert 访问与许可 | **BLOCKED_REAL_DATA** | 需用户完成账号/条款；DS 不代签、不绕过门禁 |
 | Docker daemon / PG / GPU | **AVAILABLE**（本轮复核） | Docker 29.4.1 + nvidia-container-runtime；项目栈 Up 且 healthy；`gpu:0` 空闲、无在途作业 |
 | torch 2.6 / torchvision 0.21 | **AVAILABLE（仅容器内）** | worker 镜像 2.6.0+cu124 / 0.21.0+cu124，CUDA 12.4，`cuda_available=True`；宿主 venv 仍无 torch |
-| 部署是否含 CXR | **NOT_DEPLOYED** | api `code_sha=195d34c`（早于 `672f2d2`）；DB 在 `4a6b1222f002`，无 CXR 表 |
+| 部署是否含 CXR | **NOT_DEPLOYED** | 运行栈 api `code_sha=195d34c`；DB 仍在 `4a6b1222f002`。隔离演练已证明 f004 可备份/恢复/读取，但生产迁移需另立窗口 |
 | `requirements-cxr` 锁 | **NOT_CREATED** | 未新增运行时依赖（指标为纯 numpy）；sklearn 只在隔离 venv 做对照，不进镜像；若要在镜像内跑 sklearn 需另行 Linux/Py3.12 锁 |
 | 真实审核者 | 外部待补 | 系统记录实际操作账号，不冒用医生署名 |
 | 临床有效性 / 外部验证 | 未验证 | 不得声称具备临床诊断能力 |
