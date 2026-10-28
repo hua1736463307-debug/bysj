@@ -66,6 +66,30 @@ def legacy_source(pg_engine, tmp_path):
             conn.execute(sa.text(f'DROP SCHEMA "{schema}" CASCADE'))
 
 
+#: 旧库 9 张共享表之外、由当前 ORM/Alembic 创建的表。
+#: 新增表必须同步更新此清单——该断言的作用就是阻止"加了表却没更新迁移测试"。
+EXPECTED_NEW_TABLES = {
+    "artifact_records",
+    "auth_sessions",
+    "dataset_imports",
+    "evaluation_runs",
+    "experiment_runs",
+    "feedback_exports",
+    "inference_items",
+    "inference_predictions",
+    "inference_runs",
+    "resource_leases",
+    "review_items",
+    "review_records",
+    # CXR 五标签（Alembic 4a6b1222f003）
+    "cxr_samples",
+    "cxr_analysis_batches",
+    "cxr_analyses",
+    "cxr_reviews",
+    "cxr_reports",
+}
+
+
 def test_offline_legacy_copy_preserves_identity_files_and_api(sessions, legacy_source, tmp_path):
     old = legacy_source
     settings = get_settings()
@@ -74,7 +98,7 @@ def test_offline_legacy_copy_preserves_identity_files_and_api(sessions, legacy_s
         source.execute(sa.text("SET TRANSACTION READ ONLY"))
         report = copy_snapshot(source,target,settings,expected_metadata=old["metadata"],source_data_root=old["data"],source_model_root=old["models"])
         assert report["source_counts"] == report["target_counts"]
-        assert len(report["new_tables"]) == 12
+        assert report["new_tables"] == sorted(EXPECTED_NEW_TABLES)
         version = target.get(DatasetVersion,old["version"])
         assert version.dataset_id == old["resource"] and version.content_hash == "a"*64
         assert version.state == "frozen" and version.manifest_sha256
