@@ -18,6 +18,7 @@ from app.directions.isic import ISIC_DIRECTION_KEY, ISIC_LABEL_SCHEMA, ISIC_LABE
 from app.domains import job_service
 from app.domains.datasets import service as dataset_service
 from app.schemas.common import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
+from app.schemas.isic import IsicEvaluationRequest
 
 router = APIRouter(prefix="/isic", tags=["isic"])
 
@@ -256,5 +257,154 @@ def version_summary(
             "rare_class_warnings": (version.metadata_json or {}).get("rare_class_warnings"),
             "source": manifest.get("source"),
             "note": "单标签七类；总体准确率会被多数类主导，须同时看逐类指标。",
+        }
+    )
+
+
+# ---------------------------------------------------------------------------
+# 训练与评价（七类单标签）
+# ---------------------------------------------------------------------------
+
+
+class IsicTrainingRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_version_id: str
+    base_model_id: str | None = None
+    params: dict = Field(default_factory=dict)
+
+
+def _run_inline(settings: Settings, job, created_now: bool) -> None:
+    if settings.inline_jobs and created_now:
+        from app.workers.dispatcher import execute_job_inline
+
+        execute_job_inline(job.id)
+
+
+@router.post("/training/preflight", response_model=None)
+def training_preflight(
+    payload: IsicTrainingRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    from app.domains.isic import training_service
+
+    return ok(training_service.preflight(db, settings, user, payload.model_dump()))
+
+
+@router.post("/training/jobs", response_model=None)
+def create_training(
+    payload: IsicTrainingRequest,
+    idempotency_key: str = Header(..., alias="Idempotency-Key", min_length=1, max_length=128),
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    from app.domains.isic import training_service
+
+    job, created_now = training_service.create_training_job(
+        db, settings, user, payload.model_dump(), idempotency_key=idempotency_key
+    )
+    _run_inline(settings, job, created_now)
+    db.refresh(job)
+    return accepted(job.to_public(), message="皮肤镜训练任务已接收")
+
+
+@router.post("/evaluations", response_model=None)
+def create_evaluation(
+    payload: IsicEvaluationRequest,
+    idempotency_key: str = Header(..., alias="Idempotency-Key", min_length=1, max_length=128),
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    from app.domains.isic import evaluation_service
+
+    job, created_now = evaluation_service.create_evaluation_job(
+        db, settings, user, payload.model_dump(), idempotency_key=idempotency_key
+    )
+    _run_inline(settings, job, created_now)
+    db.refresh(job)
+    return accepted(job.to_public(), message="皮肤镜评价任务已接收")
+
+
+@router.get("/evaluations", response_model=None)
+def list_evaluations(
+    dataset_version_id: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from app.db.models import EvaluationRun, ModelRegistry
+
+    query = db.query(EvaluationRun).order_by(EvaluationRun.created_at.desc())
+    if dataset_version_id:
+        query = query.filter(EvaluationRun.dataset_version_id == dataset_version_id)
+    if not user.is_admin:
+        query = query.filter(EvaluationRun.owner_id == user.id)
+    total = query.count()
+    rows = query.offset((page - 1) * page_size).limit(page_size).all()
+    models = {
+        item.id: item
+        for item in db.query(ModelRegistry).filter(ModelRegistry.id.in_({row.model_id for row in rows})).all()
+    } if rows else {}
+    items = [
+        {
+            "evaluation_id": row.id,
+            "job_id": row.job_id,
+            "model_id": row.model_id,
+            "model_name": (models.get(row.model_id).name if models.get(row.model_id) else None),
+            "dataset_version_id": row.dataset_version_id,
+            "split": row.split,
+            "status": row.status,
+            "purpose": row.purpose,
+            "metrics": row.metrics_json,
+            "created_at": row.created_at.isoformat() if row.created_at else None,
+            "finished_at": row.finished_at.isoformat() if row.finished_at else None,
+        }
+        for row in rows
+    ]
+    return ok({"items": items, "total": total, "page": page, "page_size": page_size})
+
+
+@router.get("/models", response_model=None)
+def list_isic_models(
+    task: str = Query(default="isic_multiclass"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from app.db.models import ModelRegistry
+
+    if task not in {"isic_multiclass", "isic_backbone"}:
+        raise ApiError(422, "isic_model_task", "task 只支持 isic_multiclass 或 isic_backbone")
+    query = db.query(ModelRegistry).filter(ModelRegistry.status == "active", ModelRegistry.model_task == task)
+    if not user.is_admin:
+        query = query.filter(ModelRegistry.owner_id == user.id)
+    total = query.count()
+    rows = query.order_by(ModelRegistry.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+    return ok(
+        {
+            "items": [
+                {
+                    "model_id": row.id,
+                    "name": row.name,
+                    "model_task": row.model_task,
+                    "sha256": row.sha256,
+                    "size": row.size,
+                    "created_at": row.created_at.isoformat() if row.created_at else None,
+                    "label_schema": (row.metadata_json or {}).get("label_schema"),
+                    "class_order": (row.metadata_json or {}).get("class_order"),
+                    "research_valid": (row.metadata_json or {}).get("research_valid"),
+                    "metrics": (row.metadata_json or {}).get("metrics"),
+                }
+                for row in rows
+            ],
+            "total": total,
+            "page": page,
+            "page_size": page_size,
         }
     )

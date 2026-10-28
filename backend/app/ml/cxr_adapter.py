@@ -23,27 +23,7 @@ ARCH_DENSENET121 = "densenet121"
 SUPPORTED_ARCHES = {ARCH_DENSENET121}
 
 
-def _normalize_device(raw, torch) -> str:
-    """把训练参数里的 "0"/"cuda"/"cuda:1" 归一化为 torch 可接受的设备串。
-
-    `CxrTrainingParams.device` 默认是 "0"（与既有 detect 参数习惯一致），
-    但 torch 不接受裸序号；无 CUDA 时统一回退 cpu。
-    """
-    text = str(raw or "cpu").strip().lower()
-    if text in {"", "cpu", "-1"}:
-        return "cpu"
-    if text in {"cuda", "gpu"}:
-        text = "cuda:0"
-    elif text.isdigit():
-        text = f"cuda:{text}"
-    if not text.startswith("cuda"):
-        return "cpu"
-    if not torch.cuda.is_available():
-        return "cpu"
-    index = text.partition(":")[2] or "0"
-    if not index.isdigit() or int(index) >= torch.cuda.device_count():
-        return "cuda:0"
-    return f"cuda:{index}"
+from app.ml.device import normalize_device as _normalize_device
 
 
 @dataclass

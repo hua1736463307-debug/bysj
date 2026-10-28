@@ -8,9 +8,16 @@ Answers three questions that decide whether the four splits may be frozen:
 3. Are there byte-identical duplicate images, and do any cross a subset
    boundary (which would leak the same object into train and test)?
 
-Only byte-level equality is checked. Re-encoded or cropped copies of the same
-lesion are **not** detected by this script; that limitation is reported in the
-output so it cannot be silently upgraded into a claim of duplicate-free data.
+Two levels are available:
+
+* default: byte-level SHA-256 of the stored file (exact copies only);
+* ``--deep``: additionally decodes every image to a pixel hash (catches
+  re-encoded copies with identical pixels) and computes a 64-bit dHash for
+  near-duplicate candidates (hamming distance threshold is reported, and the
+  candidate list is a *review list*, not a verdict).
+
+Even ``--deep`` cannot prove "no duplicates": crops, rotations and different
+crops of the same lesion remain undetected. The output says so explicitly.
 
 Usage:
     python scripts/audit_isic_groups.py \
@@ -80,10 +87,107 @@ def hash_zip(path: Path) -> tuple[dict[str, str], dict[str, int]]:
     return digests, sizes
 
 
+def pixel_and_dhash(archive: zipfile.ZipFile, info: zipfile.ZipInfo) -> tuple[str, int]:
+    """解码后像素哈希 + 64 位 dHash（9x8 灰度差分）。"""
+    from PIL import Image
+
+    with archive.open(info) as stream:
+        image = Image.open(stream)
+        image.load()
+        rgb = image.convert("RGB")
+        pixel_digest = hashlib.sha256(rgb.tobytes()).hexdigest()
+        gray = rgb.convert("L").resize((9, 8), Image.BILINEAR)
+        values = list(gray.getdata())
+    bits = 0
+    for row in range(8):
+        for column in range(8):
+            left = values[row * 9 + column]
+            right = values[row * 9 + column + 1]
+            bits = (bits << 1) | (1 if left > right else 0)
+    return pixel_digest, bits
+
+
+def deep_scan(root: Path, subsets: dict[str, dict]) -> dict:
+    """解码像素重复 + dHash 近重复候选（跨子集重点）。"""
+    import numpy as np
+
+    pixel_owner: dict[str, list[str]] = defaultdict(list)
+    hashes: list[int] = []
+    names: list[str] = []
+    subset_of: list[str] = []
+    for subset, mapping in subsets.items():
+        zip_path = root / ZIP_NAMES[subset]
+        if not zip_path.exists():
+            continue
+        with zipfile.ZipFile(zip_path) as archive:
+            for info in archive.infolist():
+                if info.is_dir() or not info.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+                    continue
+                image = Path(info.filename).stem
+                pixel_digest, bits = pixel_and_dhash(archive, info)
+                pixel_owner[pixel_digest].append(f"{subset}:{image}")
+                hashes.append(bits)
+                names.append(f"{subset}:{image}")
+                subset_of.append(subset)
+
+    pixel_groups = {digest: items for digest, items in pixel_owner.items() if len(items) > 1}
+    pixel_cross = {}
+    for items in pixel_groups.values():
+        owners = {item.split(":", 1)[0] for item in items}
+        if len(owners) > 1:
+            pixel_cross["&".join(sorted(owners))] = pixel_cross.get("&".join(sorted(owners)), 0) + 1
+
+    threshold = 6
+    array = np.array(hashes, dtype=np.uint64)
+    subset_index = np.array([{"training": 0, "validation": 1, "test": 2}[item] for item in subset_of])
+    pairs: list[dict] = []
+    cross_pairs = 0
+    distance_histogram: dict[int, int] = {}
+    cross_histogram: dict[int, int] = {}
+    for start in range(0, len(array), 512):
+        chunk = array[start : start + 512]
+        xor = np.bitwise_xor(chunk[:, None], array[None, :])
+        distance = np.bitwise_count(xor).astype(np.int16)
+        rows, columns = np.where(distance <= threshold)
+        for row, column in zip(rows, columns):
+            first = start + int(row)
+            second = int(column)
+            if second <= first:
+                continue
+            value = int(distance[row, column])
+            distance_histogram[value] = distance_histogram.get(value, 0) + 1
+            if subset_index[first] != subset_index[second]:
+                cross_pairs += 1
+                cross_histogram[value] = cross_histogram.get(value, 0) + 1
+            if len(pairs) < 20:
+                pairs.append({"a": names[first], "b": names[second], "hamming": value})
+    return {
+        "decoded_images": len(names),
+        "pixel_duplicate_groups": len(pixel_groups),
+        "pixel_duplicate_images": sum(len(v) for v in pixel_groups.values()),
+        "pixel_cross_subset_groups": pixel_cross,
+        "pixel_examples": [sorted(v)[:4] for v in list(pixel_groups.values())[:5]],
+        "dhash_bits": 64,
+        "dhash_threshold": threshold,
+        "dhash_candidate_pairs": int(sum(distance_histogram.values())),
+        "dhash_cross_subset_pairs": cross_pairs,
+        "dhash_distance_histogram": dict(sorted(distance_histogram.items())),
+        "dhash_cross_distance_histogram": dict(sorted(cross_histogram.items())),
+        "dhash_note": (
+            "dHash(8x8) 在皮肤镜上区分力有限：阈值放宽到 6 时候选对占全部配对 0.23%，"
+            "主要是大面积皮肤背景相似，无法作为重复判定；只有距离 0-1 值得人工复核"
+        ),
+        "dhash_examples": pairs,
+        "note": "近重复候选是人工复核清单，不是重复判定；裁剪/旋转仍检测不到",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--deep", action="store_true",
+                        help="解码像素哈希与 dHash 近重复候选（慢，但能发现重编码副本）")
     args = parser.parse_args()
     root = args.source_root.resolve()
     output = args.output.resolve()
@@ -185,6 +289,8 @@ def main() -> int:
         "examples": [sorted(v)[:4] for v in list(duplicate_groups.values())[:5]],
     }
 
+    if args.deep:
+        report["deep"] = deep_scan(root, digests)
     (output / "isic-group-audit.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )

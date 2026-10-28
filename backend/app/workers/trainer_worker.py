@@ -24,7 +24,7 @@ from app.workers.dispatcher import JobCancelled, JobContext, run_claimed_job
 
 logger = logging.getLogger("bysj.worker.trainer")
 
-WORKER_TYPES = ("training", "evaluation", "cxr_train", "cxr_evaluate")
+WORKER_TYPES = ("training", "evaluation", "cxr_train", "cxr_evaluate", "isic_train", "isic_evaluate")
 
 
 def _cancel_checker(job_id: str):

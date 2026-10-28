@@ -79,6 +79,9 @@ class Settings(BaseSettings):
     cxr_ml_backend: str = Field(
         default="auto", description="auto|densenet121|dummy；dummy 只用于契约测试"
     )
+    isic_ml_backend: str = Field(
+        default="auto", description="auto|densenet121|dummy；dummy 只用于契约测试"
+    )
     cxr_allow_synthetic: bool = Field(
         default=False, description="是否允许导入显式标注 synthetic 的工程 fixture"
     )

@@ -38,6 +38,9 @@ HANDLERS: dict[str, str] = {
     # 皮肤镜方向（单标签七类）：导入/冻结为 CPU 工作，不占 GPU。
     "isic_import": "app.workers.isic_handlers:handle_isic_import",
     "isic_freeze": "app.workers.isic_handlers:handle_isic_freeze",
+    # 皮肤镜 GPU 作业：与 CXR 共用 trainer 角色、GPU 租约与 fencing。
+    "isic_train": "app.workers.isic_handlers:handle_isic_train",
+    "isic_evaluate": "app.workers.isic_handlers:handle_isic_evaluate",
 }
 
 
