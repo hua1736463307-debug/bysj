@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import ApiError
+from app.core.sources import resolve_source_root as resolve_source_root_shared
 from app.core.storage import atomic_write_bytes, ensure_dir, sha256_file
 from app.db.models import CxrSample, DatasetAsset, DatasetResource, DatasetVersion
 from app.schemas.cxr import (
@@ -61,24 +62,19 @@ def assert_source_allowed(root: Path, settings: Settings) -> bool:
 
 
 def resolve_source_root(settings: Settings, source_id: str) -> Path:
-    """只解析已配置的 source_id；未配置即拒绝，不回落到任意路径。"""
-    sources = getattr(settings, "cxr_sources", None) or {}
-    configured = sources.get(source_id)
-    if configured:
-        root = Path(configured).expanduser()
-    else:
-        base = getattr(settings, "cxr_import_root", None)
-        if not base:
-            raise ApiError(
-                409,
-                "cxr_source_not_configured",
-                "未配置 CXR 数据来源；管理员需先设置 CXR_IMPORT_ROOT 或 CXR_SOURCES",
-            )
-        root = Path(base).expanduser() / source_id
-    root = root.resolve()
-    if not root.is_dir():
-        raise ApiError(404, "cxr_source_missing", "配置的 CXR 来源目录不存在或不可读")
-    return root
+    """只解析已配置的 source_id；未配置即拒绝，不回落到任意路径。
+
+    解析顺序由 `app.core.sources` 统一：`DATASET_SOURCES` → `DATASET_IMPORT_ROOT`
+    → 兼容旧键 `CXR_SOURCES` / `CXR_IMPORT_ROOT`。新增方向不再各自造一套配置键。
+    """
+    return resolve_source_root_shared(
+        settings,
+        source_id,
+        legacy_sources=getattr(settings, "cxr_sources", None),
+        legacy_root=getattr(settings, "cxr_import_root", None),
+        direction="CXR",
+        code_prefix="cxr_",
+    )
 
 
 def _resolve_inside(root: Path, relative: str) -> Path:

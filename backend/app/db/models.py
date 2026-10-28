@@ -667,3 +667,37 @@ class CxrReport(Base):
     __table_args__ = (
         UniqueConstraint("analysis_id", "version", name="uq_cxr_report_version"),
     )
+
+
+# ---------------------------------------------------------------------------
+# 皮肤镜方向（ISIC 2018 Task 3 / 七类单标签）——与 CXR 多标签表并列，
+# 不复用四态，也不把七类塞进胸片标签列。
+# ---------------------------------------------------------------------------
+
+
+class IsicSample(Base):
+    """皮肤镜样本：单标签互斥，按 lesion（或单图）分组。"""
+
+    __tablename__ = "isic_samples"
+
+    id: Mapped[int] = mapped_column(BIGINT_PK, primary_key=True, autoincrement=True)
+    asset_id: Mapped[int] = mapped_column(
+        BIGINT_FK, ForeignKey("dataset_assets.id", ondelete="RESTRICT"), nullable=False
+    )
+    dataset_version_id: Mapped[str] = mapped_column(UUID, nullable=False, index=True)
+    #: 官方 lesion_id；validation/test 无分组表时为 NULL。
+    lesion_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    #: 切分用的分组键：有 lesion_id 用 lesion，否则退化为单图键。
+    group_key: Mapped[str] = mapped_column(String(96), nullable=False)
+    class_key: Mapped[str] = mapped_column(String(32), nullable=False)
+    class_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False, default="isic2018-task3-v1")
+    pixel_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    source_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (
+        UniqueConstraint("asset_id", name="uq_isic_sample_asset"),
+        Index("ix_isic_sample_version_group", "dataset_version_id", "group_key"),
+        Index("ix_isic_sample_version_class", "dataset_version_id", "class_index"),
+    )

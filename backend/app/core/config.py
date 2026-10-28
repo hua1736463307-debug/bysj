@@ -83,6 +83,17 @@ class Settings(BaseSettings):
         default=False, description="是否允许导入显式标注 synthetic 的工程 fixture"
     )
 
+    # 多方向通用只读来源配置（皮肤镜等）；CXR 保留上面的历史键以兼容既有部署。
+    dataset_import_root: Path | None = Field(
+        default=None, description="通用只读来源根目录；source_id 作为其子目录名"
+    )
+    dataset_sources: dict[str, str] = Field(
+        default_factory=dict, description="source_id -> 只读目录的显式映射，优先于 dataset_import_root"
+    )
+    dataset_allow_synthetic: bool = Field(
+        default=False, description="是否允许导入显式标注 synthetic 的工程 fixture"
+    )
+
     cors_origins: list[str] = []
 
     @field_validator("data_root", "model_root", "artifact_root", mode="before")
@@ -95,6 +106,13 @@ class Settings(BaseSettings):
     @field_validator("cxr_import_root", mode="before")
     @classmethod
     def _expand_cxr_root(cls, value):
+        if value in (None, ""):
+            return None
+        return Path(os.path.expanduser(str(value))).resolve()
+
+    @field_validator("dataset_import_root", mode="before")
+    @classmethod
+    def _expand_dataset_root(cls, value):
         if value in (None, ""):
             return None
         return Path(os.path.expanduser(str(value))).resolve()

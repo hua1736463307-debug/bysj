@@ -17,9 +17,11 @@ from app.api.v1 import auth as auth_api
 from app.api.v1 import artifacts as artifacts_api
 from app.api.v1 import cxr as cxr_api
 from app.api.v1 import datasets as datasets_api
+from app.api.v1 import directions as directions_api
 from app.api.v1 import evaluations as evaluations_api
 from app.api.v1 import experiments as experiments_api
 from app.api.v1 import health as health_api
+from app.api.v1 import isic as isic_api
 from app.api.v1 import inference as inference_api
 from app.api.v1 import jobs as jobs_api
 from app.api.v1 import models as models_api
@@ -90,6 +92,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         reviews_api,
         experiments_api,
         cxr_api,
+        directions_api,
+        isic_api,
     ):
         app.include_router(module.router, prefix=settings.api_prefix)
 

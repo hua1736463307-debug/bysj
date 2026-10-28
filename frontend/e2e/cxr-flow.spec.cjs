@@ -102,7 +102,8 @@ test('CXR flow: import, freeze, analyze, explain, review, report', async ({ page
   await page.getByRole('button', { name: '保存草稿' }).click()
   await page.getByRole('button', { name: '提交复核' }).click()
   await page.getByRole('button', { name: '批准' }).click()
-  await expect(page.getByText(/approved/)).toBeVisible()
+  // 表格单元格与标题都含 approved，按标题精确断言，避免 strict mode 多重匹配。
+  await expect(page.locator('h2').filter({ hasText: 'approved' })).toBeVisible()
 
   // 6. 报告：批准后签发最终报告，并导出只读快照
   const reportResponse = page.waitForResponse(
@@ -113,10 +114,15 @@ test('CXR flow: import, freeze, analyze, explain, review, report', async ({ page
   expect(report.state).toBe('final')
   await expect(page).toHaveURL(/cxr\/reports/)
   await page.getByRole('button', { name: '查看' }).first().click()
-  await expect(page.getByText(/最终报告|待复核研究草稿/)).toBeVisible()
-  const downloadPromise = page.waitForEvent('download')
+  await expect(page.getByText(/最终报告|待复核研究草稿/).first()).toBeVisible()
+  // 导出走 blob 下载，Playwright 不产生 download 事件；改为断言导出接口返回 200。
+  const exportResponse = page.waitForResponse(
+    (r) => r.url().includes('/api/v1/cxr/reports/') && r.url().includes('/export')
+  )
   await page.getByRole('button', { name: '导出 HTML' }).first().click()
-  expect((await downloadPromise).suggestedFilename()).toMatch(/\.html$/)
+  const exported = await exportResponse
+  expect(exported.status()).toBe(200)
+  expect(exported.headers()['content-type'] || '').toContain('text/html')
 
   // 7. 跨页断言：所有 API 调用走同源 /api
   expect(apiRequests.every((item) => item.path.startsWith('/api'))).toBe(true)

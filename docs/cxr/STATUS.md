@@ -1,6 +1,7 @@
 # CXR 五标签辅助分析：实施状态（一页版）
 
 > 更新时间：2026-10-27（含当日追加：sklearn 对照、GPU/Docker 实测、缺陷修复）
+> **方向已扩展为多方向**：本文件描述胸片方向；总览见 [../directions/STATUS.md](../directions/STATUS.md)，数据集盘点见 [../datasets/DATASET_INVENTORY.md](../datasets/DATASET_INVENTORY.md)。
 > 分支：`graduation/cxr-assist-20261027`（基于 `d22a16d`，未合并 main / 未合并旧 PR）
 > 范围声明：[SCOPE.md](SCOPE.md)　逐阶段记录：[execution/](execution/)
 
@@ -13,6 +14,9 @@
 | 工程 MVP | **PASS（工程）** | 69 项 CXR 后端测试 + 7 项 CLI 测试通过；sklearn 独立对照 27 项通过；旧 detect 回归 184 项通过；前端 13 项单测 + `npm run build` 通过 |
 | 真实数据闭环 | **BLOCKED_REAL_DATA** | 本机无 CheXpert 授权副本；`CXR_IMPORT_ROOT` 未配置；真实训练/校准/评价 NOT_RUN |
 | 运行环境（GPU/Docker/torch/CUDA） | **VERIFIED** | RTX 4060 + Docker 29.4.1 + torch 2.6.0+cu124 + CUDA 12.4 容器内实测通过；但部署镜像/DB 尚未更新，见下 |
+| PostgreSQL 集成测试 | **PASS** | 专用 `bysj_test_agent` 库，`tests/integration` 15 passed |
+| 浏览器 E2E | **PASS** | `e2e/cxr-flow.spec.cjs` 1 passed（导入→冻结→分析→解释→复核→批准→报告→导出） |
+| 一致性备份 | **PASS（备份）** | `backups/20261027-before-cxr`，complete、restart_failures=[]；恢复演练 NOT_RUN（见说明） |
 | 研究交付（三 seed 对比） | **NOT_RUN** | 无真实数据、无 GPU、torch/torchvision 未安装；runner 与协议冻结已就绪 |
 | 人工/临床证据 | **NOT_AVAILABLE** | 无真实审核者；系统仅出"待复核研究草稿" |
 
@@ -44,7 +48,8 @@
 | 迁移 | `alembic upgrade head` / `downgrade 4a6b1222f002` / 再 upgrade | 21→27 表；回退只删 5 张 CXR 表，detect 表保留 |
 | 前端 | `npm test` / `npm run build` | 13 passed / exit 0 |
 
-未执行：真实 GPU 训练、真实数据校准/评价、100 图性能测试、PG 并发、Docker 镜像构建、浏览器 E2E（`frontend/e2e/cxr-flow.spec.cjs` 已编写但 NOT_RUN）。
+未执行：真实 GPU 训练、真实数据校准/评价、100 图性能测试、Docker 镜像构建与部署、备份**恢复**演练。
+已完成（2026-10-27 第二轮）：PostgreSQL 集成测试 15 passed、浏览器 E2E 1 passed、一致性备份 complete——详见 [../directions/VERIFICATION-20261027.md](../directions/VERIFICATION-20261027.md)。
 
 ## 阻塞与外部待补
 

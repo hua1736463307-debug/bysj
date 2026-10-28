@@ -35,6 +35,9 @@ HANDLERS: dict[str, str] = {
     "cxr_evaluate": "app.workers.cxr_handlers:handle_cxr_evaluate",
     "cxr_analyze": "app.workers.cxr_handlers:handle_cxr_analyze",
     "cxr_explain": "app.workers.cxr_handlers:handle_cxr_explain",
+    # 皮肤镜方向（单标签七类）：导入/冻结为 CPU 工作，不占 GPU。
+    "isic_import": "app.workers.isic_handlers:handle_isic_import",
+    "isic_freeze": "app.workers.isic_handlers:handle_isic_freeze",
 }
 
 
