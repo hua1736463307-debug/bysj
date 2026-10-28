@@ -1,6 +1,6 @@
 # CXR 五标签辅助分析：实施状态（一页版）
 
-> 更新时间：2026-10-27
+> 更新时间：2026-10-27（含当日追加：sklearn 对照、GPU/Docker 实测、缺陷修复）
 > 分支：`graduation/cxr-assist-20261027`（基于 `d22a16d`，未合并 main / 未合并旧 PR）
 > 范围声明：[SCOPE.md](SCOPE.md)　逐阶段记录：[execution/](execution/)
 
@@ -10,8 +10,9 @@
 
 | 验收层级 | 状态 | 依据 |
 |---|---|---|
-| 工程 MVP | **PASS（工程）** | 67 项 CXR 后端测试 + 7 项 CLI 测试通过；旧 detect 回归 184 项通过；前端 13 项单测 + `npm run build` 通过 |
+| 工程 MVP | **PASS（工程）** | 69 项 CXR 后端测试 + 7 项 CLI 测试通过；sklearn 独立对照 27 项通过；旧 detect 回归 184 项通过；前端 13 项单测 + `npm run build` 通过 |
 | 真实数据闭环 | **BLOCKED_REAL_DATA** | 本机无 CheXpert 授权副本；`CXR_IMPORT_ROOT` 未配置；真实训练/校准/评价 NOT_RUN |
+| 运行环境（GPU/Docker/torch/CUDA） | **VERIFIED** | RTX 4060 + Docker 29.4.1 + torch 2.6.0+cu124 + CUDA 12.4 容器内实测通过；但部署镜像/DB 尚未更新，见下 |
 | 研究交付（三 seed 对比） | **NOT_RUN** | 无真实数据、无 GPU、torch/torchvision 未安装；runner 与协议冻结已就绪 |
 | 人工/临床证据 | **NOT_AVAILABLE** | 无真实审核者；系统仅出"待复核研究草稿" |
 
@@ -35,7 +36,9 @@
 | 项 | 命令 | 结果 |
 |---|---|---|
 | 初始基线 | `python verify_baseline.py` | `PASS_INITIAL_BASELINE`，49 文件一致 |
-| CXR 契约/流程 | `pytest backend/tests/cxr -q` | 67 passed |
+| CXR 契约/流程 | `pytest backend/tests/cxr -q` | 69 passed, 1 skipped（sklearn 模块在无 sklearn 环境跳过） |
+| 指标 sklearn 对照 | 隔离 venv 内 `pytest backend/tests/cxr/test_cxr_metrics_sklearn.py --noconftest` | 27 passed（sklearn 1.5.2 / numpy 2.5.4） |
+| GPU / 容器运行态 | `nvidia-smi` + `docker exec …` | 见 `execution/ENV-GPU-20261027.md`：CUDA matmul、DenseNet121 前向、Grad-CAM、退化拒绝均实测 |
 | CXR CLI | `pytest scripts/tests/test_cxr_tools.py -q` | 7 passed |
 | 旧回归 | `pytest backend/tests/medical backend/tests/test_app_factory_auth.py scripts/tests -q` | 184 passed（无回归） |
 | 迁移 | `alembic upgrade head` / `downgrade 4a6b1222f002` / 再 upgrade | 21→27 表；回退只删 5 张 CXR 表，detect 表保留 |
@@ -48,9 +51,10 @@
 | 项 | 状态 | 说明 |
 |---|---|---|
 | CheXpert 访问与许可 | **BLOCKED_REAL_DATA** | 需用户完成账号/条款；DS 不代签、不绕过门禁 |
-| Docker daemon / PG / GPU | **BLOCKED_ENV** | 本会话 `docker version` 无 Server；与 2026-10-27 审查一致 |
-| torch 2.6 / torchvision 0.21 | **NOT_INSTALLED** | 本机 venv 无 torch；真实训练/推理不可执行，dummy 仅验证契约 |
-| `requirements-cxr` 锁 | **NOT_CREATED** | 未新增第三方依赖（指标改纯 numpy），故未生成新锁；如需 sklearn 需另行 Linux/Py3.12 锁 |
+| Docker daemon / PG / GPU | **AVAILABLE**（本轮复核） | Docker 29.4.1 + nvidia-container-runtime；项目栈 Up 且 healthy；`gpu:0` 空闲、无在途作业 |
+| torch 2.6 / torchvision 0.21 | **AVAILABLE（仅容器内）** | worker 镜像 2.6.0+cu124 / 0.21.0+cu124，CUDA 12.4，`cuda_available=True`；宿主 venv 仍无 torch |
+| 部署是否含 CXR | **NOT_DEPLOYED** | api `code_sha=195d34c`（早于 `672f2d2`）；DB 在 `4a6b1222f002`，无 CXR 表 |
+| `requirements-cxr` 锁 | **NOT_CREATED** | 未新增运行时依赖（指标为纯 numpy）；sklearn 只在隔离 venv 做对照，不进镜像；若要在镜像内跑 sklearn 需另行 Linux/Py3.12 锁 |
 | 真实审核者 | 外部待补 | 系统记录实际操作账号，不冒用医生署名 |
 | 临床有效性 / 外部验证 | 未验证 | 不得声称具备临床诊断能力 |
 
@@ -61,10 +65,18 @@
 - 旧 E4 性能、旧 mAP、旧复核记录**不得**转写为胸片模型性能或人工诊断证据。
 - 旧检测链路（BBox 冻结/切片/标注/推理）接口与数据未改义；CXR 版本调用旧 BBox 接口返回 `task_mismatch`。
 
+## 本轮实测发现并修复的缺陷
+
+真 torch + GPU 下才暴露，dummy 后端与单测无法覆盖：
+
+1. `device="0"` 直接传给 torch → `Invalid device string: '0'`。新增 `_normalize_device()`（裸序号/`cuda`/越界序号/无 CUDA 统一归一化）。
+2. Grad-CAM 目标层 `features.norm5` 与 DenseNet 的原地 ReLU 冲突 → backward hook 报 view+inplace 错误。目标层改为 `features.denseblock4`。
+3. 退化热图静默输出全零（加权和全为非正）。新增 `normalize_cam()`：峰值≈0 或含非有限值时抛 `409 cxr_explain_degenerate`，原因写入 `analysis.explanation_json.failures`，评分与报告不受影响。实测 5 标签中出现 1 例。
+
 ## 下一步（按优先级）
 
-1. 取得授权数据 → 配置 `CXR_IMPORT_ROOT` → 运行 `prepare_chexpert.py --dry-run` 审计。
-2. 恢复 Docker + PG → 迁移演练 → 备份（`scripts/backup_project.py`）。
-3. 安装 CXR 运行镜像（torch 2.6 / torchvision 0.21 / CUDA 12.4）→ 真实 2 epoch smoke。
+1. 取得授权数据 → 配置 `CXR_IMPORT_ROOT` → 运行 `prepare_chexpert.py --dry-run` 审计（仍 BLOCKED_REAL_DATA）。
+2. 备份（`scripts/backup_project.py`，当前无在途作业、`gpu:0` 空闲）→ 从干净提交构建新 api/worker 镜像 → `alembic upgrade head`（f002→f003）→ 重启复查。
+3. 真实 2 epoch smoke（环境已具备，只差部署与数据）。
 4. smoke 通过后按 `configs/cxr/pilot.json` 冻结协议 → seed 42 闭环 → 43/44 → test 一次性评价。
 5. 真实审核者完成复核 → 最终报告 → 全量备份与恢复演练。

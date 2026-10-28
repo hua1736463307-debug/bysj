@@ -197,3 +197,57 @@ def test_calibration_must_use_calibration_split(client, admin_headers, settings,
     )
     assert response.status_code == 422
     assert response.json()["code"] == "cxr_calibration_split"
+
+
+def test_degenerate_cam_is_rejected_not_blank():
+    """Grad-CAM 全为非正时必须报错，不能输出全黑热图让人误读。"""
+    import numpy as np
+    import pytest
+
+    from app.core.errors import ApiError
+    from app.ml.cxr_adapter import normalize_cam
+
+    with pytest.raises(ApiError) as excinfo:
+        normalize_cam(np.zeros((7, 7), dtype=np.float32))
+    assert excinfo.value.code == "cxr_explain_degenerate"
+
+    with pytest.raises(ApiError) as excinfo:
+        normalize_cam(np.array([[np.nan, 1.0]], dtype=np.float32))
+    assert excinfo.value.code == "cxr_explain_failed"
+
+    normalized = normalize_cam(np.array([[0.0, 0.5], [1.0, 0.25]], dtype=np.float32))
+    assert float(normalized.min()) == 0.0
+    assert float(normalized.max()) == 1.0
+
+
+def test_device_string_is_normalized_for_torch():
+    """训练参数默认 device="0"，torch 只接受 "cuda:0"/"cpu"。"""
+
+    class _FakeCuda:
+        @staticmethod
+        def is_available():
+            return True
+
+        @staticmethod
+        def device_count():
+            return 1
+
+    class _FakeTorch:
+        cuda = _FakeCuda()
+
+    from app.ml.cxr_adapter import _normalize_device
+
+    assert _normalize_device("0", _FakeTorch) == "cuda:0"
+    assert _normalize_device("cuda", _FakeTorch) == "cuda:0"
+    assert _normalize_device("cuda:1", _FakeTorch) == "cuda:0"  # 越界回退 0
+    assert _normalize_device("cpu", _FakeTorch) == "cpu"
+
+    class _NoCuda:
+        @staticmethod
+        def is_available():
+            return False
+
+    class _NoTorch:
+        cuda = _NoCuda()
+
+    assert _normalize_device("0", _NoTorch) == "cpu"

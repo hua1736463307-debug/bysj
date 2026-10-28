@@ -7,6 +7,18 @@ Linux/Py3.12 完整 hash 锁并跑 pip check，本轮无法在该环境验证。
 固定等宽 10 bins ECE），并**显式处理 mask**——绝不把 -1/空值矩阵直接塞进
 多标签 ROC 函数。该偏离记录在 docs/cxr/execution/M06.md。
 
+与 scikit-learn 的对照由 `backend/tests/cxr/test_cxr_metrics_sklearn.py` 覆盖
+（该模块在无 sklearn 的环境整体 skip）。三处**已记录的口径差异**：
+
+1. average precision 为**阶梯积分**（等同 `sklearn.metrics.average_precision_score`）：
+   ``AP = Σ (R_n - R_{n-1}) · P_n``，阈值按相同评分分组。它**不是** PR 曲线梯形
+   面积 ``auc(recall, precision)``；两者可能偏高也可能偏低，本项目不提供后者。
+2. 单类/空 mask：sklearn 抛 ``ValueError``，本项目返回 ``(None, reason)``。
+   契约要求"不填 0、不返回 NaN、不伪造宏平均"。
+3. ECE 分箱为**左闭右开** ``[lower, upper)``（最后一箱含 1.0）；
+   ``sklearn.calibration_curve(strategy='uniform')`` 把恰好落在边界上的值归入
+   下箱。连续评分下两者一致，边界命中时归属不同，本项目按左闭右开固定。
+
 所有函数在指标不可定义时返回 ``(None, reason)``，不填 0、不返回 NaN。
 """
 from __future__ import annotations
@@ -59,7 +71,13 @@ def auroc(truth: Sequence[float], score: Sequence[float], mask: Sequence[int]) -
 
 
 def average_precision(truth: Sequence[float], score: Sequence[float], mask: Sequence[int]) -> tuple[float | None, str | None]:
-    """Average precision（阶梯积分），并列评分按同一阈值分组。"""
+    """Average precision（阶梯积分），并列评分按同一阈值分组。
+
+    定义：``AP = Σ_n (R_n - R_{n-1}) · P_n``，n 遍历按评分降序的唯一阈值，
+    P_n/R_n 为该阈值下的精确率/召回率。等价于
+    ``sklearn.metrics.average_precision_score``，**不是** PR 曲线梯形面积。
+    无正例时不可定义，返回 ``(None, "no_positive")``。
+    """
     y, s = _masked(truth, score, mask)
     positives = int((y == 1).sum())
     if positives == 0:
@@ -96,7 +114,11 @@ def brier(truth: Sequence[float], probability: Sequence[float], mask: Sequence[i
 def expected_calibration_error(
     truth: Sequence[float], probability: Sequence[float], mask: Sequence[int], bins: int = ECE_BINS
 ) -> tuple[float | None, dict | None, str | None]:
-    """固定等宽 bins 的 ECE；返回 (ece, bin_table, reason)。"""
+    """固定等宽 bins 的 ECE；返回 (ece, bin_table, reason)。
+
+    箱区间为左闭右开 ``[lower, upper)``，最后一箱含 1.0。``bin_table`` 的
+    confidence/accuracy/gap 按 6 位小数落库，ECE 本身用未舍入值累加。
+    """
     y, p = _masked(truth, probability, mask)
     if len(y) == 0:
         return None, None, "no_masked_samples"

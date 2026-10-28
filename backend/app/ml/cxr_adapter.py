@@ -23,6 +23,29 @@ ARCH_DENSENET121 = "densenet121"
 SUPPORTED_ARCHES = {ARCH_DENSENET121}
 
 
+def _normalize_device(raw, torch) -> str:
+    """把训练参数里的 "0"/"cuda"/"cuda:1" 归一化为 torch 可接受的设备串。
+
+    `CxrTrainingParams.device` 默认是 "0"（与既有 detect 参数习惯一致），
+    但 torch 不接受裸序号；无 CUDA 时统一回退 cpu。
+    """
+    text = str(raw or "cpu").strip().lower()
+    if text in {"", "cpu", "-1"}:
+        return "cpu"
+    if text in {"cuda", "gpu"}:
+        text = "cuda:0"
+    elif text.isdigit():
+        text = f"cuda:{text}"
+    if not text.startswith("cuda"):
+        return "cpu"
+    if not torch.cuda.is_available():
+        return "cpu"
+    index = text.partition(":")[2] or "0"
+    if not index.isdigit() or int(index) >= torch.cuda.device_count():
+        return "cuda:0"
+    return f"cuda:{index}"
+
+
 @dataclass
 class CxrModelHandle:
     path: Path
@@ -42,6 +65,26 @@ class CxrAdapter(Protocol):
     def explain(self, handle: CxrModelHandle, image_path: Path, label_key: str) -> dict: ...
 
     def release(self, handle: CxrModelHandle) -> None: ...
+
+
+def normalize_cam(cam: np.ndarray) -> np.ndarray:
+    """把 Grad-CAM 归一到 [0,1]；退化图显式拒绝而不是输出空白热图。
+
+    Grad-CAM 经 ReLU 后非负，因此按峰值归一化即可保留相对强度。
+    若峰值≈0（权重全为非正）或含非有限值，说明该标签没有可用的关注区域；
+    契约要求此时热力图为 null + reason，不能返回一张全黑图让人误读。
+    """
+    array = np.asarray(cam, dtype=np.float32)
+    if not np.isfinite(array).all():
+        raise ApiError(500, "cxr_explain_failed", "关注区域图含非有限值")
+    peak = float(array.max())
+    if peak <= 1e-8:
+        raise ApiError(
+            409,
+            "cxr_explain_degenerate",
+            "该标签的 Grad-CAM 权重全为非正，未生成有效关注区域；评分与结构化报告不受影响",
+        )
+    return (array / peak).astype(np.float32)
 
 
 class DummyCxrAdapter:
@@ -130,9 +173,7 @@ class DenseNetCxrAdapter:
         arch = metadata.get("arch") or ARCH_DENSENET121
         if arch not in SUPPORTED_ARCHES:
             raise ApiError(422, "cxr_arch_unsupported", f"不支持的 CXR 架构: {arch}")
-        device = metadata.get("device") or "cpu"
-        if device != "cpu" and not torch.cuda.is_available():
-            device = "cpu"
+        device = _normalize_device(metadata.get("device"), torch)
         try:
             payload = torch.load(str(model_path), map_location="cpu", weights_only=True)
         except Exception as exc:
@@ -192,16 +233,20 @@ class DenseNetCxrAdapter:
         tensor, meta = self._tensor(handle, image_path)
         activations: dict[str, object] = {}
         gradients: dict[str, object] = {}
-        target_layer = handle.model.features.norm5
+
+        # 目标层用最后一个 dense block，而不是 features.norm5：
+        # DenseNet.forward 在 norm5 之后执行 `F.relu(features, inplace=True)`，
+        # 会对 norm5 的输出原地修改，导致 backward hook 的保存张量被覆盖
+        # （实测报 "Output 0 of BackwardHookFunctionBackward is a view and is
+        # being modified inplace"）。denseblock4 的输出经 BatchNorm 消费，不原地改。
+        target_layer = handle.model.features.denseblock4
+        target_layer_name = "features.denseblock4"
 
         def forward_hook(_module, _inputs, output):
             activations["value"] = output
-
-        def backward_hook(_module, _grad_input, grad_output):
-            gradients["value"] = grad_output[0]
+            output.register_hook(lambda grad: gradients.__setitem__("value", grad))
 
         forward_handle = target_layer.register_forward_hook(forward_hook)
-        backward_handle = target_layer.register_full_backward_hook(backward_hook)
         try:
             handle.model.zero_grad(set_to_none=True)
             # eval 模式保留参数冻结；仅打开解释所需梯度，不更新参数。
@@ -209,7 +254,6 @@ class DenseNetCxrAdapter:
             logits[0, index].backward()
         finally:
             forward_handle.remove()
-            backward_handle.remove()
         activation = activations.get("value")
         gradient = gradients.get("value")
         if activation is None or gradient is None:
@@ -217,11 +261,8 @@ class DenseNetCxrAdapter:
         weights = gradient.mean(dim=(2, 3), keepdim=True)
         cam = torch.relu((weights * activation).sum(dim=1))[0]
         cam = cam.detach().cpu().numpy().astype(np.float32)
-        span = float(cam.max() - cam.min())
-        if not np.isfinite(cam).all():
-            raise ApiError(500, "cxr_explain_failed", "关注区域图含非有限值")
-        cam = (cam - float(cam.min())) / span if span > 1e-8 else np.zeros_like(cam)
-        # 224 空间内的 cam 可能小于 224（DenseNet 输出 7x7），先放大到画布尺寸。
+        cam = normalize_cam(cam)
+        # cam 是 7x7 空间，先放大到画布尺寸，再按 preprocess 的可逆映射回原图。
         import torch.nn.functional as functional
 
         cam_tensor = torch.from_numpy(cam)[None, None]
@@ -235,7 +276,7 @@ class DenseNetCxrAdapter:
             "backend": self.backend,
             "label_key": label_key,
             "method": "gradcam",
-            "target_layer": "features.norm5",
+            "target_layer": target_layer_name,
             "cam": restored,
             "meta": meta,
             "limitations": [

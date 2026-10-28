@@ -465,7 +465,21 @@ def run_explanation(
             from app.workers.dispatcher import JobCancelled
 
             raise JobCancelled()
-        result = adapter.explain(handle, source, label_key)
+        try:
+            result = adapter.explain(handle, source, label_key)
+        except ApiError as exc:
+            # 解释失败不阻断评分与结构化报告：记录原因，热力图保持 null。
+            if lock_for_write:
+                lock_for_write()
+            failures = dict((analysis.explanation_json or {}).get("failures") or {})
+            failures[label_key] = {"code": exc.code, "reason": exc.message}
+            analysis.explanation_json = {
+                **(analysis.explanation_json or {}),
+                "failures": failures,
+                "definition": "模型关注区域；无定位真值，不计算 IoU/Dice，不代表病灶定位准确",
+            }
+            db.commit()
+            raise
     finally:
         adapter.release(handle)
 
