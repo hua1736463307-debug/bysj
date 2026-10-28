@@ -73,7 +73,17 @@ Atelectasis / Cardiomegaly / Consolidation / Edema / Pleural Effusion 五项同�
 `ISIC2018_Task3_Training_GroundTruth.zip`、`Training_LesionGroupings.csv`、
 `Validation_GroundTruth.zip`、`Test_GroundTruth.zip`、`Validation_Input.zip`（进行中）。
 **未完成**：`Training_Input.zip`（2.77 GB）、`Test_Input.zip`（421 MB）——受 9–12 KB/s 带宽限制，
-按实测速度需约 10 小时 / 1.6 小时。
+按实测速度需约 10 小时 / 1.6 小时。本轮结束时 `Validation_Input.zip` 已下载 13.6 MB / 53 MB（26%），
+`Training_Input.zip` 未开始。
+
+断点续传命令（已下载部分会被 `-C -` 跳过）：
+
+```bash
+BASE=https://isic-archive.s3.amazonaws.com/challenges/2018
+for f in ISIC2018_Task3_Validation_Input.zip ISIC2018_Task3_Training_Input.zip ISIC2018_Task3_Test_Input.zip; do
+  curl -L --retry 3 -C - -o "$f" "$BASE/$f"
+done
+```
 
 ## 4. 皮肤镜：ISIC 2019（备选）
 
