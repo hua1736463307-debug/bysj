@@ -2,10 +2,16 @@
 ARG PYTHON_BASE=python:3.12-slim@sha256:dd29372629eeba2dd003fd9e9d35a5b8236c44727875a0364254b5127af88e65
 FROM ${PYTHON_BASE} AS base
 
+# 构建时必须传入源码提交 SHA。scripts/restore_project.py 只接受自带 40 位
+# 提交号的镜像，避免用无法追溯的镜像恢复生产数据；未传时显式写 unknown，
+# 让恢复流程直接拒绝，而不是沿用 version.json 里的历史 SHA。
+ARG BYSJ_CODE_SHA=unknown
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PYTHONPATH=/app/backend
+    PYTHONPATH=/app/backend \
+    BYSJ_CODE_SHA=${BYSJ_CODE_SHA}
 
 WORKDIR /app
 
@@ -16,10 +22,13 @@ COPY backend /app/backend
 COPY deploy/version.json /app/version.json
 
 RUN python - <<'PY'
-import json, pathlib
+import json, os, pathlib, re
 path = pathlib.Path('/app/version.json')
 data = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
 data.setdefault('image', 'bysj-backend')
+sha = os.environ.get('BYSJ_CODE_SHA', '')
+# 只接受完整提交号；否则明确写 unknown，不继承仓库里的历史 SHA。
+data['code_sha'] = sha if re.fullmatch(r'[a-f0-9]{40}', sha or '') else 'unknown'
 path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
 PY
 
