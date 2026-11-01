@@ -125,3 +125,20 @@
 3. 多 seed 重复与置信区间。
 4. 外部留出集（官方 val/test）评价——因无分组，只能作图像级对照。
 5. 断点续训、跨机迁移、更大 batch 的显存与吞吐。
+
+## 8. 研究资格归类（2026-10-31 补记，不改写任何历史测量值）
+
+本节只是在本记录上补充元数据说明，原始数值与结论保持原样。
+
+| 项 | 值 |
+|---|---|
+| `experiment_purpose` | `smoke`（真实数据、真实 GPU，但 1 epoch、随机初始化、单 seed） |
+| `research_valid` | `true`（非 dummy 产物；历史字段语义不变） |
+| `paper_eligible` | **`false`**：smoke 不具备论文资格，即使 `research_valid=true` |
+| 原因码 | `experiment_purpose_smoke`；历史模型记录无 purpose 时另为 `experiment_purpose_missing` |
+
+含义：`research_valid=true` 只说明"不是 dummy"，**不说明能进论文**。自 2026-10-31 起由
+`backend/app/domains/isic/experiment_purpose.py` 统一计算 `paper_eligible`，
+`GET /api/v1/isic/results/paper-summary` 会把这些 smoke 记录列在 `excluded` 且不返回指标；
+smoke 结果仍可在 `/models`、`/evaluations` 查询。正式实验须通过
+`docs/datasets/ISIC-FORMAL-PROTOCOL-v1.md` 的冻结协议门禁。

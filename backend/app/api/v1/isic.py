@@ -272,6 +272,11 @@ class IsicTrainingRequest(BaseModel):
     dataset_version_id: str
     base_model_id: str | None = None
     params: dict = Field(default_factory=dict)
+    #: P0：实验用途必须显式声明；缺失即"未分类"，产物不具备论文资格。
+    experiment_purpose: str | None = Field(default=None, max_length=16, pattern=r"^(smoke|formal)$")
+    #: formal 必须绑定冻结协议（`docs/datasets/ISIC-FORMAL-PROTOCOL-v1.md`）及其字节哈希。
+    protocol_id: str | None = Field(default=None, max_length=64)
+    protocol_sha256: str | None = Field(default=None, max_length=64)
 
 
 def _run_inline(settings: Settings, job, created_now: bool) -> None:
@@ -329,6 +334,15 @@ def create_evaluation(
     return accepted(job.to_public(), message="皮肤镜评价任务已接收")
 
 
+def _model_paper_eligibility(model) -> dict:
+    """P0：论文资格按模型元数据重新计算，不信任任何已存布尔字段。"""
+    from app.domains.isic.experiment_purpose import paper_eligibility
+
+    if model is None:
+        return {"paper_eligible": False, "experiment_purpose": None, "reasons": ["model_missing"]}
+    return paper_eligibility(model.metadata_json)
+
+
 @router.get("/evaluations", response_model=None)
 def list_evaluations(
     dataset_version_id: str | None = Query(default=None),
@@ -360,6 +374,7 @@ def list_evaluations(
             "split": row.split,
             "status": row.status,
             "purpose": row.purpose,
+            "paper_eligibility": _model_paper_eligibility(models.get(row.model_id)),
             "metrics": row.metrics_json,
             "created_at": row.created_at.isoformat() if row.created_at else None,
             "finished_at": row.finished_at.isoformat() if row.finished_at else None,
@@ -399,6 +414,7 @@ def list_isic_models(
                     "label_schema": (row.metadata_json or {}).get("label_schema"),
                     "class_order": (row.metadata_json or {}).get("class_order"),
                     "research_valid": (row.metadata_json or {}).get("research_valid"),
+                    "paper_eligibility": _model_paper_eligibility(row),
                     "metrics": (row.metadata_json or {}).get("metrics"),
                 }
                 for row in rows
@@ -406,5 +422,55 @@ def list_isic_models(
             "total": total,
             "page": page,
             "page_size": page_size,
+        }
+    )
+
+
+@router.get("/results/paper-summary", response_model=None)
+def paper_summary(
+    dataset_version_id: str | None = Query(default=None),
+    user: CurrentUser = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """P0：论文汇总只收 `paper_eligible=true` 的 test 评价；其余单列原因，数值不进入汇总。"""
+    from app.db.models import EvaluationRun, ModelRegistry
+    from app.domains.isic.experiment_purpose import FORMAL_PROTOCOL_ID
+
+    query = db.query(EvaluationRun).filter(
+        EvaluationRun.split == "test", EvaluationRun.status == "completed"
+    )
+    if dataset_version_id:
+        query = query.filter(EvaluationRun.dataset_version_id == dataset_version_id)
+    rows = query.order_by(EvaluationRun.created_at.asc()).all()
+    models = {
+        item.id: item
+        for item in db.query(ModelRegistry)
+        .filter(ModelRegistry.id.in_({row.model_id for row in rows}))
+        .all()
+    } if rows else {}
+
+    included: list[dict] = []
+    excluded: list[dict] = []
+    for row in rows:
+        report = _model_paper_eligibility(models.get(row.model_id))
+        base = {
+            "evaluation_id": row.id,
+            "model_id": row.model_id,
+            "dataset_version_id": row.dataset_version_id,
+            "paper_eligibility": report,
+        }
+        if report["paper_eligible"]:
+            included.append({**base, "metrics": row.metrics_json})
+        else:
+            excluded.append(base)
+
+    return ok(
+        {
+            "protocol_id": FORMAL_PROTOCOL_ID,
+            "included": included,
+            "excluded": excluded,
+            "included_count": len(included),
+            "excluded_count": len(excluded),
+            "note": "仅收 experiment_purpose=formal 且通过冻结协议/数据/权重/seed 门禁的 test 评价；排除项不提供指标。",
         }
     )

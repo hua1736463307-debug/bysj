@@ -25,11 +25,19 @@ def _signal_child(process: subprocess.Popen, *, hard: bool) -> None:
     if os.name == "posix":
         import signal
 
+        # 子进程以 start_new_session=True 启动，正常情况下是独立进程组的组长。
+        # 只有确认"它就是组长"时才 killpg，避免误杀无关进程组；
+        # 查不到组（进程已退出）或不是组长时退回单进程信号，仍然走同一套语义。
         try:
             if os.getpgid(process.pid) == process.pid:
                 os.killpg(process.pid, signal.SIGKILL if hard else signal.SIGTERM)
-        except ProcessLookupError:
+                return
+        except (ProcessLookupError, PermissionError):
             pass
+        if hard:
+            process.kill()
+        else:
+            process.terminate()
     elif hard:
         process.kill()
     else:

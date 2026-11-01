@@ -12,14 +12,18 @@
 
 **架构已从"单方向胸片"改为"方向注册 + 任务语义分离"**，三个方向共存互不污染：
 胸片多标签（已实现，真实数据受限）、皮肤镜单标签（数据通路已实现，标签已审计、训练集已下载）、
-血细胞检测（历史模块保留）。**没有任何真实训练结果**，所有模型结论仍为空。
+血细胞检测（历史模块保留）。
+
+**当前研究状态（2026-10-31 修订）：真实工程 smoke 已完成；正式实验未完成。**
+ISIC 用真实数据跑过 1 epoch 的工程 smoke（`docs/directions/ISIC-SMOKE-20261028.md`），
+它验证链路可用，**不构成论文指标**；没有任何正式（多 seed、冻结协议门禁）训练结果。
 
 工程侧已完成：分支已推送、CI 全绿；f004 备份恢复演练在隔离环境全链路通过（运行项目仍为 f002、未被改动）；
 ISIC 三个子集图像已全部下载并校验；生产迁移方案已写好但**未执行**，等待窗口确认。
 
 **ISIC 训练链路已实现**（`63bff5f`）：七类 softmax 适配器、`isic_train` / `isic_evaluate` 作业、
 逐类 P/R/F1 + macro-F1 + 混淆矩阵 + top-1 ECE，走既有 trainer 角色与 GPU 租约。
-真实数据 smoke 见 `docs/directions/ISIC-SMOKE-20261028.md`；smoke 数值不是论文指标。
+取消路径修复（`899444d`）目前只有单元测试证据（`c966f7c`），**修复后的真实 GPU 取消未验收**。
 
 ## 1. 方向矩阵
 
@@ -41,8 +45,8 @@ ISIC 三个子集图像已全部下载并校验；生产迁移方案已写好但
 | 冻结 | 按 lesion 分组四集、单标签类别门禁、稀有类警告 | `domains/isic/split_service.py` |
 | 表 | `isic_samples`（Alembic `4a6b1222f004`） | 空库 28 表 |
 | 任务 | `isic_import` / `isic_freeze` 挂到 dataset 角色 worker | `workers/isic_handlers.py` |
-| API | `/api/v1/isic/{schema,datasets,import,versions,summary}` | 6 个端点 |
-| 测试 | 11 项（注册表、导入正/反例、冻结、跨方向拒绝） | `backend/tests/isic/` |
+| API | `/api/v1/isic/{schema,datasets,import,versions,summary,training,evaluations,models,results/paper-summary}` | 11 个端点 |
+| 测试 | 注册表、导入正/反例、冻结、跨方向拒绝 + 实验用途/论文资格门禁 | `backend/tests/isic/` |
 | 恢复演练 | 合成 ISIC 4 类记录随 f004 备份恢复，新代码可读 | `RESTORE-DRILL-20261027.md` |
 | 审计 | 真实标签表审计：train 10,015 / val 193 / test 1,512；7,470 个 lesion 组 | `scripts/prepare_isic.py` |
 
@@ -69,8 +73,8 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 | 项 | 状态 | 证据 |
 |---|---|---|
 | 分支推送 | **PASS** | `e96a424`→`82ccf42` 已推送；`github.com` 经 7890 代理可写，7897 会 TLS 失败 |
-| PR #2 | **OPEN / DRAFT** | head `82ccf42`，base `graduation/unblock-20261022`，8 commits / 98 files，未合并 |
-| CI（`82ccf42`） | **PASS** | backend / frontend / compose 均 success；gpu-acceptance skipped（无 GPU runner） |
+| PR #2 | **OPEN / DRAFT** | head `c966f7c`，base `graduation/unblock-20261022`，未合并 |
+| CI（`c966f7c`） | **PASS（有边界）** | backend / frontend / compose 均 success；gpu-acceptance **skipped**（无 GPU runner），**不等于 GPU 验收** |
 | f004 备份恢复演练 | **PASS** | 两套隔离项目，28 表 / 14,122 行，文件哈希全一致，新代码读取 200 |
 | 运行中项目 | **未改动** | 仍 `4a6b1222f002`、22 表、5,255 资产、115 任务；容器未重启 |
 | ISIC 数据完整性 | **PASS** | 三个 ZIP 字节数与官方一致、`unzip -t` 无错误、SHA-256 已记录；标签↔图像 1:1 |
@@ -82,18 +86,40 @@ val 中 DF 仅 1 例，任何基于 val 的类别指标对小类都不可靠。
 
 ## 5. 本轮未做（明确）
 
-- **没有正式训练**：ISIC 训练链路已实现，只跑过 1 epoch 的工程 smoke；CXR 真实数据不可达。
+- **没有正式训练**：ISIC 训练链路已实现并跑过 1 epoch 工程 smoke；CXR 真实数据不可达。
 - **旧 BCCD 权重不可用**：现有 `best.pt` 在 conf=0.01 下仍 0 框，属既有数据问题，未修复。
 - **生产迁移未执行**：方案已就绪，运行库仍 f002。
-- **没有 ISIC 模型/分析/报告页面**：本轮只接通数据与冻结；模型推理沿用 CXR 的 DenseNet 适配器
-  （`isic` 方向已声明 `softmax` 输出，但尚未接入训练/评价/报告链路）。
+- **没有 ISIC 模型分析/报告页面**：训练/评价/模型登记链路已接通（`63bff5f`），但前端仍无
+  ISIC 专用页面（模型选择、单图分析、人工复核、可追溯报告），不得把 CXR 的五项文案直接复用。
 - **没有 NIH 适配器**：NIH 数据未取得，不写"看起来能用"的空实现。
 - 所有合成 fixture / dummy 后端产物带 `synthetic` / `research_valid=false`，不得进入论文。
 
+### 5.1 P0 论文资格语义（2026-10-31 新增）
+
+`research_valid` 只区分"是否 dummy"，不能回答"能否进论文"。自本轮起：
+
+| 字段 | 来源 | 语义 |
+|---|---|---|
+| `experiment_purpose` | 提交训练时**显式声明**（`smoke` / `formal`） | 缺省即"未分类"，默认拒绝 |
+| `research_valid` | 历史字段，语义不变 | 产物非 dummy |
+| `paper_eligible` | 门禁函数**重新计算**，不读取已存布尔值 | 能否进入论文汇总/导出 |
+
+formal 还须绑定冻结协议（`docs/datasets/ISIC-FORMAL-PROTOCOL-v1.md` 的 id + 字节 sha256）、
+冻结数据版本 manifest 哈希、预训练权重 `init_weights_sha256` 与预登记 seed(42/43/44)。
+
+- 门禁实现：`backend/app/domains/isic/experiment_purpose.py`；
+- 提交期校验：`training_service.preflight`（无 purpose → warn 且 `paper_eligible=false`）；
+- 落库：`workers/isic_handlers.py` 写入模型元数据 `paper_eligible` / `paper_ineligible_reasons`；
+- 读取/汇总：`GET /api/v1/isic/models`、`GET /api/v1/isic/evaluations` 返回 `paper_eligibility`；
+  `GET /api/v1/isic/results/paper-summary`（管理员）只收符合资格的 test 结果，其余列原因且不给指标。
+
+历史记录未改写：2026-10-28 的 smoke 模型（含 `158acb2986604b69`）没有 `experiment_purpose`，
+按"未分类"处理，仍可查询但被正式汇总排除。
+
 ## 6. 下一步
 
-1. ISIC 正式实验：多 epoch、多 seed、calibration 拟合、test 只读一次、外部留出集对照
-   （smoke 已完成，见 `docs/directions/ISIC-SMOKE-20261028.md`）。
+1. ISIC 正式实验：按 `docs/datasets/ISIC-FORMAL-PROTOCOL-v1.md` 执行（多 epoch、seed 42/43/44、
+   calibration 温度缩放、test 只读一次、外部留出集只作来源不同的对照）；smoke 已完成但不作论文指标。
 2. 生产迁移：等窗口确认；按最终提交重建镜像并重新验证（见 `MIGRATION-PLAN-f004.md`）。
-2. NIH 数据到位后新建 `nih-chestxray14-v1` 适配器（14 列布尔，不复用四态）。
-3. ISIC 训练/评价/报告链路接入（softmax 指标：逐类 P/R/F1、macro-F1、混淆矩阵、ECE）。
+3. NIH 数据到位后新建 `nih-chestxray14-v1` 适配器（14 列布尔，不复用四态）。
+4. ISIC 前端页面（模型选择、单图分析、人工复核、可追溯报告）拆独立施工单。

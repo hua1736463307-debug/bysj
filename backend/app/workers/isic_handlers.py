@@ -22,6 +22,7 @@ from app.db.models import (
 )
 from app.directions.isic import ISIC_LABEL_SCHEMA, ISIC_TASK
 from app.domains.isic import evaluation_service, import_service, split_service, training_service
+from app.domains.isic.experiment_purpose import eligibility_metadata, paper_eligibility
 from app.domains.models import service as model_service
 from app.ml.isic_adapter import get_isic_adapter
 from app.ml.yolo_adapter import environment_snapshot
@@ -121,6 +122,7 @@ def handle_isic_train(ctx: JobContext) -> dict:
                 "model_sha256": existing.sha256,
                 "reused": True,
                 "metrics": (existing.metadata_json or {}).get("metrics"),
+                "paper_eligible": paper_eligibility(existing.metadata_json)["paper_eligible"],
             }
 
         result = training_service.train(
@@ -144,6 +146,23 @@ def handle_isic_train(ctx: JobContext) -> dict:
         ctx.lock_for_write()
         backend = result.get("backend") or get_isic_adapter(ctx.settings).backend
         params = payload.get("params") or {}
+        # P0：论文资格在落库时用门禁函数重新计算，不接受调用方传入的布尔值。
+        purpose = payload.get("experiment_purpose")
+        protocol_id = payload.get("protocol_id")
+        protocol_sha256 = payload.get("protocol_sha256")
+        eligibility = eligibility_metadata(
+            {
+                "experiment_purpose": purpose,
+                "research_valid": backend != "dummy",
+                "backend": backend,
+                "synthetic": False,
+                "dataset_manifest_sha256": version.manifest_sha256,
+                "protocol_id": protocol_id,
+                "protocol_sha256": protocol_sha256,
+                "init_weights_sha256": base_model.sha256 if base_model else None,
+                "seed": params.get("seed", 42),
+            }
+        )
         registered = model_service.register_trained_model(
             ctx.db,
             ctx.settings,
@@ -175,6 +194,10 @@ def handle_isic_train(ctx: JobContext) -> dict:
                 "init_weights_sha256": base_model.sha256 if base_model else None,
                 "environment": result.get("environment"),
                 "research_valid": backend != "dummy",
+                "experiment_purpose": purpose,
+                "protocol_id": protocol_id,
+                "protocol_sha256": protocol_sha256,
+                **eligibility,
             },
         )
         experiment = ctx.db.query(ExperimentRun).filter(ExperimentRun.training_job_id == ctx.job.id).one_or_none()
@@ -196,6 +219,10 @@ def handle_isic_train(ctx: JobContext) -> dict:
                     "effective_args": result.get("effective_args"),
                     "seed": params.get("seed", 42),
                     "preprocess_schema": ISIC_PREPROCESS_SCHEMA,
+                    "experiment_purpose": purpose,
+                    "protocol_id": protocol_id,
+                    "protocol_sha256": protocol_sha256,
+                    "paper_eligible": eligibility["paper_eligible"],
                 },
                 metrics_json=result.get("metrics") or {},
             )
@@ -208,6 +235,9 @@ def handle_isic_train(ctx: JobContext) -> dict:
             "best_epoch": result.get("best_epoch"),
             "metrics": result.get("metrics"),
             "research_valid": backend != "dummy",
+            "experiment_purpose": purpose,
+            "paper_eligible": eligibility["paper_eligible"],
+            "paper_ineligible_reasons": eligibility["paper_ineligible_reasons"],
         }
     finally:
         from app.workers.gpu import release

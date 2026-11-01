@@ -20,6 +20,12 @@ from app.db.models import DatasetResource, DatasetVersion, JobTask, ModelRegistr
 from app.directions.isic import ISIC_LABEL_SCHEMA, ISIC_LABELS, ISIC_TASK
 from app.domains import job_service
 from app.domains.isic import runner
+from app.domains.isic.experiment_purpose import (
+    EXPERIMENT_PURPOSE_FORMAL,
+    normalize_purpose,
+    validate_formal_dataset,
+    validate_formal_protocol,
+)
 from app.domains.models import service as model_service
 from app.ml.isic_adapter import get_isic_adapter
 from app.schemas.isic import ISIC_CLASS_KEYS, ISIC_BACKBONE_TASK, IsicTrainingParams
@@ -120,6 +126,45 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
     except ValidationError as exc:
         checks.append({"name": "params", "status": "fail", "detail": str(exc)})
 
+    # P0：实验用途是提交时必须显式声明的独立语义，不再用 research_valid 兼任。
+    # smoke 允许随机初始化；formal 必须绑定冻结协议、冻结数据版本与预训练权重。
+    raw_purpose = payload.get("experiment_purpose")
+    purpose = normalize_purpose(raw_purpose)
+    if raw_purpose in (None, ""):
+        checks.append(
+            {
+                "name": "experiment_purpose",
+                "status": "warn",
+                "detail": "未声明 experiment_purpose：按未分类处理，产物不具备论文资格（paper_eligible=false）",
+            }
+        )
+    elif not purpose:
+        checks.append(
+            {
+                "name": "experiment_purpose",
+                "status": "fail",
+                "detail": "experiment_purpose 只能是 smoke 或 formal",
+            }
+        )
+    else:
+        checks.append({"name": "experiment_purpose", "status": "pass", "detail": f"experiment_purpose={purpose}"})
+
+    if purpose == EXPERIMENT_PURPOSE_FORMAL:
+        formal_reasons = validate_formal_protocol(payload.get("protocol_id"), payload.get("protocol_sha256"))
+        if payload.get("dataset_version_id"):
+            version_for_dataset = db.get(DatasetVersion, payload["dataset_version_id"])
+            if version_for_dataset is not None:
+                formal_reasons.extend(validate_formal_dataset(version_for_dataset.manifest_sha256))
+        if not payload.get("base_model_id"):
+            formal_reasons.append("base_model_id_missing")
+        checks.append(
+            {
+                "name": "formal_protocol",
+                "status": "fail" if formal_reasons else "pass",
+                "detail": "formal 门禁通过" if not formal_reasons else f"未满足：{formal_reasons}",
+            }
+        )
+
     base_model: ModelRegistry | None = None
     base_id = payload.get("base_model_id")
     if base_id:
@@ -168,6 +213,7 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         "backend": configured,
         "label_schema": ISIC_LABEL_SCHEMA,
         "class_order": list(ISIC_CLASS_KEYS),
+        "experiment_purpose": purpose or None,
     }
 
 
@@ -209,6 +255,9 @@ def create_training_job(
             "label_schema": ISIC_LABEL_SCHEMA,
             "class_order": list(ISIC_CLASS_KEYS),
             "params": report["params"],
+            "experiment_purpose": report["experiment_purpose"],
+            "protocol_id": payload.get("protocol_id"),
+            "protocol_sha256": payload.get("protocol_sha256"),
         },
         idempotency_key=idempotency_key,
     )
