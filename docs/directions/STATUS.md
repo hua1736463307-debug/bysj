@@ -6,6 +6,7 @@
 > 生产迁移窗口方案（**未执行**）：`docs/directions/MIGRATION-PLAN-f004.md`。
 > 迁移前补充验证（BCCD 功能、GPU 取消、PG 降级、备份保护）：`docs/directions/MIGRATION-READINESS-20261028.md`。
 > ISIC 数据核验与四集方案：`docs/datasets/ISIC-SPLIT-PLAN.md`。
+> 本轮（2026-11-01）P0/P2/P4 复核与未验证项：`docs/directions/VERIFICATION-20261101.md`。
 > 分支 `graduation/cxr-assist-20261027`，草稿 PR #2（base `graduation/unblock-20261022`，未合并）。
 
 ## 0. 一句话结论

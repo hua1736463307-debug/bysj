@@ -12,7 +12,8 @@
 
 升级到
 
-- 代码 `abfd310`（分支 `graduation/cxr-assist-20261027` 当前 HEAD）
+- 代码 `02123fc735f20d622cff312caec7549f32c43cb7`（2026-11-01 核对，
+  分支 `graduation/cxr-assist-20261027` 当前 HEAD；含 P0 论文资格门禁与 P2 冻结协议）
 - 数据库 `4a6b1222f004`（28 表，新增 5 张 CXR 表 + 1 张 ISIC 表）
 
 **不改**：数据卷内容（除新增文件外）、BCCD 数据集与模型、既有 API 契约、前端路由（旧页保留）。
@@ -78,7 +79,7 @@ docker exec bysj-restore2-20261022-db-1 psql -U bysj -d bysj -tAc "select versio
 
 ## 5. 镜像准备（窗口前完成，不占停服时间）
 
-在干净工作区、`HEAD=abfd310` 上构建：
+在干净工作区、`HEAD=02123fc735f20d622cff312caec7549f32c43cb7` 上构建：
 
 ```bash
 cd D:/毕业设计/bysj-unblock
@@ -119,6 +120,17 @@ docker run --rm --entrypoint python bysj-worker:f004-$SHA \
 
 生产迁移仍**必须按最终提交重新构建并记录新 ID**，避免"镜像 SHA 与 HEAD 不符"的追溯缺口。
 worker 重建要重新下载 ML 依赖（实测 34–53 分钟，随网络波动），**建议窗口前一天完成构建**。
+
+**当前候选状态（2026-11-01 核对，未构建）**：`02123fc` 的 `bysj-api` / `bysj-worker`
+候选镜像**尚未构建，ID 未知**。上表 `isic-63bff5f` 两组镜像不含 P0 论文资格门禁与 P2 冻结
+协议（`02123fc` 新增 `domains/isic/experiment_purpose.py`、`api/v1/isic.py` 的
+`/results/paper-summary`、`training_service.preflight` 的 formal 门禁），**不得用于迁移或
+formal 训练**。构建前须知：
+
+- 工作区当前有 1 个未提交改动 `deploy/compose.yml`（协作测试服务 `hub-test`，带
+  `profiles: [hub-test]`，不参与默认启动）。构建候选镜像前须先确认该改动的去处：
+  要么由维护者提交，要么在干净的 `02123fc` checkout 上构建，避免把未审内容带入生产镜像。
+- 构建与 `docker image inspect` 记录在窗口前完成；`BYSJ_CODE_SHA` 必须等于实际构建的 SHA。
 
 前端镜像 `bysj-frontend:20261022` **本轮未重新核验，不得据本地 E2E 推断生产镜像已含新页面**。
 本地 E2E 跑的是工作区代码，不是该镜像。窗口前必须二选一：
