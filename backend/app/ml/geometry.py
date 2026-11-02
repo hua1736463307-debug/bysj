@@ -8,10 +8,54 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 
 class GeometryError(ValueError):
     """几何参数非法（用于 422 映射）。"""
+
+
+def normalize_polygon(points):
+    if not isinstance(points, (list, tuple)) or not 3 <= len(points) <= 256:
+        raise GeometryError("多边形需要 3 到 256 个顶点")
+    normalized = []
+    for point in points:
+        if not isinstance(point, (list, tuple)) or len(point) != 2:
+            raise GeometryError("顶点须为两个归一化坐标")
+        x, y = float(point[0]), float(point[1])
+        if not math.isfinite(x) or not math.isfinite(y) or not (0 <= x <= 1 and 0 <= y <= 1):
+            raise GeometryError("多边形坐标须为 0 到 1 的有限数值")
+        normalized.append([round(x, 6), round(y, 6)])
+    area = abs(sum(normalized[index][0] * normalized[(index + 1) % len(normalized)][1] -
+                   normalized[(index + 1) % len(normalized)][0] * normalized[index][1]
+                   for index in range(len(normalized)))) / 2
+    if area < 1e-8:
+        raise GeometryError("多边形面积必须大于零")
+    xs, ys = zip(*normalized)
+    left, right, top, bottom = min(xs), max(xs), min(ys), max(ys)
+    return normalized, {"cx": (left + right) / 2, "cy": (top + bottom) / 2,
+                        "w": right - left, "h": bottom - top}
+
+
+def clip_polygon(points, bounds):
+    """Clip normalized vertices against an axis-aligned rectangle."""
+    result = [list(point) for point in points]
+    left, top, right, bottom = bounds
+    for axis, boundary, keep_greater in ((0, left, True), (0, right, False), (1, top, True), (1, bottom, False)):
+        source, result = result, []
+        if not source:
+            break
+        previous = source[-1]
+        previous_inside = previous[axis] >= boundary if keep_greater else previous[axis] <= boundary
+        for current in source:
+            inside = current[axis] >= boundary if keep_greater else current[axis] <= boundary
+            if inside != previous_inside:
+                ratio = (boundary - previous[axis]) / (current[axis] - previous[axis])
+                result.append([previous[index] + ratio * (current[index] - previous[index]) for index in (0, 1)])
+            if inside:
+                result.append(current)
+            previous, previous_inside = current, inside
+    return result
 
 
 def _positive(value: float, name: str) -> float:

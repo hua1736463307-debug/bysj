@@ -168,6 +168,7 @@ def build_manifest(
                         "cy": round(float(annotation["cy"]), 6),
                         "w": round(float(annotation["w"]), 6),
                         "h": round(float(annotation["h"]), 6),
+                        **({"polygon": annotation["polygon"]} if annotation.get("polygon") else {}),
                     }
                     for annotation in (entry.get("annotations") or [])
                 ),

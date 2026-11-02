@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from typing import Literal
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, Header, Query, UploadFile
@@ -10,7 +11,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, get_current_user, settings_dep
+from app.api.deps import CurrentUser, get_current_user, require_reviewer, settings_dep
 from app.core.config import Settings
 from app.core.errors import ApiError, accepted, ok
 from app.core.storage import remove_tree, resolve_under
@@ -21,6 +22,114 @@ from app.domains.datasets import import_service, service
 from app.schemas.common import MAX_PAGE_SIZE, DEFAULT_PAGE_SIZE
 
 router = APIRouter(tags=["datasets"])
+
+
+@router.get("/assets/{asset_id}/augmentation-preview", response_model=None)
+def augmentation_preview(
+    asset_id: int, operation: Literal["rotate", "flip", "brightness", "contrast", "grayscale"],
+    value: float = 1, user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    import io
+    from PIL import Image, ImageDraw
+    from fastapi.responses import Response
+    from app.domains.datasets.derivative_service import transform
+    if operation == "rotate" and value not in (90, 180, 270):
+        raise ApiError(422, "invalid_rotation", "旋转角度支持 90、180、270")
+    if operation in {"brightness", "contrast"} and not 0 < value <= 3:
+        raise ApiError(422, "invalid_factor", "倍率须大于 0 且不超过 3")
+    asset = service.get_asset(db, asset_id, user)
+    version = service.get_version(db, asset.dataset_version_id, user)
+    root = Path(version.root_path).resolve()
+    if root == settings.data_root.resolve() or not root.is_relative_to(settings.data_root.resolve()):
+        raise ApiError(422, "invalid_path", "版本路径越界")
+    source = resolve_under(root / "images", asset.relative_path, must_exist=True)
+    with Image.open(source) as original:
+        image = original.convert("RGB")
+        image.thumbnail((512, 512))
+        image, boxes = transform(image, asset.annotations_json or [], operation, value)
+    draw = ImageDraw.Draw(image)
+    for box in boxes:
+        if box.get("polygon"):
+            draw.polygon([(x * image.width, y * image.height) for x, y in box["polygon"]], outline="#21e0d0", width=2)
+        else:
+            x, y, w, h = (box[key] for key in ("cx", "cy", "w", "h"))
+            draw.rectangle(((x - w / 2) * image.width, (y - h / 2) * image.height,
+                            (x + w / 2) * image.width, (y + h / 2) * image.height), outline="#21e0d0", width=2)
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return Response(buffer.getvalue(), media_type="image/png", headers={"Cache-Control": "private, no-store"})
+
+
+class DerivativeRequest(BaseModel):
+    operation: Literal["merge", "augment", "preannotate"]
+    version_ids: list[str] = Field(min_length=1, max_length=8)
+    name: str = Field(default="合并数据集", min_length=1, max_length=255)
+    rotations: list[Literal[90, 180, 270]] = Field(default_factory=list, max_length=3)
+    brightness: list[float] = Field(default_factory=list, max_length=3)
+    contrast: list[float] = Field(default_factory=list, max_length=3)
+    flip: bool = False
+    grayscale: bool = False
+    model_id: str | None = None
+    asset_ids: list[int] = Field(default_factory=list, max_length=100)
+    confidence: float = Field(default=.5, ge=0, le=1)
+    class_mapping: dict[str, int] = Field(default_factory=dict)
+    annotation_mode: Literal["append", "replace"] = "append"
+
+
+@router.post("/dataset-derivatives", response_model=None)
+def create_derivative(
+    payload: DerivativeRequest, idempotency_key: str = Header(alias="Idempotency-Key", min_length=1, max_length=128),
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    from app.domains.models.service import get_model
+    if payload.operation == "preannotate" and not user.is_admin and "annotations" not in user.modules:
+        raise ApiError(403, "module_forbidden", "需要数据标注模块权限")
+    versions = [service.get_version(db, value, user) for value in payload.version_ids]
+    if len(set(payload.version_ids)) != len(versions):
+        raise ApiError(422, "duplicate_version", "来源版本不能重复")
+    if payload.operation == "merge" and len(versions) < 2:
+        raise ApiError(422, "merge_sources", "合并至少需要两个版本")
+    if payload.operation != "merge" and len(versions) != 1:
+        raise ApiError(422, "single_source_required", "此操作需要单个来源版本")
+    for version in versions:
+        service.assert_detect_task(db, version)
+        if version.state != "frozen":
+            raise ApiError(409, "parent_not_frozen", "请先在版本管理中冻结来源版本")
+        if version.class_map_json != versions[0].class_map_json:
+            raise ApiError(422, "class_map_mismatch", "类别映射不同的版本不能合并")
+        if version.split_config_json.get("group_level") != versions[0].split_config_json.get("group_level"):
+            raise ApiError(422, "group_level_mismatch", "分组级别不同的版本不能合并")
+    factors = payload.brightness + payload.contrast
+    if any(not (0 < value <= 3) for value in factors):
+        raise ApiError(422, "invalid_factor", "亮度和对比度倍率须大于 0 且不超过 3")
+    if payload.operation == "augment" and not (payload.rotations or factors or payload.flip or payload.grayscale):
+        raise ApiError(422, "empty_augmentation", "请选择至少一种增强")
+    if payload.operation == "preannotate":
+        model = get_model(db, payload.model_id or "", user)
+        if model.model_task != "detect":
+            raise ApiError(422, "task_mismatch", "预标注需要目标检测模型")
+        target_map = versions[0].class_map_json
+        if any(key not in model.class_map_json or str(value) not in target_map for key, value in payload.class_mapping.items()):
+            raise ApiError(422, "invalid_mapping", "类别映射包含未知源类别或目标类别")
+        if not payload.class_mapping and not set(model.class_map_json.values()).intersection(target_map.values()):
+            raise ApiError(422, "mapping_required", "模型与数据集类别名称无交集，请提供类别映射")
+        if payload.asset_ids:
+            count = db.query(DatasetAsset).filter(DatasetAsset.id.in_(payload.asset_ids),
+                DatasetAsset.dataset_version_id == versions[0].id, DatasetAsset.deleted_at.is_(None)).count()
+            if count != len(set(payload.asset_ids)):
+                raise ApiError(404, "not_found", "所选图片不属于来源版本")
+    data = payload.model_dump()
+    data["dataset_version_id"] = versions[0].id
+    job_type = "annotation_preannotate" if payload.operation == "preannotate" else "dataset_derive"
+    job, created = job_service.create_job(db, job_type=job_type, owner_id=user.id,
+        owner_username=user.username, payload=data, idempotency_key=idempotency_key)
+    if created and settings.inline_jobs:
+        from app.workers.dispatcher import execute_job_inline
+        execute_job_inline(job.id)
+        db.refresh(job)
+    return accepted(job.to_public(), message="派生版本任务已入队")
 
 
 def dataset_dict(resource: DatasetResource, version: DatasetVersion | None) -> dict:
@@ -56,6 +165,8 @@ def version_dict(version: DatasetVersion) -> dict:
         "split_manifest_hash": version.split_manifest_hash,
         "class_map_hash": version.class_map_hash,
         "frozen_at": version.frozen_at.isoformat() if version.frozen_at else None,
+        "requires_annotation_review": bool((version.metadata_json or {}).get("requires_annotation_review")),
+        "preserve_parent_splits": bool((version.metadata_json or {}).get("preserve_parent_splits")),
         "created_at": version.created_at.isoformat() if version.created_at else None,
     }
 
@@ -153,13 +264,15 @@ def import_dataset(
 
 @router.get("/datasets", response_model=None)
 def list_datasets(
+    search: str = Query(default="", max_length=255),
+    owner: str = Query(default="", max_length=64),
     task: str | None = Query(default=None, description="按 task_type 过滤，例如 detect / cxr_multilabel"),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
     user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    items, total = service.list_datasets(db, user, page=page, page_size=page_size, task_type=task)
+    items, total = service.list_datasets(db, user, page=page, page_size=page_size, task_type=task, search=search, owner=owner)
     return ok(
         {
             "items": [
@@ -367,6 +480,67 @@ def restore_asset(
 
 class AnnotationVersionRequest(BaseModel):
     base_version_id: str
+
+
+class ClassMapRequest(BaseModel):
+    expected_class_map: dict[str, str]
+    class_map: dict[str, str]
+
+
+@router.put("/dataset-versions/{version_id}/classes", response_model=None)
+def update_class_map(
+    version_id: str, payload: ClassMapRequest,
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db),
+):
+    from app.db.models import AnnotationDraft, User
+    version = service.get_version(db, version_id, user)
+    service.assert_detect_task(db, version)
+    version = db.query(DatasetVersion).filter_by(id=version.id).populate_existing().with_for_update().one()
+    if version.state not in {"draft", "failed"}:
+        raise ApiError(409, "version_frozen", "冻结版本的类别只读，请先创建标注副本")
+    if payload.expected_class_map != version.class_map_json:
+        raise ApiError(409, "class_map_conflict", "类别已被其他会话修改，请刷新")
+    classes = {key: value.strip() for key, value in payload.class_map.items()}
+    if not 1 <= len(classes) <= 256 or any(
+        not key.isdigit() or str(int(key)) != key or not value or len(value) > 64 for key, value in classes.items()
+    ) or len(set(classes.values())) != len(classes):
+        raise ApiError(422, "invalid_class_map", "类别需使用非负整数 ID 和不重复的非空名称，最多 256 类")
+    if sorted(map(int, classes)) != list(range(len(classes))):
+        raise ApiError(422, "invalid_class_map", "检测类别 ID 必须从 0 连续编号")
+    assets = db.query(DatasetAsset).filter_by(dataset_version_id=version.id).yield_per(200)
+    used = {str(box["class_id"]) for asset in assets for box in (asset.annotations_json or [])}
+    if not used.issubset(classes):
+        raise ApiError(409, "class_referenced", "待删除类别仍被标注引用，请先修改对应标注")
+    version.class_map_json = classes
+    resource = db.get(DatasetResource, version.dataset_id)
+    owners = db.query(User).filter((User.role == "admin") | (User.id == resource.owner_user_id)).all()
+    drafts = db.query(AnnotationDraft).filter_by(source_version_id=version.id).all()
+    for draft in drafts:
+        draft.revision += 1
+        draft.class_names_json = list(classes.values())
+    existing = {draft.owner_user_id for draft in drafts if draft.annotation_geometry == "rect"}
+    for owner in owners:
+        if owner.id not in existing:
+            db.add(AnnotationDraft(owner_user_id=owner.id, owner_username=owner.username,
+                dataset_id=version.dataset_id, source_version_id=version.id, annotation_geometry="rect",
+                class_names_json=list(classes.values()), revision=1))
+    db.commit()
+    return ok(version_dict(version), message="类别已更新")
+
+
+@router.post("/dataset-versions/{version_id}/annotation-review", response_model=None)
+def confirm_annotation_review(
+    version_id: str, user: CurrentUser = Depends(require_reviewer), db: Session = Depends(get_db),
+):
+    from app.db.base import utcnow
+    version = service.get_version(db, version_id, user)
+    version = db.query(DatasetVersion).filter_by(id=version.id).with_for_update().one()
+    if version.state not in {"draft", "failed"}:
+        raise ApiError(409, "version_frozen", "只可确认草稿版本")
+    version.metadata_json = {**(version.metadata_json or {}), "requires_annotation_review": False,
+                             "annotation_review": {"user_id": user.id, "at": utcnow().isoformat()}}
+    db.commit()
+    return ok(version_dict(version), message="人工检查确认已记录")
 
 
 @router.post('/datasets/{dataset_id}/annotation-versions', response_model=None)

@@ -353,7 +353,9 @@ def list_evaluations(
 ):
     from app.db.models import EvaluationRun, ModelRegistry
 
-    query = db.query(EvaluationRun).order_by(EvaluationRun.created_at.desc())
+    query = db.query(EvaluationRun).join(ModelRegistry, ModelRegistry.id == EvaluationRun.model_id).filter(
+        ModelRegistry.model_task == ISIC_TASK
+    ).order_by(EvaluationRun.created_at.desc())
     if dataset_version_id:
         query = query.filter(EvaluationRun.dataset_version_id == dataset_version_id)
     if not user.is_admin:
@@ -436,7 +438,8 @@ def paper_summary(
     from app.db.models import EvaluationRun, ModelRegistry
     from app.domains.isic.experiment_purpose import FORMAL_PROTOCOL_ID
 
-    query = db.query(EvaluationRun).filter(
+    query = db.query(EvaluationRun).join(ModelRegistry, ModelRegistry.id == EvaluationRun.model_id).filter(
+        ModelRegistry.model_task == ISIC_TASK,
         EvaluationRun.split == "test", EvaluationRun.status == "completed"
     )
     if dataset_version_id:

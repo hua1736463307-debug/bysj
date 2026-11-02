@@ -89,6 +89,11 @@ EXPECTED_NEW_TABLES = {
     "cxr_reports",
     # 皮肤镜方向（Alembic 4a6b1222f004）
     "isic_samples",
+    "system_departments",
+    "system_roles",
+    "system_user_profiles",
+    "system_menus",
+    "system_audit_logs",
 }
 
 

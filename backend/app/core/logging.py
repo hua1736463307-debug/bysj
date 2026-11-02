@@ -8,6 +8,31 @@ import uuid
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
+from starlette.concurrency import run_in_threadpool
+
+
+def record_audit(request: Request, status: int, request_id: str) -> None:
+    if request.url.path.endswith("/auth/login"):
+        kind = "login"
+    elif status >= 500:
+        kind = "fault"
+    elif request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        kind = "operation"
+    else:
+        return
+    from app.db.models import SystemAuditLog
+    from app.db.session import get_session_factory
+    try:
+        with get_session_factory()() as db:
+            db.add(SystemAuditLog(
+                kind=kind, username=getattr(request.state, "username", ""),
+                action=(request.method + " " + request.url.path)[:160],
+                status=status, request_id=request_id,
+                client_ip=(request.client.host[:64] if request.client else None),
+            ))
+            db.commit()
+    except Exception:
+        logging.getLogger(__name__).warning("audit_write_failed request_id=%s", request_id)
 
 _request_id: contextvars.ContextVar[str] = contextvars.ContextVar("request_id", default="")
 
@@ -48,7 +73,11 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         token = set_request_id(request_id)
         try:
             response = await call_next(request)
+        except Exception:
+            await run_in_threadpool(record_audit, request, 500, request_id)
+            raise
         finally:
             _request_id.reset(token)
+        await run_in_threadpool(record_audit, request, response.status_code, request_id)
         response.headers["X-Request-ID"] = request_id
         return response

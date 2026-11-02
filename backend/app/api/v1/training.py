@@ -17,11 +17,33 @@ router = APIRouter(prefix="/training", tags=["training"])
 
 
 class TrainingRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=128)
     dataset_version_id: str
     model_id: str | None = None
     model_ref: str | None = None
     task: str = "detect"
     params: TrainingParams = Field(default_factory=TrainingParams)
+
+
+@router.get("/resources", response_model=None)
+def resources(
+    _: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db),
+    settings: Settings = Depends(settings_dep),
+):
+    import os
+    import shutil
+    from app.db.models import ResourceLease, JobTask
+    from app.db.base import utcnow
+    from app.domains.lease_service import GPU_RESOURCE, worker_roles
+    lease = db.get(ResourceLease, GPU_RESOURCE)
+    held = bool(lease and lease.holder)
+    state = "available"
+    if held:
+        state = "held" if lease.expires_at > utcnow() else "recovery_required"
+    disk = shutil.disk_usage(settings.data_root)
+    return ok({"cpu_count": os.cpu_count(), "disk_free_bytes": disk.free, "disk_total_bytes": disk.total,
+               "gpu_lease_state": state, "workers": worker_roles(db),
+               "pending_jobs": db.query(JobTask).filter(JobTask.status == "pending").count()})
 
 
 @router.post("/preflight", response_model=None)

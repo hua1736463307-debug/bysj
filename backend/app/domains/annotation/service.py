@@ -15,6 +15,14 @@ GEOMETRY_KIND = "bbox"
 
 
 def _validate_box(box: dict, class_map: dict) -> dict:
+    polygon = None
+    if box.get("polygon") is not None:
+        from app.ml.geometry import normalize_polygon
+        try:
+            polygon, bounds = normalize_polygon(box["polygon"])
+            box = {**box, **bounds}
+        except (ValueError, TypeError) as exc:
+            raise ApiError(422, "invalid_polygon", str(exc)) from exc
     try:
         class_id = int(box.get("class_id"))
     except (TypeError, ValueError) as exc:
@@ -45,6 +53,7 @@ def _validate_box(box: dict, class_map: dict) -> dict:
         "h": round(h, 6),
         "source": str(box.get("source") or "manual"),
         "prediction_id": box.get("prediction_id"),
+        **({"polygon": polygon} if polygon is not None else {}),
     }
 
 
@@ -73,6 +82,7 @@ def _get_draft(
 def get_annotation_state(db: Session, asset_id: int, user: CurrentUser) -> dict:
     asset = dataset_service.get_asset(db, asset_id, user)
     version = dataset_service.get_version(db, asset.dataset_version_id, user)
+    version = db.query(DatasetVersion).filter_by(id=version.id).populate_existing().with_for_update().one()
     class_map = version.class_map_json or {}
     draft = _get_draft(
         db,

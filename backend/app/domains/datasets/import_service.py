@@ -158,6 +158,18 @@ def parse_yolo_label(text: str, report: ImportReport, file_label: str, class_map
         if not line:
             continue
         parts = line.split()
+        if len(parts) >= 7 and len(parts) % 2 == 1:
+            from app.ml.geometry import normalize_polygon
+            try:
+                class_id = int(parts[0])
+                if str(class_id) not in class_map:
+                    raise ValueError("多边形类别不在类别映射中")
+                coordinates = [float(value) for value in parts[1:]]
+                polygon, bounds = normalize_polygon(list(zip(coordinates[::2], coordinates[1::2])))
+                annotations.append({"class_id": class_id, **bounds, "polygon": polygon})
+            except (ValueError, TypeError) as exc:
+                report.add_error("label_polygon", str(exc), file_label, line_no)
+            continue
         if len(parts) != 5:
             report.add_error("label_format", "YOLO 标签必须为 5 列: class cx cy w h", file_label, line_no)
             continue
@@ -196,13 +208,15 @@ def _load_class_map(staging: Path, payload: dict) -> dict[str, str]:
     provided = payload.get("class_map")
     if provided:
         return {str(k): str(v) for k, v in provided.items()}
-    candidate = staging / "uploads" / "class_map.json"
-    if candidate.exists():
-        try:
-            data = json.loads(candidate.read_text(encoding="utf-8"))
-            return {str(k): str(v) for k, v in data.items()}
-        except (json.JSONDecodeError, OSError):
-            pass
+    for directory in ("uploads", "extracted"):
+        candidate = staging / directory / "class_map.json"
+        if candidate.exists():
+            try:
+                data = json.loads(candidate.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    return {str(k): str(v) for k, v in data.items()}
+            except (json.JSONDecodeError, OSError):
+                pass
     return {}
 
 
@@ -313,9 +327,21 @@ def import_dataset(
             continue
         seen_hashes[digest] = relative
 
-        annotations = list(annotation_map.get(relative) or [])
+        annotations = []
+        raw_annotations = annotation_map.get(relative) or []
+        if not isinstance(raw_annotations, list):
+            report.add_error("annotation_json_invalid", "图像标注必须是数组", relative)
+        else:
+            from app.domains.annotation.service import _validate_box
+            try:
+                annotations = [{**annotation, **_validate_box(annotation, class_map)} for annotation in raw_annotations]
+            except (ApiError, TypeError, AttributeError) as exc:
+                report.add_error("annotation_json_invalid", str(exc), relative)
         label_rel = None
         candidate = label_index.get(str(Path(relative).with_suffix(LABEL_SUFFIX).as_posix()))
+        if candidate is None and Path(relative).parts[0] == "images":
+            label_path = Path("labels", *Path(relative).parts[1:]).with_suffix(LABEL_SUFFIX).as_posix()
+            candidate = label_index.get(label_path)
         if candidate is None:
             candidate = label_index.get(f"labels/{Path(relative).stem}{LABEL_SUFFIX}")
         if candidate is not None and not annotations:

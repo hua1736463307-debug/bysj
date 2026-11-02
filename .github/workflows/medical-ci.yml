@@ -42,10 +42,12 @@ jobs:
       - name: Contract and medical tests (SQLite)
         env:
           PYTHONPATH: backend
-        run: python -m pytest backend/tests/medical backend/tests/test_app_factory_auth.py -q
+        run: python -m pytest backend/tests/medical backend/tests/test_app_factory_auth.py backend/tests/test_account_management.py backend/tests/test_system_management.py backend/tests/test_platform_completion.py -q
       - name: CXR five-label contract and flow tests (SQLite)
         env:
           PYTHONPATH: backend
+          CXR_ML_BACKEND: dummy
+          ISIC_ML_BACKEND: dummy
         # test_cxr_metrics_sklearn.py 在未安装 scikit-learn 时整模块 skip：
         # 运行时镜像与 CI 都不引入 sklearn，对照测试只在隔离环境执行。
         run: python -m pytest backend/tests/cxr backend/tests/isic -q

@@ -33,7 +33,7 @@
           </el-input>
         </el-form-item>
 
-        <el-checkbox v-model="rememberPassword" class="remember">记住密码</el-checkbox>
+        <el-checkbox v-model="rememberPassword" class="remember">记住用户名</el-checkbox>
 
         <el-button type="primary" size="large" class="login-button" :loading="loading" @click="submitLogin">
           登 录
@@ -54,10 +54,10 @@ import { login } from '../api/auth'
 const router = useRouter()
 const loginFormRef = ref(null)
 const loading = ref(false)
-const rememberPassword = ref(false)
+const rememberPassword = ref(!!localStorage.getItem('remembered_username'))
 
 const form = reactive({
-  username: '',
+  username: localStorage.getItem('remembered_username') || '',
   password: ''
 })
 
@@ -82,6 +82,8 @@ const submitLogin = async () => {
   loading.value = true
   try {
     await login(form.username, form.password)
+    if (rememberPassword.value) localStorage.setItem('remembered_username', form.username)
+    else localStorage.removeItem('remembered_username')
     ElMessage.success('登录成功')
     router.replace('/')
   } catch (error) {

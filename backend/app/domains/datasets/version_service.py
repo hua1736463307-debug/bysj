@@ -67,6 +67,8 @@ def freeze_version(
         raise ApiError(409, "version_frozen", "版本已冻结，内容不可修改")
     if version.state not in {"draft", "failed"}:
         raise ApiError(409, "version_invalid_state", f"当前版本状态不可冻结: {version.state}")
+    if (version.metadata_json or {}).get("requires_annotation_review"):
+        raise ApiError(409, "annotation_review_required", "AI 预标注版本须由复核员确认后再冻结")
     # Resolve before changing state so a conflicting declaration cannot leave
     # the version in "validating" or pick one of the two values silently.
     declared_group_level = resolve_group_level(version.metadata_json)
@@ -102,6 +104,12 @@ def freeze_version(
         }
         for asset in assets
     ]
+    if (version.metadata_json or {}).get("preserve_parent_splits") and fixed_splits is None:
+        fixed_splits = {asset.relative_path: asset.split for asset in assets}
+        config = version.split_config_json or {}
+        seed = int(config.get("seed", seed))
+        if config.get("ratios"):
+            ratios = [config["ratios"][name] for name in ("train", "val", "test")]
 
     try:
         manifest, stats = build_manifest(

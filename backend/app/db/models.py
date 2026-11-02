@@ -20,6 +20,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -45,6 +46,7 @@ class User(Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
+    __table_args__ = (Index("uq_users_username_lower", func.lower(username), unique=True),)
 
     def to_public(self) -> dict:
         from app.core.auth import product_role
@@ -58,6 +60,51 @@ class User(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "last_login_at": self.last_login_at.isoformat() if self.last_login_at else None,
         }
+
+
+class SystemDepartment(Base):
+    __tablename__ = "system_departments"
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    name: Mapped[str] = mapped_column(String(64), nullable=False)
+    parent_id: Mapped[str | None] = mapped_column(UUID, nullable=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class SystemRole(Base):
+    __tablename__ = "system_roles"
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    name: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    base_role: Mapped[str] = mapped_column(String(32), nullable=False, default="researcher")
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
+    modules: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+
+
+class SystemUserProfile(Base):
+    __tablename__ = "system_user_profiles"
+    user_id: Mapped[int] = mapped_column(BIGINT_FK, ForeignKey("users.id", ondelete="RESTRICT"), primary_key=True)
+    department_id: Mapped[str | None] = mapped_column(UUID, ForeignKey("system_departments.id", ondelete="RESTRICT"), nullable=True)
+    role_id: Mapped[str | None] = mapped_column(UUID, ForeignKey("system_roles.id", ondelete="RESTRICT"), nullable=True)
+
+
+class SystemMenu(Base):
+    __tablename__ = "system_menus"
+    path: Mapped[str] = mapped_column(String(128), primary_key=True)
+    label: Mapped[str] = mapped_column(String(64), nullable=False)
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    visible: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+
+class SystemAuditLog(Base):
+    __tablename__ = "system_audit_logs"
+    id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    username: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    action: Mapped[str] = mapped_column(String(160), nullable=False)
+    status: Mapped[int] = mapped_column(Integer, nullable=False)
+    client_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    request_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow, index=True)
 
 
 class AuthSession(Base):
@@ -236,6 +283,7 @@ class JobTask(Base):
 
     id: Mapped[str] = mapped_column(UUID, primary_key=True, default=new_uuid)
     type: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending", index=True)
     stage: Mapped[str] = mapped_column(String(64), nullable=False, default="queued")
     progress: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
@@ -270,6 +318,8 @@ class JobTask(Base):
         return {
             "job_id": self.id,
             "type": self.type,
+            "owner": self.owner_username,
+            "archived_at": self.archived_at.isoformat() if self.archived_at else None,
             "status": self.status,
             "stage": self.stage,
             "progress": float(self.progress or 0.0),

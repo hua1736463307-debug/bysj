@@ -7,6 +7,7 @@ export function listDatasets(params = {}) {
 export function getDataset(datasetId) {
   return api.get(`/datasets/${datasetId}`)
 }
+export const getVersion = versionId => api.get('/dataset-versions/' + versionId)
 
 export function listVersions(datasetId) {
   return api.get(`/datasets/${datasetId}/versions`)
@@ -45,3 +46,11 @@ export function importDataset(formData, { signal } = {}) {
 export function createAnnotationVersion(datasetId, baseVersionId) {
   return api.post(`/datasets/${datasetId}/annotation-versions`, { base_version_id: baseVersionId }, { timeout: 300000 })
 }
+
+export function createDerivative(payload, key) {
+  return api.post('/dataset-derivatives', payload, { headers: { 'Idempotency-Key': key } })
+}
+
+export const confirmAnnotationReview = versionId => api.post('/dataset-versions/' + versionId + '/annotation-review')
+export const updateClasses = (versionId, expected, classes) => api.put('/dataset-versions/' + versionId + '/classes', { expected_class_map: expected, class_map: classes })
+export const augmentationPreview = (assetId, operation, value) => api.get('/assets/' + assetId + '/augmentation-preview', { params: { operation, value }, responseType: 'blob' })

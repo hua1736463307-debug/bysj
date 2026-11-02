@@ -23,6 +23,8 @@ LEGACY_ROLE_MAP = {"user": "researcher", "admin": "admin", "researcher": "resear
 def hash_password(password: str) -> str:
     if not password or len(password) < 8:
         raise ApiError(422, "weak_password", "密码至少 8 位")
+    if len(password.encode("utf-8")) > 72:
+        raise ApiError(422, "password_too_long", "密码的 UTF-8 长度须不超过 72 字节")
     return pwd_context.hash(password)
 
 

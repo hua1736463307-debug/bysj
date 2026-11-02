@@ -3,10 +3,10 @@
 .medical-page h2 { font-size:18px; margin-top:26px; }
 .toolbar { display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin:16px 0; }
 .medical-page label { display:flex; gap:8px; align-items:center; }
-.medical-page input, .medical-page select, .medical-page textarea { border:1px solid #b9c4d1; border-radius:5px; padding:8px; background:white; max-width:100%; }
-.medical-page table { width:100%; border-collapse:collapse; background:white; }
-.medical-page th, .medical-page td { padding:12px; border-bottom:1px solid #e2e7ee; text-align:left; overflow-wrap:anywhere; }
-.medical-page th { background:#eef3f9; font-size:13px; }
+.medical-page input:not([class^="el-"]):not([class*=" el-"]), .medical-page select, .medical-page textarea:not(.el-textarea__inner) { border:1px solid #b9c4d1; border-radius:5px; padding:8px; background:white; max-width:100%; }
+.medical-page table:not([class]) { width:100%; border-collapse:collapse; background:white; }
+.medical-page table:not([class]) th, .medical-page table:not([class]) td { padding:12px; border-bottom:1px solid #e2e7ee; text-align:left; overflow-wrap:anywhere; }
+.medical-page table:not([class]) th { background:#eef3f9; font-size:13px; }
 .error { color:#b42318; }
 .job-card { padding:16px; background:#eff6ff; border:1px solid #c9ddf7; border-radius:8px; margin:16px 0; }
 .medical-page .muted { color:#64748b; font-size:13px; }

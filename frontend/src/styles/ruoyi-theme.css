@@ -48,13 +48,13 @@ select {
   border-radius: 4px !important;
 }
 
-.el-button--primary {
+.el-button--primary:not(.is-disabled):not(.is-link):not(.is-text):not(.is-plain) {
   background: var(--dv-primary) !important;
   border-color: var(--dv-primary) !important;
 }
 
-.el-button--primary:hover,
-.el-button--primary:focus {
+.el-button--primary:not(.is-disabled):not(.is-link):not(.is-text):not(.is-plain):hover,
+.el-button--primary:not(.is-disabled):not(.is-link):not(.is-text):not(.is-plain):focus {
   background: #46a6ff !important;
   border-color: #46a6ff !important;
 }

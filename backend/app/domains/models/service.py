@@ -11,7 +11,7 @@ from app.core.config import Settings
 from app.core.errors import ApiError
 from app.core.storage import ensure_dir, normalize_relative, resolve_under, sha256_file
 from app.db.base import utcnow
-from app.db.models import EvaluationRun, ModelRegistry, ReviewRecord
+from app.db.models import EvaluationRun, ModelRegistry, InferenceRun, CxrAnalysisBatch, JobTask, DatasetVersion
 
 
 def _public(model: ModelRegistry) -> dict:
@@ -19,15 +19,20 @@ def _public(model: ModelRegistry) -> dict:
 
 
 def list_models(
-    db: Session, user: CurrentUser, *, page: int, page_size: int, task: str | None = None
+    db: Session, user: CurrentUser, *, page: int, page_size: int, task: str | None = None,
+    search: str = "", file_format: str = "",
 ) -> tuple[list[ModelRegistry], int]:
     query = db.query(ModelRegistry).filter(ModelRegistry.status == "active")
     if not user.is_admin:
         query = query.filter(
-            (ModelRegistry.owner_id == user.id) | (ModelRegistry.trusted_source == "base")
+            (ModelRegistry.owner_id == user.id) | (ModelRegistry.trusted_source.in_(["base", "admin_upload"]))
         )
     if task:
         query = query.filter(ModelRegistry.model_task == task)
+    if search.strip():
+        query = query.filter(ModelRegistry.name.contains(search.strip(), autoescape=True))
+    if file_format:
+        query = query.filter(ModelRegistry.format == file_format)
     total = query.count()
     items = (
         query.order_by(ModelRegistry.created_at.desc())
@@ -42,7 +47,7 @@ def get_model(db: Session, model_id: str, user: CurrentUser) -> ModelRegistry:
     model = db.get(ModelRegistry, model_id)
     if model is None or model.status != "active":
         raise ApiError(404, "not_found", "模型不存在")
-    if not user.is_admin and model.owner_id != user.id and model.trusted_source != "base":
+    if not user.is_admin and model.owner_id != user.id and model.trusted_source not in {"base", "admin_upload"}:
         raise ApiError(404, "not_found", "模型不存在")
     return model
 
@@ -122,6 +127,10 @@ def register_trained_model(
     target_dir = ensure_dir(settings.model_root / "training" / job_id)
     target = target_dir / f"best.{file_format}"
     shutil.copy2(best_path, target)
+    metadata = {"metrics": metrics, "backend": backend, "training_result": training_result, **(metadata_extra or {})}
+    source_version = db.get(DatasetVersion, version_id)
+    if backend == "dummy" or (source_version and (source_version.metadata_json or {}).get("synthetic")):
+        metadata.update({"synthetic": True, "research_valid": False})
     model = ModelRegistry(
         id=__import__("uuid").uuid4().hex,
         name=name,
@@ -140,12 +149,7 @@ def register_trained_model(
         trusted_source="platform",
         available=True,
         class_map_json={str(k): str(v) for k, v in class_map.items()},
-        metadata_json={
-            "metrics": metrics,
-            "backend": backend,
-            "training_result": training_result,
-            **(metadata_extra or {}),
-        },
+        metadata_json=metadata,
     )
     db.add(model)
     db.commit()
@@ -174,10 +178,17 @@ def verify_model_file(model: ModelRegistry, settings: Settings) -> Path:
 def delete_model(db: Session, model: ModelRegistry, user: CurrentUser) -> None:
     if not user.is_admin and model.owner_id != user.id:
         raise ApiError(404, "not_found", "模型不存在")
-    evaluations = db.query(EvaluationRun).filter(EvaluationRun.model_id == model.id).count()
-    if evaluations:
-        raise ApiError(409, "resource_referenced", "模型已被评估记录引用，不能删除")
-    reviews = db.query(ReviewRecord).count()
+    if model.trusted_source == "base":
+        raise ApiError(409, "protected_model", "基础模型受保护")
+    for resource in (EvaluationRun, InferenceRun, CxrAnalysisBatch):
+        if db.query(resource).filter(resource.model_id == model.id).first():
+            raise ApiError(409, "resource_referenced", "模型已被分析或评估记录引用")
+    active_job = db.query(JobTask).filter(
+        JobTask.status.in_(["pending", "running", "cancelling"]),
+        JobTask.input_json["model_id"].as_string() == model.id,
+    ).first()
+    if active_job:
+        raise ApiError(409, "resource_referenced", "模型仍被在途任务引用")
     model.status = "deleted"
     model.available = False
     model.updated_at = utcnow()

@@ -8,7 +8,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { listDatasets, listVersions } from '../../api/datasets'
-const props = defineProps({ frozenOnly: Boolean })
+const props = defineProps({ frozenOnly: Boolean, taskType: { type: String, default: 'detect' } })
 const emit = defineEmits(['change'])
 const datasets = ref([]), versions = ref([]), datasetId = ref(''), versionId = ref(''), error = ref('')
 let generation = 0
@@ -22,11 +22,18 @@ async function loadVersions() {
 async function refresh() {
   try {
     const all = []; let page = 1, data
-    do { data = await listDatasets({ page: page++, page_size: 100 }); all.push(...data.items) } while (all.length < data.total)
+    do { data = await listDatasets({ task: props.taskType, page: page++, page_size: 100 }); all.push(...data.items) } while (all.length < data.total)
     datasets.value = all; error.value = ''
     if (!all.some(d => d.dataset_id === datasetId.value)) datasetId.value = all[0]?.dataset_id || ''
     await loadVersions()
   } catch(e) { error.value = e.message }
 }
-defineExpose({ refresh }); onMounted(refresh)
+async function select(dataset, version) {
+  datasetId.value = dataset
+  await loadVersions()
+  if (!versions.value.some(item => item.version_id === version)) throw new Error('训练来源版本已不可用')
+  versionId.value = version
+  choose()
+}
+defineExpose({ refresh, select }); onMounted(refresh)
 </script>

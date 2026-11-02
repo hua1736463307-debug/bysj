@@ -27,6 +27,7 @@ from app.api.v1 import jobs as jobs_api
 from app.api.v1 import models as models_api
 from app.api.v1 import reviews as reviews_api
 from app.api.v1 import training as training_api
+from app.api.v1 import system as system_api
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import RequestContextMiddleware, configure_logging
@@ -94,6 +95,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         cxr_api,
         directions_api,
         isic_api,
+        system_api,
     ):
         app.include_router(module.router, prefix=settings.api_prefix)
 

@@ -4,7 +4,8 @@
  */
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { getToken } from './api/client'
+import { getToken, getCurrentUser, clearAuth, USER_KEY } from './api/client'
+import { canAccessPath, firstAuthorizedPath } from './utils/moduleAccess.mjs'
 import './styles/medical.css'
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
@@ -14,6 +15,13 @@ import './styles/ruoyi-theme.css'
 
 import App from './App.vue'
 import Login from './views/Login.vue'
+import AdminUsers from './views/AdminUsers.vue'
+import OnlineUsers from './views/OnlineUsers.vue'
+import SystemManagement from './views/SystemManagement.vue'
+import AccessDenied from './views/AccessDenied.vue'
+import Profile from './views/Profile.vue'
+import IsicWorkspace from './views/IsicWorkspace.vue'
+import { fetchMe } from './api/auth'
 import Annotation from './views/Annotation.vue'
 import Dataset from './views/Dataset.vue'
 import DatasetManager from './views/DatasetManager.vue'
@@ -28,9 +36,23 @@ import CxrReview from './views/cxr/Review.vue'
 import CxrReports from './views/cxr/Reports.vue'
 
 const routes = [
+  { path: '/isic/workspace', component: IsicWorkspace, meta: { requiresAuth: true } },
+  { path: '/profile', component: Profile, meta: { requiresAuth: true } },
+  { path: '/access-denied', component: AccessDenied, meta: { requiresAuth: true } },
+  { path: '/system/dept', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'departments' } },
+  { path: '/system/role', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'roles' } },
+  { path: '/system/menu', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'menus' } },
+  { path: '/system/log/logininfor', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'login' } },
+  { path: '/system/log/operlog', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'operation' } },
+  { path: '/system/log/faults', component: SystemManagement, meta: { requiresAuth: true, requiresAdmin: true, systemPanel: 'fault' } },
+  { path: '/system/login-log', redirect: '/system/log/logininfor' },
+  { path: '/system/oper-log', redirect: '/system/log/operlog' },
+  { path: '/system/online', component: OnlineUsers, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/system/user', component: AdminUsers, meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/admin/users', redirect: '/system/user' },
   { path: '/login', component: Login, meta: { guestOnly: true } },
   // 新主线：胸片五标签辅助分析
-  { path: '/', redirect: '/cxr/dashboard' },
+  { path: '/', redirect: () => firstAuthorizedPath(getCurrentUser()) },
   { path: '/cxr', redirect: '/cxr/dashboard' },
   { path: '/cxr/dashboard', component: CxrDashboard, meta: { requiresAuth: true } },
   { path: '/cxr/data', component: CxrData, meta: { requiresAuth: true } },
@@ -55,9 +77,17 @@ const routes = [
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 const router = createRouter({ history: createWebHistory(), routes })
-router.beforeEach(to => {
+router.beforeEach(async to => {
   const token = getToken()
   if (to.meta.requiresAuth && !token) return '/login'
+  if (to.meta.requiresAuth) {
+    try {
+      const user = await fetchMe()
+      localStorage.setItem(USER_KEY, JSON.stringify(user))
+      if (to.meta.requiresAdmin && user.role !== 'admin') return '/access-denied'
+      if (!canAccessPath(user, to.path)) return firstAuthorizedPath(user)
+    } catch { clearAuth(); return '/login' }
+  }
   if (to.meta.guestOnly && token) return '/'
 })
 const app = createApp(App)

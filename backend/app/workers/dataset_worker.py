@@ -24,7 +24,7 @@ from app.workers.dispatcher import JobContext, JobCancelled, run_claimed_job
 
 logger = logging.getLogger("bysj.worker.dataset")
 
-WORKER_TYPES = ("dataset_import", "dataset_version", "dataset_process", "annotation_export", "feedback_export", "dataset_export", "cxr_import", "cxr_freeze", "isic_import", "isic_freeze")
+WORKER_TYPES = ("dataset_import", "dataset_version", "dataset_process", "dataset_derive", "annotation_export", "feedback_export", "dataset_export", "cxr_import", "cxr_freeze", "isic_import", "isic_freeze")
 
 
 def handle_dataset_import(ctx: JobContext) -> dict:
@@ -76,31 +76,64 @@ def handle_annotation_export(ctx: JobContext) -> dict:
     snapshot = []
     for index, asset in enumerate(assets, start=1):
         snapshot.append({"asset_id": asset.id, "relative_path": asset.relative_path,
-                         "sha256": asset.content_hash, "annotations": asset.annotations_json or []})
-        ctx.progress(index / max(1, len(assets)), "exporting", f"导出 {index}/{len(assets)}")
+                         "sha256": asset.content_hash, "split": asset.split, "annotations": asset.annotations_json or []})
+        ctx.progress(.1 * index / max(1, len(assets)), "exporting", f"收集标注 {index}/{len(assets)}")
     from app.core.storage import atomic_write_bytes, ensure_dir, normalize_relative
     from app.domains.inference.service import record_artifact
     directory = ensure_dir(ctx.settings.artifact_root / "annotations" / ctx.job.id / str(ctx.attempt))
     export = {"schema_version": 1, "dataset_id": version.dataset_id, "version_id": version.id,
               "class_map": version.class_map_json, "assets": snapshot}
     fmt = payload.get("format", "yolo-txt")
+    full_dataset = fmt.endswith("dataset")
+    if full_dataset and version.state != "frozen":
+        raise ApiError(409, "version_not_frozen", "完整训练集导出需要冻结版本")
     if fmt == "json":
         path = directory / "annotations.json"
         atomic_write_bytes(path, json.dumps(export, ensure_ascii=False, indent=2).encode("utf-8"))
         mime = "application/json"
     else:
-        path = directory / "labels.zip"
+        path = directory / ("dataset.zip" if full_dataset else "labels.zip")
         names = set()
         with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             archive.writestr("manifest.json", json.dumps(export, ensure_ascii=False, indent=2))
-            for item in snapshot:
+            if full_dataset:
+                import yaml
+                archive.writestr("data.yaml", yaml.safe_dump({
+                    "train": "images/train", "val": "images/val", "test": "images/test",
+                    "nc": len(version.class_map_json), "names": version.class_map_json,
+                }, allow_unicode=True, sort_keys=False))
+                archive.writestr("class_map.json", json.dumps(version.class_map_json, ensure_ascii=False))
+                group_map = {f"images/{asset.split}/{asset.relative_path}": asset.source_group for asset in assets}
+                archive.writestr("source_groups.json", json.dumps(group_map, ensure_ascii=False))
+            for index, item in enumerate(snapshot):
                 ctx.check_cancelled()
-                name = "labels/" + normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
+                prefix = item["split"] + "/" if full_dataset else ""
+                name = "labels/" + prefix + normalize_relative(item["relative_path"]).with_suffix(".txt").as_posix()
                 if name in names:
                     raise ApiError(409, "label_name_collision", "不同图像导出为同名标签，请使用 JSON 导出")
                 names.add(name)
                 body = "".join(f"{a['class_id']} {a['cx']:.6f} {a['cy']:.6f} {a['w']:.6f} {a['h']:.6f}\n" for a in item["annotations"])
+                if fmt in {"yolo-seg", "yolo-seg-dataset"}:
+                    lines = []
+                    for annotation in item["annotations"]:
+                        x, y, w, h = (annotation[key] for key in ("cx", "cy", "w", "h"))
+                        points = annotation.get("polygon") or [
+                            [x - w / 2, y - h / 2], [x + w / 2, y - h / 2],
+                            [x + w / 2, y + h / 2], [x - w / 2, y + h / 2],
+                        ]
+                        lines.append(str(annotation["class_id"]) + " " + " ".join(f"{coordinate:.6f}" for point in points for coordinate in point) + "\n")
+                    body = "".join(lines)
                 archive.writestr(name, body)
+                if full_dataset:
+                    from app.core.storage import resolve_under, sha256_file
+                    root = Path(version.root_path).resolve()
+                    if root == ctx.settings.data_root.resolve() or not root.is_relative_to(ctx.settings.data_root.resolve()):
+                        raise ApiError(422, "invalid_path", "来源版本目录越界")
+                    source = resolve_under(root / "images", item["relative_path"], must_exist=True)
+                    if sha256_file(source) != item["sha256"]:
+                        raise ApiError(409, "source_tampered", "来源图像摘要改变")
+                    archive.write(source, "images/" + prefix + normalize_relative(item["relative_path"]).as_posix())
+                ctx.progress(.1 + .8 * (index + 1) / max(1, len(snapshot)), "exporting", f"打包 {index + 1}/{len(snapshot)}")
         mime = "application/zip"
     ctx.lock_for_write()
     record = record_artifact(ctx.db, ctx.settings, owner_id=ctx.job.owner_user_id,

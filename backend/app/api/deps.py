@@ -19,6 +19,7 @@ class CurrentUser:
     username: str
     role: str
     raw_role: str
+    modules: tuple[str, ...] = ()
 
     @property
     def is_admin(self) -> bool:
@@ -29,7 +30,7 @@ class CurrentUser:
         return self.role in {"admin", "reviewer"}
 
     def to_public(self) -> dict:
-        return {"id": self.id, "username": self.username, "role": self.role}
+        return {"id": self.id, "username": self.username, "role": self.role, "modules": list(self.modules)}
 
 
 def settings_dep() -> Settings:
@@ -61,11 +62,34 @@ def get_current_user(
     user = db.get(User, user_id)
     if user is None or user.status != "active":
         raise ApiError(401, "user_inactive", "账号不可用")
+    from app.domains.system_service import permissions
+    modules = permissions(db, user)
+    request.state.username = user.username
+    resource = request.url.path.removeprefix(settings.api_prefix).strip("/").split("/")[0]
+    module = {
+        "datasets": "datasets", "dataset-versions": "datasets", "assets": "datasets", "dataset-derivatives": "datasets",
+        "annotations": "annotations", "training": "training", "models": "models",
+        "evaluations": "models", "experiments": "models", "inference": "inference",
+        "reviews": "reviews", "feedback": "reviews", "cxr": "cxr", "isic": "isic",
+    }.get(resource)
+    if request.url.path.endswith("/annotations/export"):
+        module = "datasets"
+    if resource == "jobs" and request.path_params.get("job_id"):
+        from app.db.models import JobTask
+        from app.domains.system_service import JOB_MODULES
+        job = db.get(JobTask, request.path_params["job_id"])
+        if job is not None:
+            if user.role != "admin" and job.owner_id != str(user.id):
+                raise ApiError(404, "not_found", "任务不存在")
+            module = JOB_MODULES.get(job.type, "training")
+    if user.role != "admin" and module and module not in modules:
+        raise ApiError(403, "module_forbidden", "角色没有访问此模块的权限")
     return CurrentUser(
         id=user.id,
         username=user.username,
         role=product_role(user.role),
         raw_role=user.role,
+        modules=tuple(modules),
     )
 
 

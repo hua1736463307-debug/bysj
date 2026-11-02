@@ -174,8 +174,20 @@ def list_jobs(
     status: str | None = None,
     page: int = 1,
     page_size: int = 50,
+    search: str = "", owner: str = "", include_archived: bool = False,
+    allowed_types: list[str] | None = None,
 ) -> tuple[list[JobTask], int]:
     query = db.query(JobTask)
+    if allowed_types is not None:
+        query = query.filter(JobTask.type.in_(allowed_types))
+    if not include_archived:
+        query = query.filter(JobTask.archived_at.is_(None))
+    if search:
+        from sqlalchemy import or_
+        query = query.filter(or_(JobTask.id.contains(search, autoescape=True),
+                                 JobTask.input_json["name"].as_string().contains(search, autoescape=True)))
+    if owner:
+        query = query.filter(JobTask.owner_username.contains(owner, autoescape=True))
     if not is_admin and owner_id is not None:
         query = query.filter(JobTask.owner_id == str(owner_id))
     if job_type:

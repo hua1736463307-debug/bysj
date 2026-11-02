@@ -22,7 +22,7 @@ def get_dataset(db: Session, dataset_id: str, user: CurrentUser, *, manage: bool
 
 def list_datasets(
     db: Session, user: CurrentUser, *, page: int, page_size: int, include_deleted: bool = False,
-    task_type: str | None = None,
+    task_type: str | None = None, search: str = "", owner: str = "",
 ) -> tuple[list[DatasetResource], int]:
     query = db.query(DatasetResource)
     if not user.is_admin:
@@ -31,6 +31,10 @@ def list_datasets(
         query = query.filter(DatasetResource.deleted_at.is_(None))
     if task_type:
         query = query.filter(DatasetResource.task_type == task_type)
+    if search.strip():
+        query = query.filter(DatasetResource.name.contains(search.strip(), autoescape=True))
+    if owner.strip():
+        query = query.filter(DatasetResource.owner_username.contains(owner.strip(), autoescape=True))
     total = query.count()
     items = (
         query.order_by(DatasetResource.created_at.desc(), DatasetResource.id.desc())
@@ -112,22 +116,21 @@ def _referenced(db: Session, version_ids: list[str]) -> list[str]:
     )
     if models:
         usages.append(f"models:{models}")
-    # JSON 查询在不同方言上行为不一致，这里对活跃作业做有界扫描（作业量可控）。
+    # Stream JSON references so secondary merge parents remain protected.
     wanted = set(version_ids)
     active_jobs = (
         db.query(JobTask)
         .filter(JobTask.status.in_(["pending", "running", "cancelling"]))
-        .limit(1000)
-        .all()
+        .yield_per(200)
     )
-    jobs = sum(1 for job in active_jobs if (job.input_json or {}).get("dataset_version_id") in wanted)
+    jobs = sum(1 for job in active_jobs if wanted.intersection(
+        [(job.input_json or {}).get("dataset_version_id"), (job.input_json or {}).get("parent_version_id")] +
+        list((job.input_json or {}).get("version_ids") or [])
+    ))
     if jobs:
         usages.append(f"jobs:{jobs}")
-    children = (
-        db.query(DatasetVersion)
-        .filter(DatasetVersion.parent_version_id.in_(version_ids), DatasetVersion.deleted_at.is_(None))
-        .count()
-    )
+    children = sum(1 for child in db.query(DatasetVersion).filter(DatasetVersion.deleted_at.is_(None)).yield_per(200)
+                   if wanted.intersection([child.parent_version_id] + list((child.metadata_json or {}).get("parent_version_ids") or [])))
     if children:
         usages.append(f"child_versions:{children}")
     return usages
@@ -214,7 +217,9 @@ def create_annotation_version(db, settings, dataset_id, base_version_id, user):
             id=child_id, dataset_id=dataset_id, parent_version_id=parent.id,
             dataset_role=parent.dataset_role, status='ready', state='draft',
             root_path=str(target), class_map_json=copy.deepcopy(parent.class_map_json),
-            metadata_json={**copy.deepcopy(parent.metadata_json or {}), 'annotation_parent_version_id': parent.id},
+            metadata_json={**copy.deepcopy(parent.metadata_json or {}), 'annotation_parent_version_id': parent.id, 'preserve_parent_splits': True},
+            split_config_json=copy.deepcopy(parent.split_config_json or {}),
+            split_counts_json=copy.deepcopy(parent.split_counts_json or {}),
             content_hash=child_id, asset_count=len(assets), created_by=user.username,
             created_by_user_id=user.id,
         )
@@ -227,7 +232,7 @@ def create_annotation_version(db, settings, dataset_id, base_version_id, user):
             db.add(DatasetAsset(
                 dataset_version_id=child_id, relative_path=asset.relative_path,
                 basename=asset.basename, size=asset.size, width=asset.width, height=asset.height,
-                source_group=asset.source_group, content_hash=asset.content_hash,
+                source_group=asset.source_group, content_hash=asset.content_hash, split=asset.split,
                 annotations_json=copy.deepcopy(asset.annotations_json or []),
                 root_asset_id=asset.root_asset_id or asset.id, original_asset_id=asset.id,
                 group_level=asset.group_level, transform_json=copy.deepcopy(asset.transform_json or {}),

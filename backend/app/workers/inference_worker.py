@@ -20,7 +20,7 @@ from app.workers.dispatcher import JobCancelled, JobContext, run_claimed_job
 
 logger = logging.getLogger("bysj.worker.inference")
 
-WORKER_TYPES = ("inference", "cxr_analyze", "cxr_explain")
+WORKER_TYPES = ("inference", "annotation_preannotate", "cxr_analyze", "cxr_explain")
 
 
 def _acquire_gpu(ctx: JobContext):

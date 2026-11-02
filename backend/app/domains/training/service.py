@@ -157,6 +157,8 @@ def create_training_job(
         "task": "detect",
         "params": report["params"],
     }
+    if payload.get("name"):
+        job_payload["name"] = str(payload["name"])[:128]
     return job_service.create_job(
         db,
         job_type="training",

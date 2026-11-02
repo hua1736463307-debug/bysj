@@ -14,8 +14,32 @@ from app.schemas.common import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 
+@router.delete("/{job_id}", response_model=None)
+def archive_job(job_id: str, user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)):
+    from app.db.base import utcnow
+    from app.db.models import JobTask
+    job = job_service.get_job(db, job_id, owner_id=user.id, is_admin=user.is_admin)
+    job = db.query(JobTask).filter_by(id=job.id).populate_existing().with_for_update().one()
+    if job.status not in {"completed", "failed", "cancelled"}:
+        raise ApiError(409, "job_active", "只能归档已完成、失败或取消的任务")
+    job.archived_at = utcnow()
+    db.commit()
+    return ok({"archived": True}, message="任务记录已归档")
+
+
+@router.post("/{job_id}/restore", response_model=None)
+def restore_job(job_id: str, user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)):
+    job = job_service.get_job(db, job_id, owner_id=user.id, is_admin=user.is_admin)
+    job.archived_at = None
+    db.commit()
+    return ok({"restored": True})
+
+
 @router.get("", response_model=None)
 def list_jobs(
+    search: str = Query(default="", max_length=128),
+    owner: str = Query(default="", max_length=64),
+    include_archived: bool = False,
     type: str | None = Query(default=None),
     status: str | None = Query(default=None),
     page: int = Query(default=1, ge=1),
@@ -23,6 +47,8 @@ def list_jobs(
     user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    from app.domains.system_service import JOB_MODULES
+    allowed_types = None if user.is_admin else [name for name, module in JOB_MODULES.items() if module in user.modules]
     items, total = job_service.list_jobs(
         db,
         owner_id=user.id,
@@ -31,6 +57,8 @@ def list_jobs(
         status=status,
         page=page,
         page_size=page_size,
+        search=search, owner=owner, include_archived=include_archived,
+        allowed_types=allowed_types,
     )
     return ok(
         {

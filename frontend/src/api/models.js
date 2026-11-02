@@ -3,6 +3,7 @@ import { api } from './client'
 export function listModels(params = {}) {
   return api.get('/models', { params })
 }
+export const uploadModel = form => api.post('/models/upload', form, { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 300000 })
 
 export function getModel(modelId) {
   return api.get(`/models/${modelId}`)

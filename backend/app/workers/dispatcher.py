@@ -20,6 +20,8 @@ from app.workers.liveness import JobHeartbeat
 logger = logging.getLogger("bysj.worker")
 
 HANDLERS: dict[str, str] = {
+    "dataset_derive": "app.domains.datasets.derivative_service:process_derivative",
+    "annotation_preannotate": "app.domains.datasets.derivative_service:process_derivative",
     "dataset_import": "app.workers.dataset_worker:handle_dataset_import",
     "dataset_version": "app.workers.dataset_worker:handle_dataset_version",
     "dataset_process": "app.domains.datasets.processing_service:process_train_tiles",

@@ -39,5 +39,5 @@ async function submit(){const items=reviewTarget.value.predictions.map(p=>({pred
 async function refreshReviews(){reviews.value=(await listReviews({page_size:100})).items}
 async function decide(review,approve){await decideReview(review.review_id,approve,approve?'人工检查通过':'需要进一步修正');await refreshReviews()}
 async function feedback(){const job=await exportVersion(selection.value.version.version_id,selectedReviews.value,crypto.randomUUID());jobId.value=job.job_id}
-onMounted(()=>act(async()=>{models.value=(await listModels({page_size:200})).items;await refreshRuns();await refreshReviews()}))
+onMounted(()=>act(async()=>{models.value=(await listModels({page_size:200,task:'detect'})).items;await refreshRuns();await refreshReviews()}))
 </script>

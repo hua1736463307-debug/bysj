@@ -163,7 +163,7 @@ def test_paper_summary_endpoint_excludes_ineligible(client, admin_headers):
 def _seed_model(db, metadata: dict, *, name: str):
     from app.db.models import ModelRegistry
 
-    model = ModelRegistry(name=name, path="/tmp/does-not-exist.pt", sha256="b" * 64, metadata_json=metadata)
+    model = ModelRegistry(name=name, path="/tmp/does-not-exist.pt", sha256="b" * 64, metadata_json=metadata, model_task="isic_multiclass")
     db.add(model)
     db.commit()
     return model

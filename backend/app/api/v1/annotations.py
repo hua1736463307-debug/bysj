@@ -25,6 +25,7 @@ class BoxPayload(BaseModel):
     h: float
     source: str = "manual"
     prediction_id: str | None = None
+    polygon: list[list[float]] | None = Field(default=None, min_length=3, max_length=256)
 
 
 class AnnotationSaveRequest(BaseModel):
@@ -87,8 +88,10 @@ def export_annotations(
         raise ApiError(404, "not_found", "数据集还没有版本")
     if version.dataset_id != resource.id:
         raise ApiError(404, "not_found", "该版本不属于此数据集")
-    if payload.format not in {"yolo-txt", "json"}:
-        raise ApiError(422, "invalid_format", "导出格式只支持 yolo-txt 或 json")
+    if payload.format not in {"yolo-txt", "yolo-seg", "json", "yolo-dataset", "yolo-seg-dataset"}:
+        raise ApiError(422, "invalid_format", "不支持的导出格式")
+    if payload.format.endswith("dataset") and version.state != "frozen":
+        raise ApiError(409, "version_not_frozen", "完整训练集导出需要冻结版本")
 
     job, created = job_service.create_job(
         db,

@@ -14,7 +14,7 @@ from app.db.base import utcnow
 from app.db.models import DatasetAsset, DatasetVersion
 from app.domains.datasets.split_service import build_manifest
 from app.domains.job_service import canonical_hash
-from app.ml.geometry import cxcywh_norm_to_xyxy, xyxy_to_cxcywh_norm
+from app.ml.geometry import cxcywh_norm_to_xyxy, xyxy_to_cxcywh_norm, clip_polygon, normalize_polygon
 from app.ml.tiling import plan_tiles, visibility, clip_box_to_tile
 
 
@@ -86,7 +86,17 @@ def process_train_tiles(ctx):
                             if clipped is None:continue
                             local=[clipped[0]-tile.x1,clipped[1]-tile.y1,clipped[2]-tile.x1,clipped[3]-tile.y1]
                             coords=xyxy_to_cxcywh_norm(local,tile.width,tile.height)
-                            annotations.append({'class_id':annotation['class_id'],**dict(zip(('cx','cy','w','h'),coords))})
+                            transformed_annotation = {'class_id':annotation['class_id'],**dict(zip(('cx','cy','w','h'),coords))}
+                            if annotation.get('polygon'):
+                                points = clip_polygon(annotation['polygon'], [tile.x1 / image.width, tile.y1 / image.height, tile.x2 / image.width, tile.y2 / image.height])
+                                local_points = [[max(0, min(1, (x * image.width - tile.x1) / tile.width)), max(0, min(1, (y * image.height - tile.y1) / tile.height))] for x, y in points]
+                                try:
+                                    polygon, polygon_bounds = normalize_polygon(local_points)
+                                except ValueError:
+                                    continue
+                                transformed_annotation.update(polygon_bounds)
+                                transformed_annotation['polygon'] = polygon
+                            annotations.append(transformed_annotation)
                         append(relative,asset,annotations,tile.width,tile.height,
                             {'kind':'train_tile','origin_xyxy':[tile.x1,tile.y1,tile.x2,tile.y2],'parent_asset_id':asset.id})
             else:raise ApiError(409,'invalid_parent_split','父版本存在未划分资产')

@@ -28,3 +28,6 @@ export function cancelJob(jobId) {
 export function resumeJob(jobId) {
   return api.post(`/jobs/${jobId}/resume`)
 }
+export const getResources = () => api.get('/training/resources')
+export const archiveJob = id => api.delete('/jobs/' + id)
+export const restoreJob = id => api.post('/jobs/' + id + '/restore')
