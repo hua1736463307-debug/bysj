@@ -2,10 +2,10 @@
   <div class="login-page">
     <div class="login-card">
       <div class="login-brand">
-        <img src="../assets/logo.svg" alt="图像训推实验平台" />
+        <img src="../assets/logo.svg" alt="医疗辅助诊断平台" />
         <div>
-          <h1>图像训推实验平台</h1>
-          <p>训练推理一体化管理系统</p>
+          <h1>医疗辅助诊断平台</h1>
+          <p>医学影像研究与辅助分析系统</p>
         </div>
       </div>
 
@@ -40,7 +40,7 @@
         </el-button>
       </el-form>
 
-      <div class="login-footer">统一模型、数据、训练、推理和行为智能能力</div>
+      <div class="login-footer">胸片辅助分析 · 皮肤镜研究 · 血细胞检测</div>
     </div>
   </div>
 </template>
