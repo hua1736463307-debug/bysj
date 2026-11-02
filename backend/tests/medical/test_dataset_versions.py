@@ -179,3 +179,32 @@ def test_cross_user_access_is_404(client, researcher_headers, admin_headers, db)
     other = {"Authorization": f"Bearer {login}"}
     assert client.get(f"/api/v1/datasets/{dataset_id}", headers=other).status_code == 404
     assert client.get(f"/api/v1/datasets/{dataset_id}", headers=admin_headers).status_code == 200
+
+
+def test_annotation_fork_preserves_frozen_parent(client, researcher_headers):
+    dataset, parent = support.make_dataset(client, researcher_headers, count=3)
+    assert support.freeze(client, researcher_headers, dataset, version_id=parent).json()['data']['status'] == 'completed'
+    url = f'/api/v1/datasets/{dataset}/assets'
+    original = client.get(url, params={'version_id': parent}, headers=researcher_headers).json()['data']['items'][0]
+    response = client.post(f'/api/v1/datasets/{dataset}/annotation-versions', json={'base_version_id': parent}, headers=researcher_headers)
+    assert response.status_code == 200, response.text
+    child = response.json()['data']
+    assert child['state'] == 'draft' and child['parent_version_id'] == parent
+    asset = client.get(url, params={'version_id': child['version_id']}, headers=researcher_headers).json()['data']['items'][0]
+    assert asset['asset_id'] != original['asset_id']
+    assert asset['annotations'] == original['annotations']
+    assert asset['source_group'] == original['source_group']
+    assert client.get(f"/api/v1/assets/{asset['asset_id']}/image", headers=researcher_headers).status_code == 200
+    result = client.put(f"/api/v1/annotations/{asset['asset_id']}", json={'expected_revision': 0, 'boxes': []}, headers=researcher_headers)
+    assert result.status_code == 200, result.text
+    before = client.get(f"/api/v1/annotations/{original['asset_id']}", headers=researcher_headers).json()['data']
+    assert before['annotations'] == original['annotations'] and before['editable'] is False
+    assert client.put(f"/api/v1/annotations/{original['asset_id']}", json={'expected_revision': 0, 'boxes': []}, headers=researcher_headers).status_code == 409
+
+
+def test_annotation_fork_rejects_wrong_dataset_and_draft(client, researcher_headers):
+    dataset, parent = support.make_dataset(client, researcher_headers, count=3)
+    route = f'/api/v1/datasets/{dataset}/annotation-versions'
+    assert client.post(route, json={'base_version_id': parent}, headers=researcher_headers).status_code == 409
+    other, _ = support.make_dataset(client, researcher_headers, count=2)
+    assert client.post(f'/api/v1/datasets/{other}/annotation-versions', json={'base_version_id': parent}, headers=researcher_headers).status_code == 404

@@ -180,3 +180,62 @@ def restore_asset(db: Session, asset: DatasetAsset) -> None:
         raise ApiError(409, "version_frozen", "冻结或冻结中的版本只读")
     asset.deleted_at = None
     db.commit()
+
+
+def create_annotation_version(db, settings, dataset_id, base_version_id, user):
+    """Fork an immutable detection version without changing its images or labels."""
+    import copy
+    import shutil
+    import uuid
+    from pathlib import Path
+    from app.core.storage import resolve_under
+
+    parent = get_version(db, base_version_id, user)
+    if parent.dataset_id != dataset_id:
+        raise ApiError(404, 'not_found', '该版本不属于此数据集')
+    assert_detect_task(db, parent)
+    if parent.state != 'frozen':
+        raise ApiError(409, 'version_invalid_state', '请选择已冻结版本创建标注副本')
+    source = Path(parent.root_path).resolve()
+    try:
+        relative = source.relative_to(settings.data_root.resolve())
+        if not relative.parts:
+            raise ValueError()
+    except ValueError as exc:
+        raise ApiError(422, 'invalid_version_root', '版本目录不在数据根目录内') from exc
+    child_id = str(uuid.uuid4())
+    target = resolve_under(settings.data_root, f'annotation-versions/{child_id}')
+    assets = db.query(DatasetAsset).filter(
+        DatasetAsset.dataset_version_id == parent.id, DatasetAsset.deleted_at.is_(None)
+    ).order_by(DatasetAsset.id).all()
+    try:
+        target.mkdir(parents=True)
+        child = DatasetVersion(
+            id=child_id, dataset_id=dataset_id, parent_version_id=parent.id,
+            dataset_role=parent.dataset_role, status='ready', state='draft',
+            root_path=str(target), class_map_json=copy.deepcopy(parent.class_map_json),
+            metadata_json={**copy.deepcopy(parent.metadata_json or {}), 'annotation_parent_version_id': parent.id},
+            content_hash=child_id, asset_count=len(assets), created_by=user.username,
+            created_by_user_id=user.id,
+        )
+        db.add(child)
+        for asset in assets:
+            src = resolve_under(source, f'images/{asset.relative_path}', must_exist=True)
+            dst = resolve_under(target, f'images/{asset.relative_path}')
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            db.add(DatasetAsset(
+                dataset_version_id=child_id, relative_path=asset.relative_path,
+                basename=asset.basename, size=asset.size, width=asset.width, height=asset.height,
+                source_group=asset.source_group, content_hash=asset.content_hash,
+                annotations_json=copy.deepcopy(asset.annotations_json or []),
+                root_asset_id=asset.root_asset_id or asset.id, original_asset_id=asset.id,
+                group_level=asset.group_level, transform_json=copy.deepcopy(asset.transform_json or {}),
+            ))
+        db.commit()
+        return child
+    except Exception:
+        db.rollback()
+        if target.exists():
+            shutil.rmtree(target)
+        raise

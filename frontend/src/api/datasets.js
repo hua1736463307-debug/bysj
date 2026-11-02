@@ -41,3 +41,7 @@ export function importDataset(formData, { signal } = {}) {
     timeout: 300000
   })
 }
+
+export function createAnnotationVersion(datasetId, baseVersionId) {
+  return api.post(`/datasets/${datasetId}/annotation-versions`, { base_version_id: baseVersionId }, { timeout: 300000 })
+}

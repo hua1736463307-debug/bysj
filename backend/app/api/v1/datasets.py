@@ -363,3 +363,18 @@ def restore_asset(
     asset = service.get_asset(db, asset_id, user, include_deleted=True)
     service.restore_asset(db, asset)
     return ok({"asset_id": asset_id, "restored": True}, message="图像资产已恢复")
+
+
+class AnnotationVersionRequest(BaseModel):
+    base_version_id: str
+
+
+@router.post('/datasets/{dataset_id}/annotation-versions', response_model=None)
+def create_annotation_version(
+    dataset_id: str, payload: AnnotationVersionRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db), settings: Settings = Depends(settings_dep),
+):
+    service.get_dataset(db, dataset_id, user)
+    child = service.create_annotation_version(db, settings, dataset_id, payload.base_version_id, user)
+    return ok(version_dict(child), message='可编辑标注版本已创建')
