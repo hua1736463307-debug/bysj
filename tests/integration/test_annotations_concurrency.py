@@ -46,6 +46,25 @@ def test_first_save_same_revision_only_one_winner(sessions, tmp_path):
     assert results.count("revision_conflict") == 1
 
 
+def test_owner_and_admin_saving_same_shared_revision_only_one_wins(sessions, tmp_path):
+    _, asset_id = seed(sessions, tmp_path)
+    barrier = Barrier(2)
+    admin = CurrentUser(2, "admin", "admin", "admin")
+
+    def save(user):
+        with sessions() as db:
+            barrier.wait(10)
+            try:
+                return save_annotations(db, asset_id, user, expected_revision=0, boxes=[BOX])["revision"]
+            except ApiError as exc:
+                return exc.code
+
+    with ThreadPoolExecutor(2) as pool:
+        results = list(pool.map(save, (USER, admin)))
+    assert results.count(1) == 1
+    assert results.count("revision_conflict") == 1
+
+
 def test_freeze_uses_saved_labels_and_rejects_late_save(sessions, tmp_path):
     version_id, asset_id = seed(sessions, tmp_path)
     with sessions() as db:

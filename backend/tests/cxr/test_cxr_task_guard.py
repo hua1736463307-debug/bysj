@@ -199,6 +199,23 @@ def test_calibration_must_use_calibration_split(client, admin_headers, settings,
     assert response.json()["code"] == "cxr_calibration_split"
 
 
+def test_cxr_evaluation_retry_keeps_one_record(client, admin_headers, settings, db, cxr_dataset):
+    from app.db.models import User, EvaluationRun
+    admin_id = db.query(User).filter_by(username='admin').one().id
+    model = cxr_support.register_model(db, settings, owner_id=admin_id)
+    payload = {'model_id': model.id, 'dataset_version_id': cxr_dataset['version_id'],
+               'split': 'val', 'action': 'evaluate'}
+    headers = {**admin_headers, 'Idempotency-Key': 'cxr-retry'}
+    first = client.post('/api/v1/cxr/evaluations', json=payload, headers=headers)
+    retried = client.post('/api/v1/cxr/evaluations', json=payload, headers=headers)
+    assert first.status_code == retried.status_code == 202, retried.text
+    assert first.json()['data']['job_id'] == retried.json()['data']['job_id']
+    assert db.query(EvaluationRun).count() == 1
+    changed = client.post('/api/v1/cxr/evaluations', json={**payload, 'purpose': 'changed'}, headers=headers)
+    assert changed.status_code == 409
+    assert db.query(EvaluationRun).count() == 1
+
+
 def test_degenerate_cam_is_rejected_not_blank():
     """Grad-CAM 全为非正时必须报错，不能输出全黑热图让人误读。"""
     import numpy as np

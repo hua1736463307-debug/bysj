@@ -150,17 +150,21 @@ def handle_isic_train(ctx: JobContext) -> dict:
         purpose = payload.get("experiment_purpose")
         protocol_id = payload.get("protocol_id")
         protocol_sha256 = payload.get("protocol_sha256")
+        synthetic = bool((version.metadata_json or {}).get("synthetic"))
+        research_valid = backend != "dummy" and not synthetic
         eligibility = eligibility_metadata(
             {
                 "experiment_purpose": purpose,
-                "research_valid": backend != "dummy",
+                "research_valid": research_valid,
                 "backend": backend,
-                "synthetic": False,
+                "synthetic": synthetic,
                 "dataset_manifest_sha256": version.manifest_sha256,
                 "protocol_id": protocol_id,
                 "protocol_sha256": protocol_sha256,
                 "init_weights_sha256": base_model.sha256 if base_model else None,
                 "seed": params.get("seed", 42),
+                "class_weight": params.get("class_weight", "none"),
+                "effective_args": result.get("effective_args"),
             }
         )
         registered = model_service.register_trained_model(
@@ -193,7 +197,8 @@ def handle_isic_train(ctx: JobContext) -> dict:
                 "best_epoch": result.get("best_epoch"),
                 "init_weights_sha256": base_model.sha256 if base_model else None,
                 "environment": result.get("environment"),
-                "research_valid": backend != "dummy",
+                "research_valid": research_valid,
+                "synthetic": synthetic,
                 "experiment_purpose": purpose,
                 "protocol_id": protocol_id,
                 "protocol_sha256": protocol_sha256,
@@ -234,7 +239,7 @@ def handle_isic_train(ctx: JobContext) -> dict:
             "backend": backend,
             "best_epoch": result.get("best_epoch"),
             "metrics": result.get("metrics"),
-            "research_valid": backend != "dummy",
+            "research_valid": research_valid,
             "experiment_purpose": purpose,
             "paper_eligible": eligibility["paper_eligible"],
             "paper_ineligible_reasons": eligibility["paper_ineligible_reasons"],
@@ -257,6 +262,7 @@ def handle_isic_evaluate(ctx: JobContext) -> dict:
     holder = _acquire_gpu(ctx)
     try:
         if run is not None:
+            ctx.lock_for_write()
             run.status = "running"
             ctx.db.commit()
         result = evaluation_service.run(
@@ -285,12 +291,6 @@ def handle_isic_evaluate(ctx: JobContext) -> dict:
             "metrics": result.get("metrics"),
             "backend": result.get("backend"),
         }
-    except Exception:
-        if run is not None:
-            run.status = "failed"
-            run.finished_at = utcnow()
-            ctx.db.commit()
-        raise
     finally:
         from app.workers.gpu import release
 

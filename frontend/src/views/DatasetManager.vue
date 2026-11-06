@@ -1,6 +1,6 @@
 <template>
   <main class="medical-page"><h1>数据版本与划分</h1>
-    <DatasetVersionPicker ref="picker" @change="change" />
+    <DatasetVersionPicker ref="picker" :initial-dataset-id="route.query.dataset" :initial-version-id="route.query.version" @change="change" />
     <div class="toolbar"><label>导出格式 <select aria-label="导出格式" v-model="exportFormat"><option value="yolo-txt">YOLO 检测标签</option><option value="yolo-seg">YOLO 多边形标签</option><option value="yolo-dataset">完整检测训练集（图片与标签）</option><option value="yolo-seg-dataset">完整多边形训练集（图片与标签）</option><option value="json">JSON 完整标注</option></select></label></div>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
     <template v-if="version"><div class="toolbar"><strong>{{ version.state }} · {{ version.asset_count }} 图</strong><label>划分种子 <input type="number" min="0" v-model.number="seed" :disabled="version.preserve_parent_splits" /></label><el-tag v-if="version.preserve_parent_splits">沿用父版本划分</el-tag><el-button type="primary" :disabled="busy || version.requires_annotation_review || !['draft','failed'].includes(version.state)" @click="act(freeze)">冻结版本</el-button><el-button :disabled="busy" @click="act(exportLabels)">{{ exportFormat === 'json' ? '导出 JSON' : exportFormat.endsWith('dataset') ? '导出训练数据集' : '导出标签 ZIP' }}</el-button><el-button v-if="artifactId" @click="act(download)">下载导出文件</el-button></div>
@@ -15,13 +15,14 @@
           <el-button :disabled="busy || processing" @click="act(tileTrain)">创建切片版本</el-button></div>
       </fieldset>
       <JobProgress :job-id="jobId" @terminal="finished" />
-      <table><thead><tr><th>图像</th><th>尺寸</th><th>来源组</th><th>split</th><th>标签数</th><th>操作</th></tr></thead><tbody><tr v-for="a in assets" :key="a.asset_id"><td>{{ a.relative_path }}</td><td>{{ a.width }} × {{ a.height }}</td><td>{{ a.source_group }}</td><td>{{ a.split || '未划分' }}</td><td>{{ a.annotations.length }}</td><td><el-button :disabled="version.state==='frozen'" @click="act(()=>remove(a))">删除图像</el-button></td></tr></tbody></table>
+      <table><thead><tr><th>图像</th><th>尺寸</th><th>来源组</th><th>split</th><th>标签数</th><th>操作</th></tr></thead><tbody><tr v-for="a in assets" :key="a.asset_id"><td>{{ a.relative_path }}</td><td>{{ a.width }} × {{ a.height }}</td><td>{{ a.source_group }}</td><td>{{ a.split || '未划分' }}</td><td>{{ a.annotations.length }}</td><td><el-button :disabled="busy || version.state==='frozen'" @click="act(()=>remove(a))">删除图像</el-button></td></tr></tbody></table>
       <el-pagination v-model:current-page="page" :page-size="8" :total="total" layout="total, prev, pager, next" @current-change="act(loadAssets)" />
     </template>
   </main>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import DatasetVersionPicker from '../components/medical/DatasetVersionPicker.vue'
 import JobProgress from '../components/medical/JobProgress.vue'
@@ -34,9 +35,30 @@ const {error,busy,act}=useTaskAction(),picker=ref(null),version=ref(null),datase
 const tileSize=ref(320),overlap=ref(.2),minVisibility=ref(.5),processing=ref(false)
 const exportFormat=ref('yolo-txt'),artifactFormat=ref('yolo-txt')
 const tileRequests=new Map()
+const route = useRoute()
+let assetGeneration = 0
+onBeforeUnmount(() => { ++assetGeneration })
 let finishedJob = ''
-async function change(data){datasetId.value=data.datasetId;version.value=data.version;seed.value=data.version?.split_config?.seed ?? 42;page.value=1;assets.value=[];if(data.version)await act(loadAssets)}
-async function loadAssets(){const data=await listAssets(datasetId.value,{version_id:version.value.version_id,page:page.value,page_size:8});assets.value=data.items;total.value=data.total}
+async function change(data) {
+  ++assetGeneration
+  datasetId.value = data.datasetId
+  version.value = data.version
+  seed.value = data.version?.split_config?.seed ?? 42
+  page.value = 1
+  assets.value = []
+  total.value = 0
+  if (data.version) await act(loadAssets)
+}
+async function loadAssets() {
+  const selectedVersion = version.value?.version_id
+  if (!selectedVersion) return
+  const ticket = ++assetGeneration
+  assets.value = []
+  const data = await listAssets(datasetId.value, { version_id: selectedVersion, page: page.value, page_size: 8 })
+  if (ticket !== assetGeneration) return
+  assets.value = data.items
+  total.value = data.total
+}
 async function freeze(){jobId.value=(await createVersion(datasetId.value,{base_version_id:version.value.version_id,split_seed:seed.value,ratios:[.8,.1,.1]})).job_id}
 async function tileTrain(){
   const payload={parent_version_id:version.value.version_id,tile_size:tileSize.value,overlap:overlap.value,min_visibility:minVisibility.value}
@@ -56,5 +78,15 @@ async function finished(job) {
   await picker.value.refresh()
 }
 async function download(){saveBlob(await getArtifact(artifactId.value),artifactFormat.value==='json'?'annotations.json':artifactFormat.value.endsWith('dataset')?'dataset.zip':'labels.zip')}
-async function remove(asset){await ElMessageBox.confirm(`删除图像 ${asset.relative_path}？`,'删除图像');await deleteAsset(asset.asset_id);await loadAssets()}
+async function remove(asset) {
+  const selectedVersion = version.value?.version_id
+  const ticket = assetGeneration
+  if (!assets.value.some(item => item.asset_id === asset.asset_id)) return
+  await ElMessageBox.confirm(`删除图像 ${asset.relative_path}？`, '删除图像')
+  if (ticket !== assetGeneration || selectedVersion !== version.value?.version_id) {
+    throw new Error('数据版本或列表已切换，请在当前列表重新选择要删除的图片')
+  }
+  await deleteAsset(asset.asset_id)
+  if (ticket === assetGeneration) await loadAssets()
+}
 </script>

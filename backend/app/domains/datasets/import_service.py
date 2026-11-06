@@ -247,6 +247,98 @@ def _iter_source_files(staging: Path) -> list[tuple[str, Path]]:
     return sorted(collected.items())
 
 
+def _load_dataset_package(files: list[tuple[str, Path]], class_map: dict, payload: dict) -> dict | None:
+    """Validate platform exports before preserving their grouping and split layout."""
+    indexed = dict(files)
+    if "manifest.json" not in indexed:
+        return None
+
+    def invalid(message):
+        raise ApiError(422, "dataset_package_invalid", message)
+
+    try:
+        manifest = json.loads(indexed["manifest.json"].read_text(encoding="utf-8"))
+        if "source_groups.json" not in indexed:
+            if isinstance(manifest, dict) and (manifest.get("package_type") == "bysj-detection-dataset" or
+                    {"assets", "dataset_id", "version_id", "class_map"}.issubset(manifest)):
+                invalid("平台导出包缺少 source_groups.json")
+            return None
+        groups = json.loads(indexed["source_groups.json"].read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        invalid(f"导出包清单无法解析: {exc}")
+    if not isinstance(manifest, dict) or manifest.get("schema_version") != 1 or not isinstance(manifest.get("assets"), list):
+        invalid("导出包 manifest 格式无效")
+    if manifest.get("class_map") != class_map or not isinstance(groups, dict):
+        invalid("导出包类别映射或来源分组无效")
+    if payload.get("source_groups") is not None and payload["source_groups"] != groups:
+        invalid("表单来源分组与导出包不一致")
+    level = manifest.get("group_level", "image_cluster")
+    if level not in {"original_image", "image_cluster"}:
+        invalid("导出包分组级别无效")
+    from app.domains.annotation.service import _validate_box
+    from app.domains.datasets.split_service import integrity_report
+
+    def geometry(annotations, polygons):
+        normalized = []
+        for annotation in annotations:
+            box = _validate_box(annotation, class_map)
+            if polygons:
+                x, y, w, h = (box[key] for key in ("cx", "cy", "w", "h"))
+                points = box.get("polygon") or [[x-w/2, y-h/2], [x+w/2, y-h/2], [x+w/2, y+h/2], [x-w/2, y+h/2]]
+                normalized.append({"class_id": box["class_id"], "polygon": [[round(value, 6) for value in point] for point in points]})
+            else:
+                normalized.append({key: box[key] for key in ("class_id", "cx", "cy", "w", "h")})
+        return sorted(normalized, key=lambda box: json.dumps(box, sort_keys=True))
+
+    splits, labels, entries = {}, set(), []
+    for item in manifest["assets"]:
+        if not isinstance(item, dict) or item.get("split") not in {"train", "val", "test"}:
+            invalid("导出包包含无效划分")
+        relative = item.get("relative_path")
+        if not isinstance(relative, str) or normalize_relative(relative).as_posix() != relative:
+            invalid("导出包图像路径无效")
+        image_path = f"images/{item['split']}/{relative}"
+        label_path = "labels/" + item["split"] + "/" + Path(relative).with_suffix(".txt").as_posix()
+        if image_path in splits or label_path in labels or image_path not in indexed or label_path not in indexed:
+            invalid("导出包图像或标签缺失、重名")
+        if sha256_file(indexed[image_path]) != item.get("sha256"):
+            invalid("导出包图像摘要不匹配")
+        group = groups.get(image_path)
+        if not isinstance(group, str) or not group.strip() or len(group) > 255:
+            invalid("导出包来源组缺失或无效")
+        report = ImportReport()
+        annotations = parse_yolo_label(indexed[label_path].read_text(encoding="utf-8"), report, label_path, class_map)
+        try:
+            polygons = any(annotation.get("polygon") for annotation in annotations)
+            if report.errors or geometry(annotations, polygons) != geometry(item.get("annotations", []), polygons):
+                invalid("导出包标签与清单不一致")
+        except (TypeError, ValueError, AttributeError) as exc:
+            invalid(f"导出包标注无效: {exc}")
+        splits[image_path] = item["split"]
+        labels.add(label_path)
+        entries.append({"sha256": item["sha256"], "source_group": group, "root_asset": group, "split": item["split"]})
+    images = {relative for relative, path in files if path.suffix.lower() in IMAGE_SUFFIXES}
+    if set(splits) != images or set(groups) != images or not images:
+        invalid("导出包清单和来源组必须精确覆盖全部图像")
+    if {relative for relative, path in files if relative.startswith("labels/") and path.suffix == ".txt"} != labels:
+        invalid("导出包含未登记标签")
+    if not integrity_report({"assets": entries})["ok"]:
+        invalid("导出包来源组或相同图像跨越不同划分")
+    config = manifest.get("split_config") or {"seed": 42, "ratios": {"train": .8, "val": .1, "test": .1}}
+    try:
+        import math
+        seed = int(config["seed"])
+        ratios = {key: float(config["ratios"][key]) for key in ("train", "val", "test")}
+        if seed < 0 or not all(math.isfinite(value) and value > 0 for value in ratios.values()):
+            invalid("导出包划分配置无效")
+    except (KeyError, TypeError, ValueError) as exc:
+        invalid(f"导出包划分配置无效: {exc}")
+    return {"groups": groups, "splits": splits, "group_level": level,
+            "config": {"seed": seed, "ratios": ratios, "group_level": level},
+            # Preserve restrictive provenance only. Uploaded claims cannot grant research eligibility.
+            "synthetic": manifest.get("synthetic") is True}
+
+
 def import_dataset(
     db: Session,
     settings: Settings,
@@ -276,12 +368,15 @@ def import_dataset(
 
     class_map = _load_class_map(staging, payload)
     annotation_map = _load_annotation_json(staging)
-    group_level = str(payload.get("group_level") or "original_image")
-    groups = payload.get('source_groups')
+    package = _load_dataset_package(files, class_map, payload)
+    if package:
+        annotation_map = {}  # Native sidecars were validated against the package manifest.
+    group_level = package["group_level"] if package else str(payload.get("group_level") or "original_image")
+    groups = package["groups"] if package else payload.get('source_groups')
     if group_level not in {'original_image', 'image_cluster'}:
         report.add_error("group_level_unsupported", "来源组只支持 original_image 或 image_cluster")
         db_raise(report)
-    if group_level == 'original_image' and groups is not None:
+    if group_level == 'original_image' and groups is not None and package is None:
         report.add_error('source_groups_unexpected', '显式分组必须使用 image_cluster，不能静默忽略分组')
         db_raise(report)
     if group_level == 'image_cluster':
@@ -320,7 +415,7 @@ def import_dataset(
             report.add_error("image_pixels", "图像像素数超过上限", relative)
             continue
         digest = sha256_file(path)
-        if digest in seen_hashes:
+        if digest in seen_hashes and package is None:
             if groups is not None and groups[relative] != groups[seen_hashes[digest]]:
                 report.add_error('source_groups_content_conflict', '完全相同内容被分配到不同来源组', relative)
             report.duplicates.append({"file": relative, "duplicate_of": seen_hashes[digest], "sha256": digest})
@@ -362,6 +457,7 @@ def import_dataset(
                 "annotations": annotations,
                 "source_group": groups[relative] if groups is not None else f"img:{digest[:16]}",
                 "label_relative": label_rel,
+                "split": package["splits"][relative] if package else None,
             }
         )
 
@@ -406,8 +502,11 @@ def import_dataset(
         root_path=str(version_dir),
         manifest_path="",
         class_map_json=class_map,
-        split_config_json={},
-        metadata_json={"source": payload, "group_level": group_level},
+        split_config_json=package["config"] if package else {},
+        metadata_json={"source": {**payload, "group_level": group_level}, "group_level": group_level, **({
+            "preserve_parent_splits": True, "synthetic": package["synthetic"],
+            "research_valid": False, "imported_package": True,
+        } if package else {})},
         content_hash="",
         created_by=owner_username,
         created_by_user_id=owner_id,
@@ -445,6 +544,7 @@ def import_dataset(
                     label_path=label_value,
                     source_group=item["source_group"],
                     group_level=group_level,
+                    split=item["split"],
                     content_hash=item["sha256"],
                     annotations_json=item["annotations"],
                 )

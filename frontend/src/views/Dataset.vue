@@ -23,7 +23,7 @@
         <div class="card-actions">
           <el-button :disabled="busy || !dataset.latest_version" @click="act(() => openDetails(dataset))">详情</el-button>
           <el-button :disabled="busy || !dataset.latest_version" @click="annotate(dataset)">标注</el-button>
-          <el-button :disabled="busy" @click="router.push('/train-dataset')">版本管理</el-button>
+          <el-button :disabled="busy || !dataset.latest_version" @click="manageVersions(dataset)">版本管理</el-button>
           <el-button :disabled="busy" @click="remove(dataset)">删除</el-button>
           <el-button :disabled="busy || dataset.latest_version?.state !== 'frozen'" @click="openDerivative('augment', [dataset.latest_version.version_id])">数据增强</el-button>
           <el-button :disabled="busy || dataset.latest_version?.state !== 'frozen'" @click="openDerivative('preannotate', [dataset.latest_version.version_id])">AI 预标注</el-button>
@@ -100,6 +100,9 @@ function searchDatasets() { page.value = 1; act(refresh) }
 function resetQuery() { query.search = ''; query.owner = ''; searchDatasets() }
 function annotate(dataset) {
   router.push({ path: '/dataset-annotation', query: { dataset: dataset.dataset_id, version: dataset.latest_version?.version_id } })
+}
+function manageVersions(dataset) {
+  router.push({ path: '/train-dataset', query: { dataset: dataset.dataset_id, version: dataset.latest_version?.version_id } })
 }
 async function openDetails(dataset) {
   selected.value = dataset

@@ -87,6 +87,12 @@ def handle_annotation_export(ctx: JobContext) -> dict:
     full_dataset = fmt.endswith("dataset")
     if full_dataset and version.state != "frozen":
         raise ApiError(409, "version_not_frozen", "完整训练集导出需要冻结版本")
+    if full_dataset:
+        export.update({"package_type": "bysj-detection-dataset",
+                       "group_level": (version.metadata_json or {}).get("group_level", "original_image"),
+                       "split_config": version.split_config_json,
+                       "synthetic": bool((version.metadata_json or {}).get("synthetic")),
+                       "research_valid": False})
     if fmt == "json":
         path = directory / "annotations.json"
         atomic_write_bytes(path, json.dumps(export, ensure_ascii=False, indent=2).encode("utf-8"))

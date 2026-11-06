@@ -25,10 +25,18 @@
           <el-form label-width="130px">
             <el-form-item label="冻结版本"><el-select v-model="versionId"><el-option v-for="dataset in datasets.filter(item => item.latest_version?.state === 'frozen')" :key="dataset.dataset_id" :label="dataset.name" :value="dataset.latest_version.version_id" /></el-select></el-form-item>
             <el-form-item label="初始骨干"><el-select v-model="baseModelId" clearable><el-option v-for="model in backbones" :key="model.model_id" :label="model.name" :value="model.model_id" /></el-select></el-form-item>
-            <el-form-item label="训练轮数"><el-input-number v-model="epochs" :min="1" :max="50" /></el-form-item>
-            <el-form-item label="批次大小"><el-input-number v-model="batch" :min="1" :max="128" /></el-form-item>
-            <el-form-item label="学习率"><el-input-number v-model="lr" :min=".000001" :max=".1" :step=".0001" :precision="6" /></el-form-item>
             <el-form-item label="实验用途"><el-radio-group v-model="purpose"><el-radio label="smoke">工程验证</el-radio><el-radio label="formal">正式协议</el-radio></el-radio-group></el-form-item>
+            <el-alert v-if="purpose === 'formal'" title="正式实验采用冻结协议参数。请选择主臂或对照臂及预登记种子，训练前需通过服务端预检。" type="info" :closable="false" />
+            <el-form-item label="训练轮数"><el-input-number v-model="trainingParams.epochs" :disabled="purpose === 'formal'" :min="1" :max="50" /></el-form-item>
+            <el-form-item label="批次大小"><el-input-number v-model="trainingParams.batch" :disabled="purpose === 'formal'" :min="1" :max="128" /></el-form-item>
+            <el-form-item label="学习率"><el-input-number v-model="trainingParams.lr" :disabled="purpose === 'formal'" :min=".000001" :max=".1" :step=".0001" :precision="6" /></el-form-item>
+            <el-form-item label="随机种子"><el-select v-if="purpose === 'formal'" v-model="trainingParams.seed"><el-option v-for="seed in [42,43,44]" :key="seed" :value="seed" :label="String(seed)" /></el-select><el-input-number v-else v-model="trainingParams.seed" :min="0" :max="2147483647" /></el-form-item>
+            <el-form-item label="对照臂 / 类别权重"><el-select v-model="trainingParams.class_weight"><el-option label="A 主臂 · 平衡类别权重" value="balanced" /><el-option label="B 对照臂 · 无类别权重" value="none" /></el-select></el-form-item>
+            <el-form-item label="早停耐心值"><el-input-number v-model="trainingParams.patience" :disabled="purpose === 'formal'" :min="1" :max="20" /></el-form-item>
+            <el-form-item label="图像尺寸"><el-input-number v-model="trainingParams.image_size" :disabled="purpose === 'formal'" :min="128" :max="512" /></el-form-item>
+            <el-form-item label="权重衰减"><el-input-number v-model="trainingParams.weight_decay" :disabled="purpose === 'formal'" :min="0" :max=".1" :step=".0001" :precision="6" /></el-form-item>
+            <el-form-item label="混合精度 AMP"><el-switch v-model="trainingParams.amp" :disabled="purpose === 'formal'" /></el-form-item>
+            <el-form-item label="执行设置"><span>GPU {{ trainingParams.device }} · 数据加载进程 {{ trainingParams.num_workers }}</span></el-form-item>
             <template v-if="purpose === 'formal'"><el-form-item label="协议 ID"><el-input v-model="protocolId" /></el-form-item><el-form-item label="协议 SHA256"><el-input v-model="protocolHash" /></el-form-item></template>
             <el-form-item><el-button :disabled="busy || !versionId" @click="act(preflight)">训练预检</el-button><el-button type="primary" :disabled="busy || !report?.ok || checkedRequest !== requestKey" @click="act(train)">提交训练</el-button></el-form-item>
           </el-form>
@@ -53,7 +61,7 @@
   </section>
 </template>
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { api, getCurrentUser } from '../api/client'
 import JobProgress from '../components/medical/JobProgress.vue'
 import { useTaskAction } from '../composables/useTaskAction'
@@ -62,12 +70,20 @@ const isAdmin = getCurrentUser()?.role === 'admin'
 const tab = ref('data'), schema = ref({}), datasets = ref([]), page = ref(1), total = ref(0)
 const models = ref([]), backbones = ref([]), evaluations = ref([]), detail = ref(null), jobId = ref('')
 const sourceId = ref(''), sourceSplit = ref('train'), licenseNote = ref('')
-const versionId = ref(''), baseModelId = ref(''), epochs = ref(1), batch = ref(16), lr = ref(.0003)
+const versionId = ref(''), baseModelId = ref('')
+const trainingParams = reactive({ epochs: 1, batch: 16, lr: .0003, seed: 42, device: '0',
+  class_weight: 'none', patience: 5, image_size: 224, weight_decay: .0001, amp: false, num_workers: 0 })
 const purpose = ref('smoke'), protocolId = ref(''), protocolHash = ref(''), report = ref(null), checkedRequest = ref('')
+watch(purpose, value => {
+  report.value = null
+  checkedRequest.value = ''
+  if (value === 'formal') Object.assign(trainingParams, { epochs: 30, batch: 16, lr: .0003, seed: 42,
+    device: '0', class_weight: 'balanced', patience: 8, image_size: 224, weight_decay: .0001, amp: true, num_workers: 0 })
+}, { flush: 'sync' })
 const evaluationModel = ref(''), evaluationSplit = ref('val'), evaluationPurpose = ref('')
 const request = computed(() => ({
   dataset_version_id: versionId.value, base_model_id: baseModelId.value || null,
-  params: { epochs: epochs.value, batch: batch.value, lr: lr.value, seed: 42, device: '0' },
+  params: { ...trainingParams },
   experiment_purpose: purpose.value,
   protocol_id: purpose.value === 'formal' ? protocolId.value : null,
   protocol_sha256: purpose.value === 'formal' ? protocolHash.value : null,

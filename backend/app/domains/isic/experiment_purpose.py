@@ -32,6 +32,10 @@ FORMAL_PROTOCOL_SHA256 = "40064e0639e7e66727e94c2c90133253da991be55dc963615dd0f8
 FORMAL_DATASET_MANIFEST_SHA256 = "8f5b609c6197792adf7cc71f79236338fd11c47b6fab85bc3fe51d20b2c563ae"
 #: 预登记 seed；其他 seed 的正式产物不具备论文资格。
 FORMAL_SEEDS: tuple[int, ...] = (42, 43, 44)
+FORMAL_PARAMS = {
+    "epochs": 30, "batch": 16, "image_size": 224, "lr": 0.0003,
+    "weight_decay": 0.0001, "patience": 8, "num_workers": 0, "amp": True,
+}
 
 _DUMMY_BACKENDS = frozenset({"dummy", "none", ""})
 
@@ -75,6 +79,23 @@ def is_paper_eligible(metadata: dict | None) -> bool:
     return bool(paper_eligibility(metadata)["paper_eligible"])
 
 
+def validate_formal_params(params: object) -> list[str]:
+    """Check submitted or actually executed parameters against frozen protocol v1."""
+    if not isinstance(params, dict):
+        return ["formal_params_missing"]
+    reasons = []
+    for name, expected in FORMAL_PARAMS.items():
+        value = params.get(name)
+        if value != expected or (isinstance(value, bool) != isinstance(expected, bool)):
+            reasons.append(f"formal_param_{name}_mismatch")
+    if params.get("class_weight") not in ("none", "balanced"):
+        reasons.append("formal_param_class_weight_mismatch")
+    seed = params.get("seed")
+    if not isinstance(seed, int) or isinstance(seed, bool) or seed not in FORMAL_SEEDS:
+        reasons.append("seed_not_preregistered")
+    return reasons
+
+
 def paper_eligibility(metadata: dict | None) -> dict:
     """计算论文资格。返回 `paper_eligible` 与逐条 `reasons`（原因码，可用于展示）。"""
     meta = metadata or {}
@@ -106,12 +127,21 @@ def paper_eligibility(metadata: dict | None) -> dict:
         seed = meta.get("seed")
         if not isinstance(seed, int) or isinstance(seed, bool) or seed not in FORMAL_SEEDS:
             reasons.append("seed_not_preregistered")
+        effective = meta.get("effective_args")
+        if not isinstance(effective, dict):
+            reasons.append("effective_args_missing")
+        else:
+            reasons.extend(validate_formal_params(effective))
+            if effective.get("seed") != seed:
+                reasons.append("effective_seed_mismatch")
+            if effective.get("class_weight") != meta.get("class_weight"):
+                reasons.append("effective_class_weight_mismatch")
 
     return {
         "paper_eligible": not reasons,
         "experiment_purpose": purpose or None,
         "protocol_id": FORMAL_PROTOCOL_ID,
-        "reasons": reasons,
+        "reasons": list(dict.fromkeys(reasons)),
     }
 
 

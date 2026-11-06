@@ -288,6 +288,7 @@ def _train(request: dict) -> dict:
         "history": history,
         "effective_args": {
             "epochs": max_epochs,
+            "patience": patience,
             "batch": batch_size,
             "image_size": image_size,
             "lr": float(params.get("lr", 3e-4)),

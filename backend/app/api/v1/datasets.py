@@ -511,19 +511,21 @@ def update_class_map(
     used = {str(box["class_id"]) for asset in assets for box in (asset.annotations_json or [])}
     if not used.issubset(classes):
         raise ApiError(409, "class_referenced", "待删除类别仍被标注引用，请先修改对应标注")
+    from app.domains.annotation.service import advance_revision
+    revision = advance_revision(db, version)
     version.class_map_json = classes
     resource = db.get(DatasetResource, version.dataset_id)
     owners = db.query(User).filter((User.role == "admin") | (User.id == resource.owner_user_id)).all()
     drafts = db.query(AnnotationDraft).filter_by(source_version_id=version.id).all()
     for draft in drafts:
-        draft.revision += 1
+        draft.revision = revision
         draft.class_names_json = list(classes.values())
     existing = {draft.owner_user_id for draft in drafts if draft.annotation_geometry == "rect"}
     for owner in owners:
         if owner.id not in existing:
             db.add(AnnotationDraft(owner_user_id=owner.id, owner_username=owner.username,
                 dataset_id=version.dataset_id, source_version_id=version.id, annotation_geometry="rect",
-                class_names_json=list(classes.values()), revision=1))
+                class_names_json=list(classes.values()), revision=revision))
     db.commit()
     return ok(version_dict(version), message="类别已更新")
 

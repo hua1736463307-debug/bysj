@@ -15,12 +15,14 @@ from app.domains.isic.experiment_purpose import (
     FORMAL_DATASET_MANIFEST_SHA256,
     FORMAL_PROTOCOL_ID,
     FORMAL_PROTOCOL_SHA256,
+    FORMAL_PARAMS,
     eligibility_metadata,
     is_paper_eligible,
     normalize_purpose,
     paper_eligibility,
     validate_formal_dataset,
     validate_formal_protocol,
+    validate_formal_params,
 )
 
 FORMAL_META = {
@@ -33,6 +35,8 @@ FORMAL_META = {
     "protocol_sha256": FORMAL_PROTOCOL_SHA256,
     "init_weights_sha256": "a" * 64,
     "seed": 42,
+    "class_weight": "balanced",
+    "effective_args": {**FORMAL_PARAMS, "seed": 42, "class_weight": "balanced"},
 }
 
 
@@ -48,6 +52,35 @@ def test_formal_fully_bound_metadata_is_eligible():
     report = paper_eligibility(dict(FORMAL_META))
     assert report["paper_eligible"] is True, report["reasons"]
     assert report["reasons"] == []
+
+
+@pytest.mark.parametrize("name,value", [
+    ("epochs", 1), ("batch", 8), ("lr", .001), ("weight_decay", 0),
+    ("patience", 5), ("amp", False), ("image_size", 256), ("num_workers", 1),
+    ("seed", 7), ("class_weight", "custom"),
+])
+def test_formal_rejects_unregistered_requested_and_effective_params(name, value):
+    params = {**FORMAL_META["effective_args"], name: value}
+    assert validate_formal_params(params)
+    assert not paper_eligibility({**FORMAL_META, "effective_args": params})["paper_eligible"]
+
+
+def test_historical_formal_without_effective_args_is_ineligible():
+    old = {key: value for key, value in FORMAL_META.items() if key != "effective_args"}
+    assert "effective_args_missing" in paper_eligibility(old)["reasons"]
+    partial = {**FORMAL_META["effective_args"]}
+    partial.pop("patience")
+    assert not paper_eligibility({**FORMAL_META, "effective_args": partial})["paper_eligible"]
+
+
+def test_effective_protocol_arm_and_seed_must_match_metadata():
+    assert not paper_eligibility({**FORMAL_META, "seed": 43})["paper_eligible"]
+    assert not paper_eligibility({**FORMAL_META, "class_weight": "none"})["paper_eligible"]
+    for seed in (42, 43, 44):
+        for weight in ("none", "balanced"):
+            meta = {**FORMAL_META, "seed": seed, "class_weight": weight,
+                    "effective_args": {**FORMAL_PARAMS, "seed": seed, "class_weight": weight}}
+            assert paper_eligibility(meta)["paper_eligible"]
 
 
 def test_smoke_is_never_paper_eligible_even_when_research_valid():
@@ -137,6 +170,19 @@ def test_preflight_formal_without_protocol_fails(client, admin_headers):
     assert checks["formal_protocol"]["status"] == "fail"
     assert "frozen_protocol_missing" in checks["formal_protocol"]["detail"]
     assert report["ok"] is False
+
+
+def test_preflight_formal_checks_budget_even_with_valid_protocol(client, admin_headers):
+    response = client.post('/api/v1/isic/training/preflight', headers=admin_headers, json={
+        'dataset_version_id': 'missing', 'base_model_id': 'missing',
+        'experiment_purpose': 'formal', 'protocol_id': FORMAL_PROTOCOL_ID,
+        'protocol_sha256': FORMAL_PROTOCOL_SHA256,
+        'params': {**FORMAL_META['effective_args'], 'epochs': 1},
+    })
+    assert response.status_code == 200
+    gate = next(item for item in response.json()['data']['checks'] if item['name'] == 'formal_protocol')
+    assert gate['status'] == 'fail'
+    assert 'formal_param_epochs_mismatch' in gate['detail']
 
 
 def test_preflight_rejects_unknown_purpose(client, admin_headers):

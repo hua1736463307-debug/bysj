@@ -25,8 +25,10 @@ from app.domains.isic.experiment_purpose import (
     normalize_purpose,
     validate_formal_dataset,
     validate_formal_protocol,
+    validate_formal_params,
 )
 from app.domains.models import service as model_service
+from app.domains.datasets import service as dataset_service
 from app.ml.isic_adapter import get_isic_adapter
 from app.schemas.isic import ISIC_CLASS_KEYS, ISIC_BACKBONE_TASK, IsicTrainingParams
 
@@ -50,13 +52,9 @@ def load_manifest(version: DatasetVersion) -> dict:
     return payload
 
 
-def get_version(db: Session, version_id: str) -> tuple[DatasetVersion, DatasetResource]:
-    version = db.get(DatasetVersion, version_id)
-    if version is None or version.deleted_at is not None:
-        raise ApiError(404, "not_found", "数据版本不存在")
-    resource = db.get(DatasetResource, version.dataset_id)
-    if resource is None or resource.deleted_at is not None:
-        raise ApiError(404, "not_found", "数据集不存在")
+def get_version(db: Session, version_id: str, user: CurrentUser) -> tuple[DatasetVersion, DatasetResource]:
+    version = dataset_service.get_version(db, version_id, user)
+    resource = dataset_service.get_dataset(db, version.dataset_id, user)
     if resource.task_type != ISIC_TASK:
         raise ApiError(409, "task_mismatch", "该数据集不是皮肤镜数据集")
     return version, resource
@@ -72,7 +70,7 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         checks.append({"name": "dataset_version", "status": "fail", "detail": "必须提供 dataset_version_id"})
     else:
         try:
-            version, _resource = get_version(db, version_id)
+            version, _resource = get_version(db, version_id, user)
         except ApiError as exc:
             checks.append({"name": "dataset_version", "status": "fail", "detail": exc.message})
         else:
@@ -151,10 +149,8 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
 
     if purpose == EXPERIMENT_PURPOSE_FORMAL:
         formal_reasons = validate_formal_protocol(payload.get("protocol_id"), payload.get("protocol_sha256"))
-        if payload.get("dataset_version_id"):
-            version_for_dataset = db.get(DatasetVersion, payload["dataset_version_id"])
-            if version_for_dataset is not None:
-                formal_reasons.extend(validate_formal_dataset(version_for_dataset.manifest_sha256))
+        formal_reasons.extend(validate_formal_params(params))
+        formal_reasons.extend(validate_formal_dataset(version.manifest_sha256 if version else None))
         if not payload.get("base_model_id"):
             formal_reasons.append("base_model_id_missing")
         checks.append(
@@ -168,8 +164,11 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
     base_model: ModelRegistry | None = None
     base_id = payload.get("base_model_id")
     if base_id:
-        base_model = db.get(ModelRegistry, base_id)
-        if base_model is None or base_model.status != "active":
+        try:
+            base_model = model_service.get_model(db, base_id, user)
+        except ApiError:
+            base_model = None
+        if base_model is None:
             checks.append({"name": "base_model", "status": "fail", "detail": "初始权重模型不存在或未启用"})
         elif base_model.model_task != ISIC_BACKBONE_TASK:
             checks.append(

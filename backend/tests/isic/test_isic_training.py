@@ -318,3 +318,90 @@ def test_cxr_model_cannot_be_used_for_isic_evaluation(client, admin_headers, set
     )
     assert response.status_code == 422
     assert response.json()["code"] == "isic_evaluation_preflight_failed"
+
+
+def test_isic_private_resources_require_owner(client, admin_headers, researcher_headers, researcher, isic_version, db):
+    from app.db.models import DatasetResource, ModelRegistry, JobTask
+    model_id = _train_model(client, admin_headers, isic_version["version_id"], "owner-model")
+    request = {"dataset_version_id": isic_version["version_id"], "params": {"epochs": 1}}
+    preflight = client.post('/api/v1/isic/training/preflight', headers=researcher_headers, json=request)
+    assert preflight.json()['data']['ok'] is False
+    assert client.post('/api/v1/isic/training/jobs', json=request,
+                       headers={**researcher_headers, 'Idempotency-Key': 'other-data'}).status_code == 422
+    # Owning the dataset alone must not grant use of another owner's trained model.
+    resource = db.get(DatasetResource, isic_version['dataset_id'])
+    resource.owner_user_id = researcher.id
+    db.commit()
+    evaluation = {'model_id': model_id, 'dataset_version_id': isic_version['version_id'], 'split': 'val'}
+    assert client.post('/api/v1/isic/evaluations', json=evaluation,
+                       headers={**researcher_headers, 'Idempotency-Key': 'other-model'}).status_code == 422
+    model = db.get(ModelRegistry, model_id)
+    model.model_task = 'isic_backbone'
+    db.commit()
+    request['base_model_id'] = model_id
+    assert not client.post('/api/v1/isic/training/preflight', json=request,
+                           headers=researcher_headers).json()['data']['ok']
+    model.trusted_source = 'base'
+    db.commit()
+    assert client.post('/api/v1/isic/training/preflight', json=request,
+                       headers=researcher_headers).json()['data']['ok']
+    assert db.query(JobTask).filter(JobTask.owner_id == str(researcher.id)).count() == 0
+
+
+def test_isic_evaluation_retry_keeps_one_run(client, admin_headers, isic_version, db):
+    from app.db.models import EvaluationRun
+    model_id = _train_model(client, admin_headers, isic_version['version_id'], 'retry-model')
+    payload = {'model_id': model_id, 'dataset_version_id': isic_version['version_id'], 'split': 'val'}
+    headers = {**admin_headers, 'Idempotency-Key': 'retry-evaluation'}
+    first = client.post('/api/v1/isic/evaluations', headers=headers, json=payload)
+    second = client.post('/api/v1/isic/evaluations', headers=headers, json=payload)
+    assert first.status_code == second.status_code == 202, second.text
+    assert first.json()['data']['job_id'] == second.json()['data']['job_id']
+    assert db.query(EvaluationRun).count() == 1
+    changed = client.post('/api/v1/isic/evaluations', headers=headers, json={**payload, 'split': 'calibration'})
+    assert changed.status_code == 409
+    assert db.query(EvaluationRun).count() == 1
+
+
+def test_isic_running_cancel_updates_evaluation(client, admin_headers, isic_version, db, monkeypatch):
+    from app.db.models import JobTask, EvaluationRun
+    from app.db.session import get_session_factory
+    from app.domains import job_service
+    from app.domains.isic import evaluation_service
+    model_id = _train_model(client, admin_headers, isic_version['version_id'], 'cancel-model')
+    def cancel_run(settings, session, *, job_id, should_stop, **kwargs):
+        with get_session_factory()() as other:
+            job_service.cancel_job(other, other.get(JobTask, job_id))
+        should_stop()
+        raise AssertionError('cancel must stop execution')
+    monkeypatch.setattr(evaluation_service, 'run', cancel_run)
+    response = client.post('/api/v1/isic/evaluations', headers={**admin_headers, 'Idempotency-Key': 'cancel-eval'},
+        json={'model_id': model_id, 'dataset_version_id': isic_version['version_id'], 'split': 'val'})
+    assert response.status_code == 202, response.text
+    assert response.json()['data']['status'] == 'cancelled'
+    run = db.query(EvaluationRun).one()
+    assert run.status == 'cancelled' and run.finished_at is not None
+
+
+def test_stale_isic_evaluator_cannot_overwrite_new_attempt(client, admin_headers, isic_version, db, monkeypatch):
+    from app.db.models import JobTask, EvaluationRun
+    from app.db.session import get_session_factory
+    from app.domains.isic import evaluation_service
+    model_id = _train_model(client, admin_headers, isic_version['version_id'], 'stale-model')
+    def replace_attempt(settings, session, *, job_id, should_stop, **kwargs):
+        with get_session_factory()() as other:
+            job = other.get(JobTask, job_id)
+            job.attempt += 1
+            job.lease_owner = 'new-worker'
+            run = other.get(EvaluationRun, job.input_json['evaluation_id'])
+            run.status = 'completed'
+            run.metrics_json = {'new_attempt': True}
+            other.commit()
+        should_stop()
+        raise AssertionError('stale attempt must stop execution')
+    monkeypatch.setattr(evaluation_service, 'run', replace_attempt)
+    response = client.post('/api/v1/isic/evaluations', headers={**admin_headers, 'Idempotency-Key': 'stale-eval'},
+        json={'model_id': model_id, 'dataset_version_id': isic_version['version_id'], 'split': 'val'})
+    assert response.status_code == 202, response.text
+    run = db.query(EvaluationRun).one()
+    assert run.status == 'completed' and run.metrics_json == {'new_attempt': True}

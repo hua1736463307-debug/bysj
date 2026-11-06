@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import uuid
 from datetime import timedelta
 from typing import Any, Iterable
 
@@ -29,6 +30,7 @@ def _sync_domain_state(db: Session, job: JobTask, status: str) -> None:
         "inference": (InferenceRun, "run_id"),
         "evaluation": (EvaluationRun, "evaluation_id"),
         "cxr_evaluate": (EvaluationRun, "evaluation_id"),
+        "isic_evaluate": (EvaluationRun, "evaluation_id"),
         "cxr_analyze": (CxrAnalysisBatch, "batch_id"),
     }
     model, key = mapping.get(job.type, (None, None))
@@ -128,6 +130,60 @@ def create_job(
     db.refresh(job)
     append_event(db, job, "created", "任务已创建", {"type": job_type})
     return job, True
+
+
+def create_evaluation_job(
+    db: Session, *, job_type: str, owner_id: int, owner_username: str,
+    evaluation: EvaluationRun, payload: dict, idempotency_key: str,
+) -> tuple[JobTask, bool]:
+    """Create the evaluation and its job together, retaining historical random IDs."""
+    existing_job = db.query(JobTask).filter(
+        JobTask.owner_id == str(owner_id), JobTask.type == job_type,
+        JobTask.idempotency_key == idempotency_key,
+    ).one_or_none()
+    run_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"bysj:{job_type}:{owner_id}:{idempotency_key}"))
+    if existing_job is not None:
+        previous = dict(existing_job.input_json or {})
+        run_id = previous.pop("evaluation_id", None)
+        if not run_id or canonical_hash(previous) != canonical_hash(payload):
+            raise ApiError(409, "idempotency_conflict", "相同幂等键对应了不同评价请求")
+
+    run = db.get(EvaluationRun, run_id)
+    if run is not None:
+        fields = ("owner_id", "model_id", "dataset_version_id", "split", "purpose", "params_json", "context_hash")
+        if any(getattr(run, field) != getattr(evaluation, field) for field in fields):
+            raise ApiError(409, "idempotency_conflict", "相同幂等键对应了不同评价记录")
+    elif existing_job is not None:
+        raise ApiError(409, "evaluation_missing", "已有评价任务缺少评价记录")
+    else:
+        evaluation.id = run_id
+        run = evaluation
+        db.add(run)
+
+    if existing_job is not None:
+        if run.job_id is None:
+            run.job_id = existing_job.id
+            db.commit()
+        return existing_job, False
+    try:
+        # create_job commits both rows. A concurrent insertion rolls back both,
+        # then reuses the winning job through its existing unique-key handling.
+        with db.no_autoflush:
+            job, created = create_job(
+                db, job_type=job_type, owner_id=owner_id, owner_username=owner_username,
+                payload={**payload, "evaluation_id": run_id}, idempotency_key=idempotency_key,
+            )
+    except Exception:
+        db.rollback()
+        raise
+    if not created and evaluation in db.new:
+        # The other request may have committed between our first lookup and
+        # create_job's lookup, before this session attempted any INSERT.
+        db.expunge(evaluation)
+    run = db.get(EvaluationRun, run_id)
+    run.job_id = job.id
+    db.commit()
+    return job, created
 
 
 def append_event(

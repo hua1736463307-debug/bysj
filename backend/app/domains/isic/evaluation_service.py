@@ -39,7 +39,7 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
         checks.append({"name": "dataset_version", "status": "fail", "detail": "必须提供 dataset_version_id"})
     else:
         try:
-            version, _resource = training_service.get_version(db, version_id)
+            version, _resource = training_service.get_version(db, version_id, user)
         except ApiError as exc:
             checks.append({"name": "dataset_version", "status": "fail", "detail": exc.message})
         else:
@@ -71,8 +71,11 @@ def preflight(db: Session, settings: Settings, user: CurrentUser, payload: dict)
     if not model_id:
         checks.append({"name": "model", "status": "fail", "detail": "必须提供 model_id"})
     else:
-        model = db.get(ModelRegistry, model_id)
-        if model is None or model.status != "active":
+        try:
+            model = model_service.get_model(db, model_id, user)
+        except ApiError:
+            model = None
+        if model is None:
             checks.append({"name": "model", "status": "fail", "detail": "模型不存在或未启用"})
         elif model.model_task != ISIC_MODEL_TASK:
             checks.append(
@@ -158,12 +161,10 @@ def create_evaluation_job(
         },
         context_hash=context_hash,
     )
-    db.add(run)
-    db.flush()
-
-    job, created = job_service.create_job(
+    job, created = job_service.create_evaluation_job(
         db,
         job_type="isic_evaluate",
+        evaluation=run,
         owner_id=user.id,
         owner_username=user.username,
         payload={
@@ -171,14 +172,11 @@ def create_evaluation_job(
             "model_id": report["model_id"],
             "split": report["split"],
             "purpose": purpose,
-            "evaluation_id": run.id,
             "label_schema": ISIC_LABEL_SCHEMA,
             "class_order": list(ISIC_CLASS_KEYS),
         },
         idempotency_key=idempotency_key,
     )
-    run.job_id = job.id
-    db.commit()
     return job, created
 
 

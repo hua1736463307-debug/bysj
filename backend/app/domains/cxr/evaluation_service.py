@@ -110,17 +110,13 @@ def create_evaluation_job(
         context_hash=checked["context_hash"],
         approved_by=user.username if checked["split"] == "test" else None,
     )
-    db.add(run)
-    db.commit()
-    db.refresh(run)
-
-    job, created = job_service.create_job(
+    job, created = job_service.create_evaluation_job(
         db,
         job_type="cxr_evaluate",
+        evaluation=run,
         owner_id=user.id,
         owner_username=user.username,
         payload={
-            "evaluation_id": run.id,
             "model_id": checked["model"].id,
             "dataset_version_id": checked["version"].id,
             "split": checked["split"],
@@ -131,9 +127,6 @@ def create_evaluation_job(
         },
         idempotency_key=idempotency_key,
     )
-    if run.job_id != job.id:
-        run.job_id = job.id
-        db.commit()
     return job, created
 
 
