@@ -53,7 +53,9 @@ def legacy_source(pg_engine, tmp_path):
         for asset in assets:
             conn.execute(metadata.tables["dataset_assets"].insert().values(**{k:v for k,v in asset.items() if k!="split"}))
         conn.execute(metadata.tables["annotation_drafts"].insert().values(id=draft_id,owner_user_id=7,owner_username="legacy-researcher",dataset_id="legacy-bccd",source_version_id=version_id,annotation_kind="manual",model_path="",model_name="",revision=7,class_names_json=["RBC"]))
-        conn.execute(metadata.tables["annotation_draft_assets"].insert().values(id=91,draft_id=draft_id,relative_path=assets[0]["relative_path"],width=40,height=30,annotations_json=annotations))
+        # A private legacy draft may differ from the frozen dataset labels.
+        draft_annotations = [{**annotations[0], "width": .1}]
+        conn.execute(metadata.tables["annotation_draft_assets"].insert().values(id=91,draft_id=draft_id,relative_path=assets[0]["relative_path"],width=40,height=30,annotations_json=draft_annotations))
         conn.execute(metadata.tables["job_tasks"].insert().values(id=job_id,type="training",status="completed",owner_id="7",owner_username="legacy-researcher",input_json={"dataset_version_id":version_id},result_json={"model_id":model_id}))
         conn.execute(metadata.tables["job_events"].insert().values(id=81,task_id=job_id,sequence=1,event_type="completed",message="legacy complete"))
         conn.execute(metadata.tables["model_registry"].insert().values(id=model_id,name="legacy-best",path=str(weight),sha256=weight_hash,size=weight.stat().st_size,source="training",task_id=job_id,dataset_version_id=version_id,created_by="legacy-researcher"))
@@ -113,7 +115,7 @@ def test_offline_legacy_copy_preserves_identity_files_and_api(sessions, legacy_s
         assert manifest["split_seed"] == 0
         assert {a["split"] for a in manifest["assets"]} == {"train","val","test"}
         assert target.get(AnnotationDraft,old["draft"]).revision == 7
-        assert target.get(AnnotationDraftAsset,91).annotations_json[0]["w"] == .2
+        assert target.get(AnnotationDraftAsset,91).annotations_json[0]["w"] == .1
         assert target.get(ModelRegistry,old["model"]).sha256 == old["weight_hash"]
         assert target.get(DatasetAsset,101).annotations_json[0]["h"] == .4
         # Serial sequences must advance beyond preserved integer IDs.
@@ -131,7 +133,23 @@ def test_offline_legacy_copy_preserves_identity_files_and_api(sessions, legacy_s
         headers={"Authorization":"Bearer "+login.json()["data"]["token"]}
         assert client.get('/api/v1/dataset-versions/'+old["version"],headers=headers).json()["data"]["state"]=="frozen"
         annotation=client.get('/api/v1/annotations/101',headers=headers).json()["data"]
-        assert annotation["revision"]==7 and annotation["annotations"][0]["cx"]==.5
+        # First access initializes the shared CAS token beyond every legacy
+        # private token, while preserving those historical drafts verbatim.
+        assert annotation["revision"] == 8 and annotation["editable"] is False
+        assert annotation["annotations"][0]["cx"] == .5
+        assert annotation["annotations"][0]["w"] == .2
+        assert annotation["annotations"][0]["h"] == .4
+        assert client.get('/api/v1/annotations/101', headers=headers).json()["data"]["revision"] == 8
+        frozen_write = client.put('/api/v1/annotations/101', headers=headers,
+                                  json={"expected_revision": 8, "boxes": []})
+        assert frozen_write.status_code == 409
+        with sessions() as target:
+            assert target.get(AnnotationDraft, old["draft"]).revision == 7
+            assert target.get(AnnotationDraftAsset, 91).annotations_json[0]["w"] == .1
+            current = target.get(DatasetVersion, old["version"])
+            assert current.state == "frozen"
+            assert current.metadata_json["annotation_revision"] == {"version_id": current.id, "value": 8}
+            assert json.loads(Path(current.manifest_path).read_text()) == manifest
         image=client.get('/api/v1/assets/101/image',headers=headers)
         assert image.status_code==200 and hashlib.sha256(image.content).hexdigest()==old["assets"][0]["content_hash"]
         weight=client.get('/api/v1/models/'+old["model"]+'/download',headers=headers)
